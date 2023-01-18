@@ -1,10 +1,10 @@
-local candran = {
+local lepton = {
 	VERSION = "1.0.0"
 }
-package.loaded["candran"] = candran
+package.loaded["lepton"] = lepton
 
-#import("candran.util")
-#import("candran.serpent")
+#import("lepton.util")
+#import("lepton.serpent")
 
 #import("compiler.lua54")
 #import("compiler.lua53")
@@ -12,15 +12,15 @@ package.loaded["candran"] = candran
 #import("compiler.luajit")
 #import("compiler.lua51")
 
-#import("candran.can-parser.scope")
-#import("candran.can-parser.validator")
-#import("candran.can-parser.pp")
-#import("candran.can-parser.parser")
+#import("lepton.lpt-parser.scope")
+#import("lepton.lpt-parser.validator")
+#import("lepton.lpt-parser.pp")
+#import("lepton.lpt-parser.parser")
 
 local unpack = unpack or table.unpack
 
 --- Default options.
-candran.default = {
+lepton.default = {
 	target = "lua54",
 	indentation = "",
 	newline = "\n",
@@ -36,14 +36,14 @@ candran.default = {
 -- Autodetect version
 if _VERSION == "Lua 5.1" then
 	if package.loaded.jit then
-		candran.default.target = "luajit"
+		lepton.default.target = "luajit"
 	else
-		candran.default.target = "lua51"
+		lepton.default.target = "lua51"
 	end
 elseif _VERSION == "Lua 5.2" then
-	candran.default.target = "lua52"
+	lepton.default.target = "lua52"
 elseif _VERSION == "Lua 5.3" then
-	candran.default.target = "lua53"
+	lepton.default.target = "lua53"
 end
 
 --- Run the preprocessor
@@ -53,8 +53,8 @@ end
 -- @treturn[1] macros registered macros
 -- @treturn[2] nil nil if error
 -- @treturn[2] error string error message
-function candran.preprocess(input, options={}, _env)
-	options = util.merge(candran.default, options)
+function lepton.preprocess(input, options={}, _env)
+	options = util.merge(lepton.default, options)
 	local macros = {
 		functions = {},
 		variables = {}
@@ -100,11 +100,11 @@ function candran.preprocess(input, options={}, _env)
 	-- make preprocessor environement
 	local exportenv = {}
 	local env = util.merge(_G, options.preprocessorEnv)
-	--- Candran library table
-	env.candran = candran
+	--- lepton library table
+	env.lepton = lepton
 	--- Current preprocessor output
 	env.output = ""
-	--- Import an external Candran/Lua module into the generated file
+	--- Import an external lepton/Lua module into the generated file
 	-- Notable options:
 	-- * loadLocal (true): true to automatically load the module into a local variable
 	-- * loadPackage (true): true to automatically load the module into the loaded packages table
@@ -119,7 +119,7 @@ function candran.preprocess(input, options={}, _env)
 
 		margs = util.merge(options, { chunkname = filepath, loadLocal = true, loadPackage = true }, margs)
 		margs.import = {} -- no need for recursive import
-		local modcontent, modmacros, modenv = assert(candran.preprocess(f:read("*a"), margs))
+		local modcontent, modmacros, modenv = assert(lepton.preprocess(f:read("*a"), margs))
 		macros = util.recmerge(macros, modmacros)
 		for k, v in pairs(modenv) do env[k] = v end
 		f:close()
@@ -194,19 +194,19 @@ function candran.preprocess(input, options={}, _env)
 	-- default macros
 	if options.builtInMacros then
 		env.define("__STR__(x)", function(x) return ("%q"):format(x) end)
-		local s = require("candran.serpent")
+		local s = require("lepton.serpent")
 		env.define("__CONSTEXPR__(expr)", function(expr)
-			return s.block(assert(candran.load(expr))(), {fatal = true})
+			return s.block(assert(lepton.load(expr))(), {fatal = true})
 		end)
 	end
 
 	-- compile & load preprocessor
-	local preprocess, err = candran.compile(preprocessor, options)
+	local preprocess, err = lepton.compile(preprocessor, options)
 	if not preprocess then
 		return nil, "in preprocessor: "..err
 	end
 
-	preprocess, err = util.load(preprocessor, "candran preprocessor", env)
+	preprocess, err = util.load(preprocessor, "lepton preprocessor", env)
 	if not preprocess then
 		return nil, "in preprocessor: "..err
 	end
@@ -227,8 +227,8 @@ end
 -- @treturn[1] output string output code
 -- @treturn[2] nil nil if error
 -- @treturn[2] error string error message
-function candran.compile(input, options={}, macros)
-	options = util.merge(candran.default, options)
+function lepton.compile(input, options={}, macros)
+	options = util.merge(lepton.default, options)
 
 	local ast, errmsg = parser.parse(input, options.chunkname)
 
@@ -245,10 +245,10 @@ end
 -- @treturn[1] output string output code
 -- @treturn[2] nil nil if error
 -- @treturn[2] error string error message
-function candran.make(code, options)
-	local r, err = candran.preprocess(code, options)
+function lepton.make(code, options)
+	local r, err = lepton.preprocess(code, options)
 	if r then
-		r, err = candran.compile(r, options, err)
+		r, err = lepton.compile(r, options, err)
 		if r then
 			return r
 		end
@@ -258,9 +258,9 @@ end
 
 local errorRewritingActive = false
 local codeCache = {}
---- Candran equivalent to the Lua 5.3's loadfile funtion.
+--- lepton equivalent to the Lua 5.3's loadfile funtion.
 -- Will rewrite errors by default.
-function candran.loadfile(filepath, env, options)
+function lepton.loadfile(filepath, env, options)
 	local f, err = io.open(filepath)
 	if not f then
 		return nil, "cannot open %s":format(tostring(err))
@@ -268,28 +268,28 @@ function candran.loadfile(filepath, env, options)
 	local content = f:read("*a")
 	f:close()
 
-	return candran.load(content, filepath, env, options)
+	return lepton.load(content, filepath, env, options)
 end
 
---- Candran equivalent to the Lua 5.3's load funtion.
+--- lepton equivalent to the Lua 5.3's load funtion.
 -- Will rewrite errors by default.
-function candran.load(chunk, chunkname, env, options={})
+function lepton.load(chunk, chunkname, env, options={})
 	options = util.merge({ chunkname = tostring(chunkname or chunk) }, options)
 
-	local code, err = candran.make(chunk, options)
+	local code, err = lepton.make(chunk, options)
 	if not code then
 		return code, err
 	end
 
 	codeCache[options.chunkname] = code
 	local f
-	f, err = util.load(code, "=%s(%s)":format(options.chunkname, "compiled candran"), env)
+	f, err = util.load(code, "=%s(%s)":format(options.chunkname, "compiled lepton"), env)
 
-	-- Um. Candran isn't supposed to generate invalid Lua code, so this is a major issue.
+	-- Um. lepton isn't supposed to generate invalid Lua code, so this is a major issue.
 	-- This is not going to raise an error because this is supposed to behave similarly to Lua's load function.
-	-- But the error message will likely be useless unless you know how Candran works.
+	-- But the error message will likely be useless unless you know how lepton works.
 	if f == nil then
-		return f, "candran unexpectedly generated invalid code: "..err
+		return f, "lepton unexpectedly generated invalid code: "..err
 	end
 
 	if options.rewriteErrors == false then
@@ -298,7 +298,7 @@ function candran.load(chunk, chunkname, env, options={})
 		return function(...)
 			if not errorRewritingActive then
 				errorRewritingActive = true
-				local t = { xpcall(f, candran.messageHandler, ...) }
+				local t = { xpcall(f, lepton.messageHandler, ...) }
 				errorRewritingActive = false
 				if t[1] == false then
 					error(t[2], 0)
@@ -311,10 +311,10 @@ function candran.load(chunk, chunkname, env, options={})
 	end
 end
 
---- Candran equivalent to the Lua 5.3's dofile funtion.
+--- lepton equivalent to the Lua 5.3's dofile funtion.
 -- Will rewrite errors by default.
-function candran.dofile(filename, options)
-	local f, err = candran.loadfile(filename, nil, options)
+function lepton.dofile(filename, options)
+	local f, err = lepton.loadfile(filename, nil, options)
 
 	if f == nil then
 		error(err)
@@ -323,9 +323,9 @@ function candran.dofile(filename, options)
 	end
 end
 
---- Candran error message handler.
--- Use it in xpcall to rewrite stacktraces to display Candran source file lines instead of compiled Lua lines.
-function candran.messageHandler(message, noTraceback)
+--- lepton error message handler.
+-- Use it in xpcall to rewrite stacktraces to display lepton source file lines instead of compiled Lua lines.
+function lepton.messageHandler(message, noTraceback)
 	message = tostring(message)
 	if not noTraceback and not message:match("\nstack traceback:\n") then
 		message = debug.traceback(message, 2)
@@ -334,7 +334,7 @@ function candran.messageHandler(message, noTraceback)
 		line = tonumber(line)
 
 		local originalFile
-		local strName = source:match("^(.-)%(compiled candran%)$")
+		local strName = source:match("^(.-)%(compiled lepton%)$")
 		if strName then
 			if codeCache[strName] then
 				originalFile = codeCache[strName]
@@ -367,28 +367,28 @@ function candran.messageHandler(message, noTraceback)
 	end)
 end
 
---- Candran package searcher function. Use the existing package.path.
-function candran.searcher(modpath)
+--- lepton package searcher function. Use the existing package.path.
+function lepton.searcher(modpath)
 	local filepath = util.search(modpath, {"can"})
 	if not filepath then
 		if _VERSION == "Lua 5.4" then
-			return "no candran file in package.path"
+			return "no lepton file in package.path"
 		else
-			return "\n\tno candran file in package.path"
+			return "\n\tno lepton file in package.path"
 		end
 	end
 	return (modpath) -- 2nd argument is not passed in Lua 5.1, so a closure is required
-		local r, s = candran.loadfile(filepath)
+		local r, s = lepton.loadfile(filepath)
 		if r then
 			return r(modpath, filepath)
 		else
-			error("error loading candran module '%s' from file '%s':\n\t%s":format(modpath, filepath, tostring(s)), 0)
+			error("error loading lepton module '%s' from file '%s':\n\t%s":format(modpath, filepath, tostring(s)), 0)
 		end
 	end, filepath
 end
 
---- Register the Candran package searcher.
-function candran.setup()
+--- Register the lepton package searcher.
+function lepton.setup()
 	local searchers = if _VERSION == "Lua 5.1" then
 		package.loaders
 	else
@@ -396,13 +396,13 @@ function candran.setup()
 	end
 	-- check if already setup
 	for _, s in ipairs(searchers) do
-		if s == candran.searcher then
-			return candran
+		if s == lepton.searcher then
+			return lepton
 		end
 	end
 	-- setup
-	table.insert(searchers, 1, candran.searcher)
-	return candran
+	table.insert(searchers, 1, lepton.searcher)
+	return lepton
 end
 
-return candran
+return lepton

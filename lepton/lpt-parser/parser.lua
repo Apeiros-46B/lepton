@@ -69,6 +69,7 @@ opid:  -- includes additional operators from Lua 5.3 and all relational operator
   | 'and'  | 'or'  | 'unm'  | 'len' | 'bnot' | 'not'
 ]]
 
+-- {{{ import lpeg
 local lpeg = require "lpeglabel"
 
 lpeg.locale(lpeg)
@@ -81,10 +82,9 @@ local Rec, T = lpeg.Rec, lpeg.T
 local alpha, digit, alnum = lpeg.alpha, lpeg.digit, lpeg.alnum
 local xdigit = lpeg.xdigit
 local space = lpeg.space
+-- }}}
 
-
--- error message auxiliary functions
-
+-- {{{ error message auxiliary functions
 local labels = {
   { "ErrExtra", "unexpected character(s), expected EOF" },
   { "ErrInvalidStat", "unexpected token, invalid start of statement" },
@@ -202,10 +202,9 @@ end
 local function expect (patt, label)
   return patt + throw(label)
 end
+-- }}}
 
-
--- regular combinators and auxiliary functions
-
+-- {{{ regular combinators and auxiliary functions
 local function token (patt)
   return patt * V"Skip"
 end
@@ -507,8 +506,9 @@ end
 local function set (f, patt) -- patt *must* succeed (or throw an error) to preserve stack integrity
   return push(f) * patt * pop(f)
 end
+-- }}}
 
--- grammar
+-- {{{ grammar
 local G = { V"Lua",
   Lua      = (V"Shebang"^-1 * V"Skip" * V"Block" * expect(P(-1), "Extra")) / fixStructure;
   Shebang  = P"#!" * (P(1) - P"\n")^0;
@@ -761,8 +761,9 @@ local G = { V"Lua",
   PowOp     = sym("^")   / "pow";
   BinOp     = V"OrOp" + V"AndOp" + V"BOrOp" + V"BXorOp" + V"BAndOp" + V"ShiftOp" + V"ConcatOp" + V"AddOp" + V"MulOp" + V"PowOp";
 }
+-- }}}
 
--- used to parse macro indentifier in define() preprocessor function
+-- {{{ parse macros
 local macroidentifier = {
   expect(V"MacroIdentifier", "InvalidStat") * expect(P(-1), "Extra"),
 
@@ -775,33 +776,36 @@ local macroidentifier = {
 
 }
 for k,v in pairs(G) do if macroidentifier[k] == nil then macroidentifier[k] = v end end -- copy other rules from main syntax
+-- }}}
 
+-- {{{ parse
 local parser = {}
 
-local validator = require("candran.can-parser.validator")
+local validator = require("lepton.lpt-parser.validator")
 local validate = validator.validate
 local syntaxerror = validator.syntaxerror
 
-function parser.parse (subject, filename)
-  local errorinfo = { subject = subject, filename = filename }
-  lpeg.setmaxstack(1000)
-  local ast, label, errpos = lpeg.match(G, subject, nil, errorinfo)
-  if not ast then
-    local errmsg = labels[label][2]
-    return ast, syntaxerror(errorinfo, errpos, errmsg)
-  end
-  return validate(ast, errorinfo)
+function parser.parse(subject, filename)
+    local errorinfo = { subject = subject, filename = filename }
+    lpeg.setmaxstack(1000)
+    local ast, label, errpos = lpeg.match(G, subject, nil, errorinfo)
+    if not ast then
+        local errmsg = labels[label][2]
+        return ast, syntaxerror(errorinfo, errpos, errmsg)
+    end
+    return validate(ast, errorinfo)
 end
 
-function parser.parsemacroidentifier (subject, filename)
-  local errorinfo = { subject = subject, filename = filename }
-  lpeg.setmaxstack(1000)
-  local ast, label, errpos = lpeg.match(macroidentifier, subject, nil, errorinfo)
-  if not ast then
-    local errmsg = labels[label][2]
-    return ast, syntaxerror(errorinfo, errpos, errmsg)
-  end
-  return ast
+function parser.parsemacroidentifier(subject, filename)
+    local errorinfo = { subject = subject, filename = filename }
+    lpeg.setmaxstack(1000)
+    local ast, label, errpos = lpeg.match(macroidentifier, subject, nil, errorinfo)
+    if not ast then
+        local errmsg = labels[label][2]
+        return ast, syntaxerror(errorinfo, errpos, errmsg)
+    end
+    return ast
 end
 
 return parser
+-- }}}

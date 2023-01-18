@@ -1,19 +1,19 @@
 #!/usr/bin/env lua
 
-local candran = require("candran")
-local parse = require("candran.can-parser.parser").parse
-local pp = require("candran.can-parser.pp")
-local util = require("candran.util")
+local lepton = require("lepton")
+local parse = require("lepton.lpt-parser.parser").parse
+local pp = require("lepton.lpt-parser.pp")
+local util = require("lepton.util")
 local argparse = require("argparse")
 
 -- Parse args --
 
 local parser = argparse()
-	:name "canc"
-	:description("Candran "..candran.VERSION.." compiler by Reuh.")
-	:epilog "For more info, see https://github.com/Reuh/candran"
+	:name "lptc"
+	:description("Lepton "..lepton.VERSION.." compiler by Reuh and Apeiros-46B.")
+	:epilog "For more info, see https://github.com/Apeiros-46B/lepton"
 
-parser:argument("filename", "Candran files to compile. Use - to read from standard input; the output file will then be named stdin.lua by default.")
+parser:argument("filename", "Lepton files to compile. Use - to read from standard input; the output file will then be named stdin.lua by default.")
 	:args "+"
 
 parser:group("Output options",
@@ -41,7 +41,7 @@ parser:group("Output options",
 		:description"(for debugging purposes) Only parse the files and dump the AST to stdout"
 )
 
-util.cli.addCandranOptions(parser)
+util.cli.addLeptonOptions(parser)
 
 local args = parser:parse()
 
@@ -61,7 +61,7 @@ for _, file in ipairs(args.filename) do
 
 		local inputFile, err = io.open(file, "r")
 		if not inputFile then
-			io.stderr:write("canc: cannot open "..file..": "..err.."\n")
+			io.stderr:write("lptc: cannot open "..file..": "..err.."\n")
 			os.exit(1)
 		end
 		input = inputFile:read("*a")
@@ -74,7 +74,7 @@ for _, file in ipairs(args.filename) do
 	if args.parse or args.ast then
 		local ast, err = parse(input, args.chunkname)
 		if not ast then
-			io.stderr:write("canc: "..err.."\n")
+			io.stderr:write("lptc: "..err.."\n")
 			os.exit(1)
 		end
 		if args.ast then
@@ -84,7 +84,7 @@ for _, file in ipairs(args.filename) do
 	end
 
 	-- Compile and output
-	local options = util.cli.makeCandranOptions(args)
+	local options = util.cli.makeLeptonOptions(args)
 
 	if args.destination then
 		dest = args.destination .. "/" .. dest
@@ -96,25 +96,25 @@ for _, file in ipairs(args.filename) do
 
 	local out = input
 	if args.preprocess then
-		local r, err = candran.preprocess(out, options)
+		local r, err = lepton.preprocess(out, options)
 		if not r then
-			io.stderr:write("canc: "..err.."\n")
+			io.stderr:write("lptc: "..err.."\n")
 			os.exit(1)
 		end
 		out = r
 	end
 	if args.compile then
-		local r, err = candran.compile(out, options)
+		local r, err = lepton.compile(out, options)
 		if not r then
-			io.stderr:write("canc: "..err.."\n")
+			io.stderr:write("lptc: "..err.."\n")
 			os.exit(1)
 		end
 		out = r
 	end
 	if args.compile == nil and args.preprocess == nil then
-		local r, err = candran.make(input, options)
+		local r, err = lepton.make(input, options)
 		if not r then
-			io.stderr:write("canc: "..err.."\n")
+			io.stderr:write("lptc: "..err.."\n")
 			os.exit(1)
 		end
 		out = r
@@ -128,7 +128,7 @@ for _, file in ipairs(args.filename) do
 			os.execute("mkdir -p "..dest:gsub("[^/]+%.lua$", ""))
 			outFile, err = io.open(dest, "w")
 			if not outFile then
-				io.stderr:write("canc: cannot open "..dest..": "..err)
+				io.stderr:write("lptc: cannot open "..dest..": "..err)
 				os.exit(1)
 			end
 		end

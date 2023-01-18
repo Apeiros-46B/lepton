@@ -1,4 +1,4 @@
-local util = require("candran.util")
+local util = require("lepton.util")
 
 local targetName = "Lua 5.4"
 

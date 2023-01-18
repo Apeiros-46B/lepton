@@ -1,48 +1,49 @@
 #!/usr/bin/env lua
 
-local candran = require("candran").setup()
-local util = require("candran.util")
+local lepton = require("lepton").setup()
+local util = require("lepton.util")
 local argparse = require("argparse")
+---@diagnostic disable-next-line: deprecated
 local unpack = unpack or table.unpack
 
 -- Parse args --
 
 local parser = argparse()
-	:name "can"
-	:description("Candran "..candran.VERSION.." interpreter by Reuh.")
-	:epilog "For more info, see https://github.com/Reuh/candran"
+	:name "lpt"
+	:description("Lepton "..lepton.VERSION.." interpreter by Reuh and Apeiros-46B.")
+	:epilog "For more info, see https://github.com/Apeiros-46B/lepton"
 
-parser:argument("filename", "Candran file to run. Use - to read from standard input. Start the REPL if no filename given.")
+parser:argument("filename", "Lepton file to run. Use - to read from standard input. Start the REPL if no filename given.")
 	:args "?"
 
-util.cli.addCandranOptions(parser)
+util.cli.addLeptonOptions(parser)
 
 local args = parser:parse()
 
-local options = util.cli.makeCandranOptions(args)
+local options = util.cli.makeLeptonOptions(args)
 
 -- Run --
 
 -- stdin
 if args.filename == "-" then
-	local f, err = candran.load(io.read("*a"), "stdin", nil, options)
+	local f, err = lepton.load(io.read("*a"), "stdin", nil, options)
 	if not f then
-		io.stderr:write("can: "..err.."\n")
+		io.stderr:write("lpt: "..err.."\n")
 		os.exit(1)
 	end
-	local r, e = xpcall(f, candran.messageHandler)
+	local r, e = xpcall(f, lepton.messageHandler)
 	if not r then
 		io.stderr:write(e.."\n")
 		os.exit(1)
 	end
 -- file
 elseif args.filename then
-	local f, err = candran.loadfile(args.filename, nil, options)
+	local f, err = lepton.loadfile(args.filename, nil, options)
 	if not f then
-		io.stderr:write("can: "..err.."\n")
+		io.stderr:write("lpt: "..err.."\n")
 		os.exit(1)
 	else
-		local r, e = xpcall(f, candran.messageHandler)
+		local r, e = xpcall(f, lepton.messageHandler)
 		if not r then
 			io.stderr:write(e.."\n")
 			os.exit(1)
@@ -50,7 +51,7 @@ elseif args.filename then
 	end
 -- REPL
 else
-	candran.default = util.merge(candran.default, options)
+	lepton.default = util.merge(lepton.default, options)
 
 	-- Setup linenoise
 	local s, l = pcall(require, "linenoise")
@@ -79,7 +80,7 @@ else
 		"and", "break", "do", "else", "elseif", "end", "false", "for", "function", "goto",
 		"if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true",
 		"until", "while",
-		-- Candran
+		-- Lepton
 		"continue", "let", "push"
 	}
 	l.enableutf8()
@@ -115,21 +116,21 @@ else
 	end)
 
 	-- Introduction
-	print("Candran " .. candran.VERSION .. ", targeting " .. candran.default.target)
-	candran.setup()
+	print("Lepton " .. lepton.VERSION .. ", targeting " .. lepton.default.target)
+	lepton.setup()
 
 	-- check errors in static import
 	-- note: static imports will be run every line, as preprocessors macros and constants aren't kept between compilations...
 	do
-		local r, e = candran.load("local _", "stdin")
+		local r, e = lepton.load("local _", "stdin")
 		if not r then
 			print("In static import: "..e)
-			candran.default.import = {}
+			lepton.default.import = {}
 		else
 			r, e = pcall(r)
 			if not r then
 				print("In static import: "..e)
-				candran.default.import = {}
+				lepton.default.import = {}
 			end
 		end
 	end
@@ -173,7 +174,7 @@ else
 		end
 
 		-- exec
-		local r, e = candran.load(buffer, "stdin")
+		local r, e = lepton.load(buffer, "stdin")
 		if not r then
 			if e:match("expected '[end})]+' to close") then
 				multiline = true

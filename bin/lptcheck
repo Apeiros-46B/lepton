@@ -26,9 +26,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ]]
 
--- Monkey patch Luacheck (tested against version 0.23.0) to support Candran files
-local candran = require("candran")
-local util = require("candran.util")
+-- Monkey patch Luacheck (tested against version 0.23.0) to support Lepton files
+local lepton = require("lepton")
+local util = require("lepton.util")
 
 -- set a function upvalues (if several names are given, will go up the upvalue chain)
 local function setupvalue(fn, val, name, ...)
@@ -61,25 +61,25 @@ local tokenAlias = {
 
 -- Patch checker
 local oldCheck = require("luacheck.check")
-local function check(can)
-	local lua, err = candran.make(can, {chunkname="_luacheck_source"})
+local function check(lpt)
+	local lua, err = lepton.make(lpt, {chunkname="_luacheck_source"})
 	-- Warnings
 	if lua then
 		local r = oldCheck(lua)
-		-- Calculate Candran file position.
+		-- Calculate Lepton file position.
 		if #r.warnings > 0 then
 			local lua_lines = {}
 			for l in (lua.."\n"):gmatch("([^\n]*)\n") do
 				table.insert(lua_lines, l)
 			end
-			local can_lines = {}
-			for l in (can.."\n"):gmatch("([^\n]*)\n") do
-				table.insert(can_lines, l)
+			local lpt_lines = {}
+			for l in (lpt.."\n"):gmatch("([^\n]*)\n") do
+				table.insert(lpt_lines, l)
 			end
 			for i=#r.warnings, 1, -1 do
 				local warning  = r.warnings[i]
 
-				-- calculating candran line
+				-- calculating lepton line
 				local lua_line = lua_lines[warning.line]
 
 				local source, line = lua_line:match(".*%-%- (.-)%:(%d+)$")
@@ -87,7 +87,7 @@ local function check(can)
 					table.remove(r.warnings, i)
 
 				elseif source then
-					warning.can_line = tonumber(line)
+					warning.lpt_line = tonumber(line)
 
 					-- do the same for prev_line
 					if warning.prev_line then
@@ -106,8 +106,8 @@ local function check(can)
 					-- 4xx: shadowing delarations
 					local isIdentifier = tonumber(warning.code) >= 100 and tonumber(warning.code) < 500
 
-					-- calculating candran column
-					local can_line = can_lines[warning.can_line]
+					-- calculating lepton column
+					local lpt_line = lpt_lines[warning.lpt_line]
 					local lua_token = lua_line:sub(warning.column, warning.end_column)
 					local token_pattern = pattern(lua_token) -- token finding pattern
 					-- the warning happens on the n-th instance of lua_token on this line
@@ -118,16 +118,16 @@ local function check(can)
 						end
 						lua_n = lua_n + 1
 					end
-					-- Find associated candran token. If lua_n > can_nmax, the last found lua_token is used.
+					-- Find associated lepton token. If lua_n > lpt_nmax, the last found lua_token is used.
 					-- This approximation should work in like, 90% of cases.
-					local can_n = 1
+					local lpt_n = 1
 					local pos = 1
-					while can_n <= lua_n do
+					while lpt_n <= lua_n do
 						-- find first token or alias of this token
-						local start, stop = can_line:match(token_pattern, pos)
+						local start, stop = lpt_line:match(token_pattern, pos)
 						if tokenAlias[lua_token] then
 							for _, token in ipairs(tokenAlias[lua_token]) do
-								local nstart, nstop = can_line:match(pattern(token), pos)
+								local nstart, nstop = lpt_line:match(pattern(token), pos)
 								if nstart and (not start or nstart < start) then
 									start, stop = nstart, nstop
 								end
@@ -135,23 +135,23 @@ local function check(can)
 						-- for non aliases token that are identifier, check if match is a full identifier
 						-- (avoid things like `let e` matching the e in let)
 						elseif start and isIdentifier then
-							local prev = can_line:sub(start-1, start-1)
-							local next = can_line:sub(stop, stop)
+							local prev = lpt_line:sub(start-1, start-1)
+							local next = lpt_line:sub(stop, stop)
 							if prev:match("[%w_]") or next:match("[%w_]") then
-								can_n = can_n - 1 -- skip this match
+								lpt_n = lpt_n - 1 -- skip this match
 							end
 						end
 						-- found
 						if start then
 							pos = stop
-							warning.can_column, warning.can_end_column = start, stop-1
-							can_n = can_n + 1
+							warning.lpt_column, warning.lpt_end_column = start, stop-1
+							lpt_n = lpt_n + 1
 						else
 							break
 						end
 					end
 
-					-- AFAIK, prev_column and prev_end_column are not displayed in any warning so we don't need to recalculate them for Candran.
+					-- AFAIK, prev_column and prev_end_column are not displayed in any warning so we don't need to recalculate them for Lepton.
 				end
 			end
 		end
@@ -181,16 +181,16 @@ local oldRunner = runner.new
 function runner.new(opts)
 	-- Disable max line length checking (it is compiled code...)
 	opts.max_line_length = false
-	opts.ignore = { "4[23]1/__CAN_.*" }
+	opts.ignore = { "4[23]1/__LPT_.*" }
 	return oldRunner(opts)
 end
 
 -- Patch formatter
 local format = require("luacheck.format")
 local function format_location(file, location, opts)
-   local res = ("%s:%d:%d"):format(file, location.can_line or location.line, location.can_column or location.column)
+   local res = ("%s:%d:%d"):format(file, location.lpt_line or location.line, location.lpt_column or location.column)
    if opts.ranges then
-      res = ("%s-%d"):format(res, location.can_end_column or location.end_column)
+      res = ("%s-%d"):format(res, location.lpt_end_column or location.end_column)
    end
    return res
 end
@@ -203,9 +203,9 @@ if path then
 	local code = f:read("*a")
 	f:close()
 
-	code = code:gsub(escape(" bug (please report at https://github.com/mpeterv/luacheck/issues)"), ", patched for Candran "..candran.VERSION.." bug. Please DO NOT report this bug to Luacheck") -- error text
-	           :gsub(escape("\"luacheck\","), "\"cancheck\",") -- command name
-	           :gsub("a linter and a static analyzer for Lua%.", "a linter and a static analyzer for Lua, patched for Candran "..candran.VERSION..".") -- help text
+	code = code:gsub(escape(" bug (please report at https://github.com/mpeterv/luacheck/issues)"), ", patched for Lepton "..lepton.VERSION.." bug. Please DO NOT report this bug to Luacheck") -- error text
+	           :gsub(escape("\"luacheck\","), "\"lptcheck\",") -- command name
+	           :gsub("a linter and a static analyzer for Lua%.", "a linter and a static analyzer for Lua, patched for Lepton "..lepton.VERSION..".") -- help text
 
 	-- run
 	return load(code)()

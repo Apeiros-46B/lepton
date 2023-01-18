@@ -1,8 +1,8 @@
-local candran = dofile(arg[1] or "../candran.lua")
-candran.default.indentation = "\t"
-candran.default.mapLines = false
+local lepton = dofile(arg[1] or "../lepton.lua")
+lepton.default.indentation = "\t"
+lepton.default.mapLines = false
 
-local load = require("candran.util").load
+local load = require("lepton.util").load
 
 -- Text formatting
 local colors = {
@@ -37,7 +37,7 @@ end
 
 -- test helper
 local results = {} -- tests result
-local function test(name, candranCode, expectedResult, options)
+local function test(name, leptonCode, expectedResult, options)
 	results[name] = { result = "not finished", message = "no info" }
 	local self = results[name]
 
@@ -46,7 +46,7 @@ local function test(name, candranCode, expectedResult, options)
 	options.chunkname = name
 
 	-- make code
-	local success, code = pcall(function() return assert(candran.make(candranCode, options)) end)
+	local success, code = pcall(function() return assert(lepton.make(leptonCode, options)) end)
 	if not success then
 		self.result = "error"
 		self.message = c("/!\\ error while making code:\n", "bold", "red")..c(code, "red")
@@ -103,9 +103,9 @@ test("preprocessor condition", [[
 #end
 ]], true)
 
-test("preprocessor candran table", [[
-#write(("return %q"):format(candran.VERSION))
-]], candran.VERSION)
+test("preprocessor lepton table", [[
+#write(("return %q"):format(lepton.VERSION))
+]], lepton.VERSION)
 
 test("preprocessor output variable", [[
 #output = "return 5"
