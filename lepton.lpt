@@ -24,7 +24,7 @@ lepton.default = {
 	target = "lua54",
 	indentation = "",
 	newline = "\n",
-	variablePrefix = "__CAN_",
+	variablePrefix = "__LPT_",
 	mapLines = true,
 	chunkname = "nil",
 	rewriteErrors = true,
@@ -111,7 +111,7 @@ function lepton.preprocess(input, options={}, _env)
 	-- @tparam modpath string module path
 	-- @tparam margs table preprocessor options to use when preprocessessing the module
 	env.import = function(modpath, margs={})
-		local filepath = assert(util.search(modpath, {"can", "lua"}), "No module named \""..modpath.."\"")
+		local filepath = assert(util.search(modpath, {"lpt", "lua"}), "No module named \""..modpath.."\"")
 
 		-- open module file
 		local f = io.open(filepath)
@@ -369,7 +369,7 @@ end
 
 --- lepton package searcher function. Use the existing package.path.
 function lepton.searcher(modpath)
-	local filepath = util.search(modpath, {"can"})
+	local filepath = util.search(modpath, {"lpt"})
 	if not filepath then
 		if _VERSION == "Lua 5.4" then
 			return "no lepton file in package.path"

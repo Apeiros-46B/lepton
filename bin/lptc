@@ -57,7 +57,7 @@ for _, file in ipairs(args.filename) do
 
 		args.chunkname = "stdin"
 	else
-		dest = args.output or (file:gsub("%.can$", "")..".lua")
+		dest = args.output or (file:gsub("%.lpt$", "")..".lua")
 
 		local inputFile, err = io.open(file, "r")
 		if not inputFile then

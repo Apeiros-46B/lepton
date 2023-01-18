@@ -70,7 +70,7 @@ opid:  -- includes additional operators from Lua 5.3 and all relational operator
 ]]
 
 -- {{{ import lpeg
-local lpeg = require "lpeglabel"
+local lpeg = require('lpeglabel')
 
 lpeg.locale(lpeg)
 
@@ -86,218 +86,218 @@ local space = lpeg.space
 
 -- {{{ error message auxiliary functions
 local labels = {
-  { "ErrExtra", "unexpected character(s), expected EOF" },
-  { "ErrInvalidStat", "unexpected token, invalid start of statement" },
+    { 'ErrExtra', [[unexpected character(s), expected EOF]] },
+    { 'ErrInvalidStat', [[unexpected token, invalid start of statement]] },
 
-  { "ErrEndIf", "expected 'end' to close the if statement" },
-  { "ErrExprIf", "expected a condition after 'if'" },
-  { "ErrThenIf", "expected 'then' after the condition" },
-  { "ErrExprEIf", "expected a condition after 'elseif'" },
-  { "ErrThenEIf", "expected 'then' after the condition" },
+    { 'ErrEndIf', [[expected 'end' to close the if statement]] },
+    { 'ErrExprIf', [[expected a condition after 'if']] },
+    { 'ErrThenIf', [[expected 'then' after the condition]] },
+    { 'ErrExprEIf', [[expected a condition after 'elseif']] },
+    { 'ErrThenEIf', [[expected 'then' after the condition]] },
 
-  { "ErrEndDo", "expected 'end' to close the do block" },
-  { "ErrExprWhile", "expected a condition after 'while'" },
-  { "ErrDoWhile", "expected 'do' after the condition" },
-  { "ErrEndWhile", "expected 'end' to close the while loop" },
-  { "ErrUntilRep", "expected 'until' at the end of the repeat loop" },
-  { "ErrExprRep", "expected a conditions after 'until'" },
+    { 'ErrEndDo', [[expected 'end' to close the do block]] },
+    { 'ErrExprWhile', [[expected a condition after 'while']] },
+    { 'ErrDoWhile', [[expected 'do' after the condition]] },
+    { 'ErrEndWhile', [[expected 'end' to close the while loop]] },
+    { 'ErrUntilRep', [[expected 'until' at the end of the repeat loop]] },
+    { 'ErrExprRep', [[expected a conditions after 'until']] },
 
-  { "ErrForRange", "expected a numeric or generic range after 'for'" },
-  { "ErrEndFor", "expected 'end' to close the for loop" },
-  { "ErrExprFor1", "expected a starting expression for the numeric range" },
-  { "ErrCommaFor", "expected ',' to split the start and end of the range" },
-  { "ErrExprFor2", "expected an ending expression for the numeric range" },
-  { "ErrExprFor3", "expected a step expression for the numeric range after ','" },
-  { "ErrInFor", "expected '=' or 'in' after the variable(s)" },
-  { "ErrEListFor", "expected one or more expressions after 'in'" },
-  { "ErrDoFor", "expected 'do' after the range of the for loop" },
+    { 'ErrForRange', [[expected a numeric or generic range after 'for']] },
+    { 'ErrEndFor', [[expected 'end' to close the for loop]] },
+    { 'ErrExprFor1', [[expected a starting expression for the numeric range]] },
+    { 'ErrCommaFor', [[expected ',' to split the start and end of the range]] },
+    { 'ErrExprFor2', [[expected an ending expression for the numeric range]] },
+    { 'ErrExprFor3', [[expected a step expression for the numeric range after ',']] },
+    { 'ErrInFor', [[expected '=' or 'in' after the variable(s)]] },
+    { 'ErrEListFor', [[expected one or more expressions after 'in']] },
+    { 'ErrDoFor', [[expected 'do' after the range of the for loop]] },
 
-  { "ErrDefLocal", "expected a function definition or assignment after local" },
-  { "ErrDefLet", "expected an assignment after let" },
-  { "ErrDefClose", "expected an assignment after close" },
-  { "ErrDefConst", "expected an assignment after const" },
-  { "ErrNameLFunc", "expected a function name after 'function'" },
-  { "ErrEListLAssign", "expected one or more expressions after '='" },
-  { "ErrEListAssign", "expected one or more expressions after '='" },
+    { 'ErrDefLocal', [[expected a function definition or assignment after local]] },
+    { 'ErrDefLet', [[expected an assignment after let]] },
+    { 'ErrDefClose', [[expected an assignment after close]] },
+    { 'ErrDefConst', [[expected an assignment after const]] },
+    { 'ErrNameLFunc', [[expected a function name after 'function']] },
+    { 'ErrEListLAssign', [[expected one or more expressions after '=']] },
+    { 'ErrEListAssign', [[expected one or more expressions after '=']] },
 
-  { "ErrFuncName", "expected a function name after 'function'" },
-  { "ErrNameFunc1", "expected a function name after '.'" },
-  { "ErrNameFunc2", "expected a method name after ':'" },
-  { "ErrOParenPList", "expected '(' for the parameter list" },
-  { "ErrCParenPList", "expected ')' to close the parameter list" },
-  { "ErrEndFunc", "expected 'end' to close the function body" },
-  { "ErrParList", "expected a variable name or '...' after ','" },
+    { 'ErrFuncName', [[expected a function name after 'function']] },
+    { 'ErrNameFunc1', [[expected a function name after '.']] },
+    { 'ErrNameFunc2', [[expected a method name after ':']] },
+    { 'ErrOParenPList', [[expected '(' for the parameter list]] },
+    { 'ErrCParenPList', [[expected ')' to close the parameter list]] },
+    { 'ErrEndFunc', [[expected 'end' to close the function body]] },
+    { 'ErrParList', [[expected a variable name or '...' after ',']] },
 
-  { "ErrLabel", "expected a label name after '::'" },
-  { "ErrCloseLabel", "expected '::' after the label" },
-  { "ErrGoto", "expected a label after 'goto'" },
-  { "ErrRetList", "expected an expression after ',' in the return statement" },
+    { 'ErrLabel', [[expected a label name after '::']] },
+    { 'ErrCloseLabel', [[expected '::' after the label]] },
+    { 'ErrGoto', [[expected a label after 'goto']] },
+    { 'ErrRetList', [[expected an expression after ',' in the return statement]] },
 
-  { "ErrVarList", "expected a variable name after ','" },
-  { "ErrExprList", "expected an expression after ','" },
+    { 'ErrVarList', [[expected a variable name after ',']] },
+    { 'ErrExprList', [[expected an expression after ',']] },
 
-  { "ErrOrExpr", "expected an expression after 'or'" },
-  { "ErrAndExpr", "expected an expression after 'and'" },
-  { "ErrRelExpr", "expected an expression after the relational operator" },
-  { "ErrBOrExpr", "expected an expression after '|'" },
-  { "ErrBXorExpr", "expected an expression after '~'" },
-  { "ErrBAndExpr", "expected an expression after '&'" },
-  { "ErrShiftExpr", "expected an expression after the bit shift" },
-  { "ErrConcatExpr", "expected an expression after '..'" },
-  { "ErrAddExpr", "expected an expression after the additive operator" },
-  { "ErrMulExpr", "expected an expression after the multiplicative operator" },
-  { "ErrUnaryExpr", "expected an expression after the unary operator" },
-  { "ErrPowExpr", "expected an expression after '^'" },
+    { 'ErrOrExpr', [[expected an expression after 'or']] },
+    { 'ErrAndExpr', [[expected an expression after 'and']] },
+    { 'ErrRelExpr', [[expected an expression after the relational operator]] },
+    { 'ErrBOrExpr', [[expected an expression after '|']] },
+    { 'ErrBXorExpr', [[expected an expression after '~']] },
+    { 'ErrBAndExpr', [[expected an expression after '&']] },
+    { 'ErrShiftExpr', [[expected an expression after the bit shift]] },
+    { 'ErrConcatExpr', [[expected an expression after '..']] },
+    { 'ErrAddExpr', [[expected an expression after the additive operator]] },
+    { 'ErrMulExpr', [[expected an expression after the multiplicative operator]] },
+    { 'ErrUnaryExpr', [[expected an expression after the unary operator]] },
+    { 'ErrPowExpr', [[expected an expression after '^']] },
 
-  { "ErrExprParen", "expected an expression after '('" },
-  { "ErrCParenExpr", "expected ')' to close the expression" },
-  { "ErrNameIndex", "expected a field name after '.'" },
-  { "ErrExprIndex", "expected an expression after '['" },
-  { "ErrCBracketIndex", "expected ']' to close the indexing expression" },
-  { "ErrNameMeth", "expected a method name after ':'" },
-  { "ErrMethArgs", "expected some arguments for the method call (or '()')" },
+    { 'ErrExprParen', [[expected an expression after '(']] },
+    { 'ErrCParenExpr', [[expected ')' to close the expression]] },
+    { 'ErrNameIndex', [[expected a field name after '.']] },
+    { 'ErrExprIndex', [[expected an expression after '[']] },
+    { 'ErrCBracketIndex', [[expected ']' to close the indexing expression]] },
+    { 'ErrNameMeth', [[expected a method name after ':']] },
+    { 'ErrMethArgs', [[expected some arguments for the method call (or '()')]] },
 
-  { "ErrArgList", "expected an expression after ',' in the argument list" },
-  { "ErrCParenArgs", "expected ')' to close the argument list" },
+    { 'ErrArgList', [[expected an expression after ',' in the argument list]] },
+    { 'ErrCParenArgs', [[expected ')' to close the argument list]] },
 
-  { "ErrCBraceTable", "expected '}' to close the table constructor" },
-  { "ErrEqField", "expected '=' after the table key" },
-  { "ErrExprField", "expected an expression after '='" },
-  { "ErrExprFKey", "expected an expression after '[' for the table key" },
-  { "ErrCBracketFKey", "expected ']' to close the table key" },
+    { 'ErrCBraceTable', [[expected '}' to close the table constructor]] },
+    { 'ErrEqField', [[expected '=' after the table key]] },
+    { 'ErrExprField', [[expected an expression after '=']] },
+    { 'ErrExprFKey', [[expected an expression after '[' for the table key]] },
+    { 'ErrCBracketFKey', [[expected ']' to close the table key]] },
 
-  { "ErrCBraceDestructuring", "expected '}' to close the destructuring variable list" },
-  { "ErrDestructuringEqField", "expected '=' after the table key in destructuring variable list" },
-  { "ErrDestructuringExprField", "expected an identifier after '=' in destructuring variable list" },
+    { 'ErrCBraceDestructuring', [[expected '}' to close the destructuring variable list]] },
+    { 'ErrDestructuringEqField', [[expected '=' after the table key in destructuring variable list]] },
+    { 'ErrDestructuringExprField', [[expected an identifier after '=' in destructuring variable list]] },
 
-  { "ErrCBracketTableCompr", "expected ']' to close the table comprehension" },
+    { 'ErrCBracketTableCompr', [[expected ']' to close the table comprehension]] },
 
-  { "ErrDigitHex", "expected one or more hexadecimal digits after '0x'" },
-  { "ErrDigitDeci", "expected one or more digits after the decimal point" },
-  { "ErrDigitExpo", "expected one or more digits for the exponent" },
+    { 'ErrDigitHex', [[expected one or more hexadecimal digits after '0x']] },
+    { 'ErrDigitDeci', [[expected one or more digits after the decimal point]] },
+    { 'ErrDigitExpo', [[expected one or more digits for the exponent]] },
 
-  { "ErrQuote", "unclosed string" },
-  { "ErrHexEsc", "expected exactly two hexadecimal digits after '\\x'" },
-  { "ErrOBraceUEsc", "expected '{' after '\\u'" },
-  { "ErrDigitUEsc", "expected one or more hexadecimal digits for the UTF-8 code point" },
-  { "ErrCBraceUEsc", "expected '}' after the code point" },
-  { "ErrEscSeq", "invalid escape sequence" },
-  { "ErrCloseLStr", "unclosed long string" },
+    { 'ErrQuote', [[unclosed string]] },
+    { 'ErrHexEsc', [[expected exactly two hexadecimal digits after '\x']] },
+    { 'ErrOBraceUEsc', [[expected '{' after '\u']] },
+    { 'ErrDigitUEsc', [[expected one or more hexadecimal digits for the UTF-8 code point]] },
+    { 'ErrCBraceUEsc', [[expected '}' after the code point]] },
+    { 'ErrEscSeq', [[invalid escape sequence]] },
+    { 'ErrCloseLStr', [[unclosed long string]] },
 
-  { "ErrUnknownAttribute", "unknown variable attribute" },
-  { "ErrCBracketAttribute", "expected '>' to close the variable attribute" },
+    { 'ErrUnknownAttribute', [[unknown variable attribute]] },
+    { 'ErrCBracketAttribute', [[expected '>' to close the variable attribute]] },
 }
 
 local function throw(label)
-  label = "Err" .. label
-  for i, labelinfo in ipairs(labels) do
-    if labelinfo[1] == label then
-      return T(i)
+    label = 'Err' .. label
+    for i, labelinfo in ipairs(labels) do
+        if labelinfo[1] == label then
+            return T(i)
+        end
     end
-  end
 
-  error("Label not found: " .. label)
+    error('Label not found: ' .. label)
 end
 
 local function expect (patt, label)
-  return patt + throw(label)
+    return patt + throw(label)
 end
 -- }}}
 
 -- {{{ regular combinators and auxiliary functions
-local function token (patt)
-  return patt * V"Skip"
+local function token(patt)
+    return patt * V'Skip'
 end
 
-local function sym (str)
-  return token(P(str))
+local function sym(str)
+    return token(P(str))
 end
 
-local function kw (str)
-  return token(P(str) * -V"IdRest")
+local function kw(str)
+    return token(P(str) * -V'IdRest')
 end
 
-local function tagC (tag, patt)
-  return Ct(Cg(Cp(), "pos") * Cg(Cc(tag), "tag") * patt)
+local function tagC(tag, patt)
+    return Ct(Cg(Cp(), 'pos') * Cg(Cc(tag), 'tag') * patt)
 end
 
-local function unaryOp (op, e)
-  return { tag = "Op", pos = e.pos, [1] = op, [2] = e }
+local function unaryOp(op, e)
+    return { tag = 'Op', pos = e.pos, [1] = op, [2] = e }
 end
 
-local function binaryOp (e1, op, e2)
-  if not op then
-    return e1
-  else
-    return { tag = "Op", pos = e1.pos, [1] = op, [2] = e1, [3] = e2 }
-  end
+local function binaryOp(e1, op, e2)
+    if not op then
+        return e1
+    else
+        return { tag = 'Op', pos = e1.pos, [1] = op, [2] = e1, [3] = e2 }
+    end
 end
 
-local function sepBy (patt, sep, label)
-  if label then
-    return patt * Cg(sep * expect(patt, label))^0
-  else
-    return patt * Cg(sep * patt)^0
-  end
+local function sepBy(patt, sep, label)
+    if label then
+        return patt * Cg(sep * expect(patt, label))^0
+    else
+        return patt * Cg(sep * patt)^0
+    end
 end
 
-local function chainOp (patt, sep, label)
-  return Cf(sepBy(patt, sep, label), binaryOp)
+local function chainOp(patt, sep, label)
+    return Cf(sepBy(patt, sep, label), binaryOp)
 end
 
-local function commaSep (patt, label)
-  return sepBy(patt, sym(","), label)
+local function commaSep(patt, label)
+    return sepBy(patt, sym(','), label)
 end
 
 local function tagDo (block)
-  block.tag = "Do"
-  return block
+    block.tag = 'Do'
+    return block
 end
 
 local function fixFuncStat (func)
-  if func[1].is_method then table.insert(func[2][1], 1, { tag = "Id", [1] = "self" }) end
-  func[1] = {func[1]}
-  func[2] = {func[2]}
-  return func
+    if func[1].is_method then table.insert(func[2][1], 1, { tag = 'Id', [1] = 'self' }) end
+    func[1] = {func[1]}
+    func[2] = {func[2]}
+    return func
 end
 
 local function addDots (params, dots)
-  if dots then table.insert(params, dots) end
-  return params
+    if dots then table.insert(params, dots) end
+    return params
 end
 
 local function insertIndex (t, index)
-  return { tag = "Index", pos = t.pos, [1] = t, [2] = index }
+    return { tag = 'Index', pos = t.pos, [1] = t, [2] = index }
 end
 
 local function markMethod (t, method)
-  if method then
-    return { tag = "Index", pos = t.pos, is_method = true, [1] = t, [2] = method }
-  end
-  return t
+    if method then
+        return { tag = 'Index', pos = t.pos, is_method = true, [1] = t, [2] = method }
+    end
+    return t
 end
 
 local function makeSuffixedExpr (t1, t2)
-  if t2.tag == "Call" or t2.tag == "SafeCall" then
-    local t = { tag = t2.tag, pos = t1.pos, [1] = t1 }
-    for k, v in ipairs(t2) do
-      table.insert(t, v)
+    if t2.tag == 'Call' or t2.tag == 'SafeCall' then
+        local t = { tag = t2.tag, pos = t1.pos, [1] = t1 }
+        for k, v in ipairs(t2) do
+            table.insert(t, v)
+        end
+        return t
+    elseif t2.tag == 'MethodStub' or t2.tag == 'SafeMethodStub' then
+        return { tag = t2.tag, pos = t1.pos, [1] = t1, [2] = t2[1] }
+    elseif t2.tag == 'SafeDotIndex' or t2.tag == 'SafeArrayIndex' then
+        return { tag = 'SafeIndex', pos = t1.pos, [1] = t1, [2] = t2[1] }
+    elseif t2.tag == 'DotIndex' or t2.tag == 'ArrayIndex' then
+        return { tag = 'Index', pos = t1.pos, [1] = t1, [2] = t2[1] }
+    else
+        error('unexpected tag in suffixed expression')
     end
-    return t
-  elseif t2.tag == "MethodStub" or t2.tag == "SafeMethodStub" then
-    return { tag = t2.tag, pos = t1.pos, [1] = t1, [2] = t2[1] }
-  elseif t2.tag == "SafeDotIndex" or t2.tag == "SafeArrayIndex" then
-    return { tag = "SafeIndex", pos = t1.pos, [1] = t1, [2] = t2[1] }
-  elseif t2.tag == "DotIndex" or t2.tag == "ArrayIndex" then
-    return { tag = "Index", pos = t1.pos, [1] = t1, [2] = t2[1] }
-  else
-    error("unexpected tag in suffixed expression")
-  end
 end
 
 local function fixShortFunc (t)
-    if t[1] == ":" then -- self method
-        table.insert(t[2], 1, { tag = "Id", "self" })
+    if t[1] == ':' then -- self method
+        table.insert(t[2], 1, { tag = 'Id', 'self' })
         table.remove(t, 1)
         t.is_method = true
     end
@@ -311,21 +311,21 @@ local function markImplicit (t)
 end
 
 local function statToExpr (t) -- tag a StatExpr
-    t.tag = t.tag .. "Expr"
+    t.tag = t.tag .. 'Expr'
     return t
 end
 
 local function fixStructure (t) -- fix the AST structure if needed
     local i = 1
     while i <= #t do
-        if type(t[i]) == "table" then
+        if type(t[i]) == 'table' then
             fixStructure(t[i])
             for j=#t[i], 1, -1 do
                 local stat = t[i][j]
-                if type(stat) == "table" and stat.move_up_block and stat.move_up_block > 0 then
+                if type(stat) == 'table' and stat.move_up_block and stat.move_up_block > 0 then
                     table.remove(t[i], j)
                     table.insert(t, i+1, stat)
-                    if t.tag == "Block" or t.tag == "Do" then
+                    if t.tag == 'Block' or t.tag == 'Do' then
                         stat.move_up_block = stat.move_up_block - 1
                     end
                 end
@@ -336,15 +336,15 @@ local function fixStructure (t) -- fix the AST structure if needed
     return t
 end
 
-local function searchEndRec (block, isRecCall) -- recursively search potential "end" keyword wrongly consumed by a short anonymous function on stat end (yeah, too late to change the syntax to something easier to parse)
+local function searchEndRec (block, isRecCall) -- recursively search potential 'end' keyword wrongly consumed by a short anonymous function on stat end (yeah, too late to change the syntax to something easier to parse)
     for i, stat in ipairs(block) do
         -- Non recursive statements
-        if stat.tag == "Set" or stat.tag == "Push" or stat.tag == "Return" or stat.tag == "Local" or stat.tag == "Let" or stat.tag == "Localrec" then
+        if stat.tag == 'Set' or stat.tag == 'Push' or stat.tag == 'Return' or stat.tag == 'Local' or stat.tag == 'Let' or stat.tag == 'Localrec' then
             local exprlist
 
-            if stat.tag == "Set" or stat.tag == "Local" or stat.tag == "Let" or stat.tag == "Localrec" then
+            if stat.tag == 'Set' or stat.tag == 'Local' or stat.tag == 'Let' or stat.tag == 'Localrec' then
                 exprlist = stat[#stat]
-            elseif stat.tag == "Push" or stat.tag == "Return" then
+            elseif stat.tag == 'Push' or stat.tag == 'Return' then
                 exprlist = stat
             end
 
@@ -352,7 +352,7 @@ local function searchEndRec (block, isRecCall) -- recursively search potential "
 
             -- Stuff parse shittily only for short function declaration which are not method and whith strictly one variable name between the parenthesis.
             -- Otherwise it's invalid Lua anyway, so not my problem.
-            if last.tag == "Function" and last.is_short and not last.is_method and #last[1] == 1 then
+            if last.tag == 'Function' and last.is_short and not last.is_method and #last[1] == 1 then
                 local p = i
                 for j, fstat in ipairs(last[2]) do
                     p = i + j
@@ -368,7 +368,7 @@ local function searchEndRec (block, isRecCall) -- recursively search potential "
                 end
 
                 exprlist[#exprlist] = last[1] -- replace func with paren and expressions
-                exprlist[#exprlist].tag = "Paren"
+                exprlist[#exprlist].tag = 'Paren'
 
                 if not isRecCall then -- if superfluous statements won't be moved in a next recursion, let fixStructure handle things
                     for j=p+1, #block, 1 do
@@ -379,7 +379,7 @@ local function searchEndRec (block, isRecCall) -- recursively search potential "
                 return block, i
 
             -- I lied, stuff can also be recursive here (StatExpr & Function)
-            elseif last.tag:match("Expr$") then
+            elseif last.tag:match('Expr$') then
                 local r = searchEndRec({ last })
                 if r then
                     for j=2, #r, 1 do
@@ -387,7 +387,7 @@ local function searchEndRec (block, isRecCall) -- recursively search potential "
                     end
                     return block, i
                 end
-            elseif last.tag == "Function" then
+            elseif last.tag == 'Function' then
                 local r = searchEndRec(last[2])
                 if r then
                     return block, i
@@ -395,17 +395,17 @@ local function searchEndRec (block, isRecCall) -- recursively search potential "
             end
 
         -- Recursive statements
-        elseif stat.tag:match("^If") or stat.tag:match("^While") or stat.tag:match("^Repeat") or stat.tag:match("^Do") or stat.tag:match("^Fornum") or stat.tag:match("^Forin") then
+        elseif stat.tag:match('^If') or stat.tag:match('^While') or stat.tag:match('^Repeat') or stat.tag:match('^Do') or stat.tag:match('^Fornum') or stat.tag:match('^Forin') then
             local blocks
 
-            if stat.tag:match("^If") or stat.tag:match("^While") or stat.tag:match("^Repeat") or stat.tag:match("^Fornum") or stat.tag:match("^Forin") then
+            if stat.tag:match('^If') or stat.tag:match('^While') or stat.tag:match('^Repeat') or stat.tag:match('^Fornum') or stat.tag:match('^Forin') then
                 blocks = stat
-            elseif stat.tag:match("^Do") then
+            elseif stat.tag:match('^Do') then
                 blocks = { stat }
             end
 
             for _, iblock in ipairs(blocks) do
-                if iblock.tag == "Block" then -- blocks
+                if iblock.tag == 'Block' then -- blocks
                     local oldLen = #iblock
                     local newiBlock, newEnd = searchEndRec(iblock, true)
                     if newiBlock then -- if end in the block
@@ -431,7 +431,7 @@ local function searchEndRec (block, isRecCall) -- recursively search potential "
     return nil
 end
 
-local function searchEnd (s, p, t) -- match time capture which try to restructure the AST to free an "end" for us
+local function searchEnd (s, p, t) -- match time capture which try to restructure the AST to free an 'end' for us
     local r = searchEndRec(fixStructure(t))
     if not r then
         return false
@@ -441,337 +441,337 @@ end
 
 local function expectBlockOrSingleStatWithStartEnd (start, startLabel, stopLabel, canFollow) -- will try a SingleStat if start doesn't match
     if canFollow then
-        return (-start * V"SingleStatBlock" * canFollow^-1)
-             + (expect(start, startLabel) * ((V"Block" * (canFollow + kw("end")))
-                                           + (Cmt(V"Block", searchEnd) + throw(stopLabel))))
+        return (-start * V'SingleStatBlock' * canFollow^-1)
+        + (expect(start, startLabel) * ((V'Block' * (canFollow + kw('end')))
+        + (Cmt(V'Block', searchEnd) + throw(stopLabel))))
     else
-        return (-start * V"SingleStatBlock")
-             + (expect(start, startLabel) * ((V"Block" * kw("end"))
-                                           + (Cmt(V"Block", searchEnd) + throw(stopLabel))))
+        return (-start * V'SingleStatBlock')
+        + (expect(start, startLabel) * ((V'Block' * kw('end'))
+        + (Cmt(V'Block', searchEnd) + throw(stopLabel))))
     end
 end
 
 local function expectBlockWithEnd (label) -- can't work *optionnaly* with SingleStat unfortunatly
-    return (V"Block" * kw("end"))
-         + (Cmt(V"Block", searchEnd) + throw(label))
+    return (V'Block' * kw('end'))
+    + (Cmt(V'Block', searchEnd) + throw(label))
 end
 
 local function maybeBlockWithEnd () -- same as above but don't error if it doesn't match
-    return (V"BlockNoErr" * kw("end"))
-         + Cmt(V"BlockNoErr", searchEnd)
+    return (V'BlockNoErr' * kw('end'))
+    + Cmt(V'BlockNoErr', searchEnd)
 end
 
 local function maybe (patt) -- fail pattern instead of propagating errors
-  return #patt/0 * patt
+    return #patt/0 * patt
 end
 
 local function setAttribute(attribute)
-  return function(assign)
-    assign[1].tag = "AttributeNameList"
-    for _, id in ipairs(assign[1]) do
-      if id.tag == "Id" then
-        id.tag = "AttributeId"
-        id[2] = attribute
-      elseif id.tag == "DestructuringId" then
-        for _, did in ipairs(id) do
-          did.tag = "AttributeId"
-          did[2] = attribute
+    return function(assign)
+        assign[1].tag = 'AttributeNameList'
+        for _, id in ipairs(assign[1]) do
+            if id.tag == 'Id' then
+                id.tag = 'AttributeId'
+                id[2] = attribute
+            elseif id.tag == 'DestructuringId' then
+                for _, did in ipairs(id) do
+                    did.tag = 'AttributeId'
+                    did[2] = attribute
+                end
+            end
         end
-      end
+        return assign
     end
-    return assign
-  end
 end
 
 local stacks = {
-  lexpr = {}
+    lexpr = {}
 }
 local function push (f)
-  return Cmt(P"", function()
-    table.insert(stacks[f], true)
-    return true
-  end)
+    return Cmt(P'', function()
+        table.insert(stacks[f], true)
+        return true
+    end)
 end
 local function pop (f)
-  return Cmt(P"", function()
-    table.remove(stacks[f])
-    return true
-  end)
+    return Cmt(P'', function()
+        table.remove(stacks[f])
+        return true
+    end)
 end
 local function when (f)
-  return Cmt(P"", function()
-    return #stacks[f] > 0
-  end)
+    return Cmt(P'', function()
+        return #stacks[f] > 0
+    end)
 end
 local function set (f, patt) -- patt *must* succeed (or throw an error) to preserve stack integrity
-  return push(f) * patt * pop(f)
+    return push(f) * patt * pop(f)
 end
 -- }}}
 
 -- {{{ grammar
-local G = { V"Lua",
-  Lua      = (V"Shebang"^-1 * V"Skip" * V"Block" * expect(P(-1), "Extra")) / fixStructure;
-  Shebang  = P"#!" * (P(1) - P"\n")^0;
+local G = { V'Lua',
+  Lua      = (V'Shebang'^-1 * V'Skip' * V'Block' * expect(P(-1), 'Extra')) / fixStructure;
+  Shebang  = P'#!' * (P(1) - P'\n')^0;
 
-  Block       = tagC("Block", (V"Stat" + -V"BlockEnd" * throw("InvalidStat"))^0 * ((V"RetStat" + V"ImplicitPushStat") * sym(";")^-1)^-1);
-  Stat        = V"IfStat" + V"DoStat" + V"WhileStat" + V"RepeatStat" + V"ForStat"
-              + V"LocalStat" + V"FuncStat" + V"BreakStat" + V"LabelStat" + V"GoToStat"
-              + V"LetStat" + V"ConstStat" + V"CloseStat"
-              + V"FuncCall" + V"Assignment"
-              + V"ContinueStat" + V"PushStat"
-              + sym(";");
-  BlockEnd    = P"return" + "end" + "elseif" + "else" + "until" + "]" + -1 + V"ImplicitPushStat" + V"Assignment";
+  Block       = tagC('Block', (V'Stat' + -V'BlockEnd' * throw('InvalidStat'))^0 * ((V'RetStat' + V'ImplicitPushStat') * sym(';')^-1)^-1);
+  Stat        = V'IfStat' + V'DoStat' + V'WhileStat' + V'RepeatStat' + V'ForStat'
+              + V'LocalStat' + V'FuncStat' + V'BreakStat' + V'LabelStat' + V'GoToStat'
+              + V'LetStat' + V'ConstStat' + V'CloseStat'
+              + V'FuncCall' + V'Assignment'
+              + V'ContinueStat' + V'PushStat'
+              + sym(';');
+  BlockEnd    = P'return' + 'end' + 'elseif' + 'else' + 'until' + ']' + -1 + V'ImplicitPushStat' + V'Assignment';
 
-  SingleStatBlock = tagC("Block", V"Stat" + V"RetStat" + V"ImplicitPushStat") / function(t) t.is_singlestatblock = true return t end;
-  BlockNoErr      = tagC("Block", V"Stat"^0 * ((V"RetStat" + V"ImplicitPushStat") * sym(";")^-1)^-1); -- used to check if something a valid block without throwing an error
+  SingleStatBlock = tagC('Block', V'Stat' + V'RetStat' + V'ImplicitPushStat') / function(t) t.is_singlestatblock = true return t end;
+  BlockNoErr      = tagC('Block', V'Stat'^0 * ((V'RetStat' + V'ImplicitPushStat') * sym(';')^-1)^-1); -- used to check if something a valid block without throwing an error
 
-  IfStat      = tagC("If", V"IfPart");
-  IfPart      = kw("if") * set("lexpr", expect(V"Expr", "ExprIf")) * expectBlockOrSingleStatWithStartEnd(kw("then"), "ThenIf", "EndIf", V"ElseIfPart" + V"ElsePart");
-  ElseIfPart  = kw("elseif") * set("lexpr", expect(V"Expr", "ExprEIf")) * expectBlockOrSingleStatWithStartEnd(kw("then"), "ThenEIf", "EndIf", V"ElseIfPart" + V"ElsePart");
-  ElsePart    = kw("else") * expectBlockWithEnd("EndIf");
+  IfStat      = tagC('If', V'IfPart');
+  IfPart      = kw('if') * set('lexpr', expect(V'Expr', 'ExprIf')) * expectBlockOrSingleStatWithStartEnd(kw('then'), 'ThenIf', 'EndIf', V'ElseIfPart' + V'ElsePart');
+  ElseIfPart  = kw('elseif') * set('lexpr', expect(V'Expr', 'ExprEIf')) * expectBlockOrSingleStatWithStartEnd(kw('then'), 'ThenEIf', 'EndIf', V'ElseIfPart' + V'ElsePart');
+  ElsePart    = kw('else') * expectBlockWithEnd('EndIf');
 
-  DoStat      = kw("do") * expectBlockWithEnd("EndDo") / tagDo;
-  WhileStat   = tagC("While", kw("while") * set("lexpr", expect(V"Expr", "ExprWhile")) * V"WhileBody");
-  WhileBody   = expectBlockOrSingleStatWithStartEnd(kw("do"), "DoWhile", "EndWhile");
-  RepeatStat  = tagC("Repeat", kw("repeat") * V"Block" * expect(kw("until"), "UntilRep") * expect(V"Expr", "ExprRep"));
+  DoStat      = kw('do') * expectBlockWithEnd('EndDo') / tagDo;
+  WhileStat   = tagC('While', kw('while') * set('lexpr', expect(V'Expr', 'ExprWhile')) * V'WhileBody');
+  WhileBody   = expectBlockOrSingleStatWithStartEnd(kw('do'), 'DoWhile', 'EndWhile');
+  RepeatStat  = tagC('Repeat', kw('repeat') * V'Block' * expect(kw('until'), 'UntilRep') * expect(V'Expr', 'ExprRep'));
 
-  ForStat   = kw("for") * expect(V"ForNum" + V"ForIn", "ForRange");
-  ForNum    = tagC("Fornum", V"Id" * sym("=") * V"NumRange" * V"ForBody");
-  NumRange  = expect(V"Expr", "ExprFor1") * expect(sym(","), "CommaFor") *expect(V"Expr", "ExprFor2")
-            * (sym(",") * expect(V"Expr", "ExprFor3"))^-1;
-  ForIn     = tagC("Forin", V"DestructuringNameList" * expect(kw("in"), "InFor") * expect(V"ExprList", "EListFor") * V"ForBody");
-  ForBody   = expectBlockOrSingleStatWithStartEnd(kw("do"), "DoFor", "EndFor");
+  ForStat   = kw('for') * expect(V'ForNum' + V'ForIn', 'ForRange');
+  ForNum    = tagC('Fornum', V'Id' * sym('=') * V'NumRange' * V'ForBody');
+  NumRange  = expect(V'Expr', 'ExprFor1') * expect(sym(','), 'CommaFor') *expect(V'Expr', 'ExprFor2')
+            * (sym(',') * expect(V'Expr', 'ExprFor3'))^-1;
+  ForIn     = tagC('Forin', V'DestructuringNameList' * expect(kw('in'), 'InFor') * expect(V'ExprList', 'EListFor') * V'ForBody');
+  ForBody   = expectBlockOrSingleStatWithStartEnd(kw('do'), 'DoFor', 'EndFor');
 
-  LocalStat    = kw("local") * expect(V"LocalFunc" + V"LocalAssign", "DefLocal");
-  LocalFunc    = tagC("Localrec", kw("function") * expect(V"Id", "NameLFunc") * V"FuncBody") / fixFuncStat;
-  LocalAssign  = tagC("Local", V"AttributeNameList" * (sym("=") * expect(V"ExprList", "EListLAssign") + Ct(Cc())))
-               + tagC("Local", V"DestructuringNameList" * sym("=") * expect(V"ExprList", "EListLAssign"));
+  LocalStat    = kw('local') * expect(V'LocalFunc' + V'LocalAssign', 'DefLocal');
+  LocalFunc    = tagC('Localrec', kw('function') * expect(V'Id', 'NameLFunc') * V'FuncBody') / fixFuncStat;
+  LocalAssign  = tagC('Local', V'AttributeNameList' * (sym('=') * expect(V'ExprList', 'EListLAssign') + Ct(Cc())))
+               + tagC('Local', V'DestructuringNameList' * sym('=') * expect(V'ExprList', 'EListLAssign'));
 
-  LetStat      = kw("let") * expect(V"LetAssign", "DefLet");
-  LetAssign    = tagC("Let", V"NameList" * (sym("=") * expect(V"ExprList", "EListLAssign") + Ct(Cc())))
-               + tagC("Let", V"DestructuringNameList" * sym("=") * expect(V"ExprList", "EListLAssign"));
+  LetStat      = kw('let') * expect(V'LetAssign', 'DefLet');
+  LetAssign    = tagC('Let', V'NameList' * (sym('=') * expect(V'ExprList', 'EListLAssign') + Ct(Cc())))
+               + tagC('Let', V'DestructuringNameList' * sym('=') * expect(V'ExprList', 'EListLAssign'));
 
-  ConstStat       = kw("const") * expect(V"AttributeAssign" / setAttribute("const"), "DefConst");
-  CloseStat       = kw("close") * expect(V"AttributeAssign" / setAttribute("close"), "DefClose");
-  AttributeAssign = tagC("Local", V"NameList" * (sym("=") * expect(V"ExprList", "EListLAssign") + Ct(Cc())))
-                  + tagC("Local", V"DestructuringNameList" * sym("=") * expect(V"ExprList", "EListLAssign"));
+  ConstStat       = kw('const') * expect(V'AttributeAssign' / setAttribute('const'), 'DefConst');
+  CloseStat       = kw('close') * expect(V'AttributeAssign' / setAttribute('close'), 'DefClose');
+  AttributeAssign = tagC('Local', V'NameList' * (sym('=') * expect(V'ExprList', 'EListLAssign') + Ct(Cc())))
+                  + tagC('Local', V'DestructuringNameList' * sym('=') * expect(V'ExprList', 'EListLAssign'));
 
-  Assignment   = tagC("Set", (V"VarList" + V"DestructuringNameList") * V"BinOp"^-1 * (P"=" / "=") * ((V"BinOp" - P"-") + #(P"-" * V"Space") * V"BinOp")^-1 * V"Skip" * expect(V"ExprList", "EListAssign"));
+  Assignment   = tagC('Set', (V'VarList' + V'DestructuringNameList') * V'BinOp'^-1 * (P'=' / '=') * ((V'BinOp' - P'-') + #(P'-' * V'Space') * V'BinOp')^-1 * V'Skip' * expect(V'ExprList', 'EListAssign'));
 
-  FuncStat    = tagC("Set", kw("function") * expect(V"FuncName", "FuncName") * V"FuncBody") / fixFuncStat;
-  FuncName    = Cf(V"Id" * (sym(".") * expect(V"StrId", "NameFunc1"))^0, insertIndex)
-              * (sym(":") * expect(V"StrId", "NameFunc2"))^-1 / markMethod;
-  FuncBody    = tagC("Function", V"FuncParams" * expectBlockWithEnd("EndFunc"));
-  FuncParams  = expect(sym("("), "OParenPList") * V"ParList" * expect(sym(")"), "CParenPList");
-  ParList     = V"NamedParList" * (sym(",") * expect(tagC("Dots", sym("...")), "ParList"))^-1 / addDots
-              + Ct(tagC("Dots", sym("...")))
+  FuncStat    = tagC('Set', kw('function') * expect(V'FuncName', 'FuncName') * V'FuncBody') / fixFuncStat;
+  FuncName    = Cf(V'Id' * (sym('.') * expect(V'StrId', 'NameFunc1'))^0, insertIndex)
+              * (sym(':') * expect(V'StrId', 'NameFunc2'))^-1 / markMethod;
+  FuncBody    = tagC('Function', V'FuncParams' * expectBlockWithEnd('EndFunc'));
+  FuncParams  = expect(sym('('), 'OParenPList') * V'ParList' * expect(sym(')'), 'CParenPList');
+  ParList     = V'NamedParList' * (sym(',') * expect(tagC('Dots', sym('...')), 'ParList'))^-1 / addDots
+              + Ct(tagC('Dots', sym('...')))
               + Ct(Cc()); -- Cc({}) generates a bug since the {} would be shared across parses
 
-  ShortFuncDef    = tagC("Function", V"ShortFuncParams" * maybeBlockWithEnd()) / fixShortFunc;
-  ShortFuncParams = (sym(":") / ":")^-1 * sym("(") * V"ParList" * sym(")");
+  ShortFuncDef    = tagC('Function', V'ShortFuncParams' * maybeBlockWithEnd()) / fixShortFunc;
+  ShortFuncParams = (sym(':') / ':')^-1 * sym('(') * V'ParList' * sym(')');
 
-  NamedParList  = tagC("NamedParList", commaSep(V"NamedPar"));
-  NamedPar      = tagC("ParPair", V"ParKey" * expect(sym("="), "EqField") * expect(V"Expr", "ExprField"))
-                + V"Id";
-  ParKey        = V"Id" * #("=" * -P"=");
+  NamedParList  = tagC('NamedParList', commaSep(V'NamedPar'));
+  NamedPar      = tagC('ParPair', V'ParKey' * expect(sym('='), 'EqField') * expect(V'Expr', 'ExprField'))
+                + V'Id';
+  ParKey        = V'Id' * #('=' * -P'=');
 
-  LabelStat       = tagC("Label", sym("::") * expect(V"Name", "Label") * expect(sym("::"), "CloseLabel"));
-  GoToStat        = tagC("Goto", kw("goto") * expect(V"Name", "Goto"));
-  BreakStat       = tagC("Break", kw("break"));
-  ContinueStat    = tagC("Continue", kw("continue"));
-  RetStat         = tagC("Return", kw("return") * commaSep(V"Expr", "RetList")^-1);
+  LabelStat       = tagC('Label', sym('::') * expect(V'Name', 'Label') * expect(sym('::'), 'CloseLabel'));
+  GoToStat        = tagC('Goto', kw('goto') * expect(V'Name', 'Goto'));
+  BreakStat       = tagC('Break', kw('break'));
+  ContinueStat    = tagC('Continue', kw('continue'));
+  RetStat         = tagC('Return', kw('return') * commaSep(V'Expr', 'RetList')^-1);
 
-  PushStat         = tagC("Push", kw("push") * commaSep(V"Expr", "RetList")^-1);
-  ImplicitPushStat = tagC("Push", commaSep(V"Expr", "RetList")) / markImplicit;
+  PushStat         = tagC('Push', kw('push') * commaSep(V'Expr', 'RetList')^-1);
+  ImplicitPushStat = tagC('Push', commaSep(V'Expr', 'RetList')) / markImplicit;
 
-  NameList              = tagC("NameList", commaSep(V"Id"));
-  DestructuringNameList = tagC("NameList", commaSep(V"DestructuringId")),
-  AttributeNameList     = tagC("AttributeNameList", commaSep(V"AttributeId"));
-  VarList   = tagC("VarList", commaSep(V"VarExpr"));
-  ExprList  = tagC("ExpList", commaSep(V"Expr", "ExprList"));
+  NameList              = tagC('NameList', commaSep(V'Id'));
+  DestructuringNameList = tagC('NameList', commaSep(V'DestructuringId')),
+  AttributeNameList     = tagC('AttributeNameList', commaSep(V'AttributeId'));
+  VarList   = tagC('VarList', commaSep(V'VarExpr'));
+  ExprList  = tagC('ExpList', commaSep(V'Expr', 'ExprList'));
 
-  DestructuringId          = tagC("DestructuringId", sym("{") * V"DestructuringIdFieldList" * expect(sym("}"), "CBraceDestructuring")) + V"Id",
-  DestructuringIdFieldList = sepBy(V"DestructuringIdField", V"FieldSep") * V"FieldSep"^-1;
-  DestructuringIdField     = tagC("Pair", V"FieldKey" * expect(sym("="), "DestructuringEqField") * expect(V"Id", "DestructuringExprField"))
-                           + V"Id";
+  DestructuringId          = tagC('DestructuringId', sym('{') * V'DestructuringIdFieldList' * expect(sym('}'), 'CBraceDestructuring')) + V'Id',
+  DestructuringIdFieldList = sepBy(V'DestructuringIdField', V'FieldSep') * V'FieldSep'^-1;
+  DestructuringIdField     = tagC('Pair', V'FieldKey' * expect(sym('='), 'DestructuringEqField') * expect(V'Id', 'DestructuringExprField'))
+                           + V'Id';
 
-  Expr        = V"OrExpr";
-  OrExpr      = chainOp(V"AndExpr", V"OrOp", "OrExpr");
-  AndExpr     = chainOp(V"RelExpr", V"AndOp", "AndExpr");
-  RelExpr     = chainOp(V"BOrExpr", V"RelOp", "RelExpr");
-  BOrExpr     = chainOp(V"BXorExpr", V"BOrOp", "BOrExpr");
-  BXorExpr    = chainOp(V"BAndExpr", V"BXorOp", "BXorExpr");
-  BAndExpr    = chainOp(V"ShiftExpr", V"BAndOp", "BAndExpr");
-  ShiftExpr   = chainOp(V"ConcatExpr", V"ShiftOp", "ShiftExpr");
-  ConcatExpr  = V"AddExpr" * (V"ConcatOp" * expect(V"ConcatExpr", "ConcatExpr"))^-1 / binaryOp;
-  AddExpr     = chainOp(V"MulExpr", V"AddOp", "AddExpr");
-  MulExpr     = chainOp(V"UnaryExpr", V"MulOp", "MulExpr");
-  UnaryExpr   = V"UnaryOp" * expect(V"UnaryExpr", "UnaryExpr") / unaryOp
-              + V"PowExpr";
-  PowExpr     = V"SimpleExpr" * (V"PowOp" * expect(V"UnaryExpr", "PowExpr"))^-1 / binaryOp;
-  SimpleExpr  = tagC("Number", V"Number")
-              + tagC("Nil", kw("nil"))
-              + tagC("Boolean", kw("false") * Cc(false))
-              + tagC("Boolean", kw("true") * Cc(true))
-              + tagC("Dots", sym("..."))
-              + V"FuncDef"
-              + (when("lexpr") * tagC("LetExpr", maybe(V"DestructuringNameList") * sym("=") * -sym("=") * expect(V"ExprList", "EListLAssign")))
-              + V"ShortFuncDef"
-              + V"SuffixedExpr"
-              + V"StatExpr";
+  Expr        = V'OrExpr';
+  OrExpr      = chainOp(V'AndExpr', V'OrOp', 'OrExpr');
+  AndExpr     = chainOp(V'RelExpr', V'AndOp', 'AndExpr');
+  RelExpr     = chainOp(V'BOrExpr', V'RelOp', 'RelExpr');
+  BOrExpr     = chainOp(V'BXorExpr', V'BOrOp', 'BOrExpr');
+  BXorExpr    = chainOp(V'BAndExpr', V'BXorOp', 'BXorExpr');
+  BAndExpr    = chainOp(V'ShiftExpr', V'BAndOp', 'BAndExpr');
+  ShiftExpr   = chainOp(V'ConcatExpr', V'ShiftOp', 'ShiftExpr');
+  ConcatExpr  = V'AddExpr' * (V'ConcatOp' * expect(V'ConcatExpr', 'ConcatExpr'))^-1 / binaryOp;
+  AddExpr     = chainOp(V'MulExpr', V'AddOp', 'AddExpr');
+  MulExpr     = chainOp(V'UnaryExpr', V'MulOp', 'MulExpr');
+  UnaryExpr   = V'UnaryOp' * expect(V'UnaryExpr', 'UnaryExpr') / unaryOp
+              + V'PowExpr';
+  PowExpr     = V'SimpleExpr' * (V'PowOp' * expect(V'UnaryExpr', 'PowExpr'))^-1 / binaryOp;
+  SimpleExpr  = tagC('Number', V'Number')
+              + tagC('Nil', kw('nil'))
+              + tagC('Boolean', kw('false') * Cc(false))
+              + tagC('Boolean', kw('true') * Cc(true))
+              + tagC('Dots', sym('...'))
+              + V'FuncDef'
+              + (when('lexpr') * tagC('LetExpr', maybe(V'DestructuringNameList') * sym('=') * -sym('=') * expect(V'ExprList', 'EListLAssign')))
+              + V'ShortFuncDef'
+              + V'SuffixedExpr'
+              + V'StatExpr';
 
-  StatExpr = (V"IfStat" + V"DoStat" + V"WhileStat" + V"RepeatStat" + V"ForStat") / statToExpr;
+  StatExpr = (V'IfStat' + V'DoStat' + V'WhileStat' + V'RepeatStat' + V'ForStat') / statToExpr;
 
-  FuncCall  = Cmt(V"SuffixedExpr", function(s, i, exp) return exp.tag == "Call" or exp.tag == "SafeCall", exp end);
-  VarExpr   = Cmt(V"SuffixedExpr", function(s, i, exp) return exp.tag == "Id" or exp.tag == "Index", exp end);
+  FuncCall  = Cmt(V'SuffixedExpr', function(s, i, exp) return exp.tag == 'Call' or exp.tag == 'SafeCall', exp end);
+  VarExpr   = Cmt(V'SuffixedExpr', function(s, i, exp) return exp.tag == 'Id' or exp.tag == 'Index', exp end);
 
-  SuffixedExpr      = Cf(V"PrimaryExpr" * (V"Index" + V"MethodStub" + V"Call")^0
-                    + V"NoCallPrimaryExpr" * -V"Call" * (V"Index" + V"MethodStub" + V"Call")^0
-                    + V"NoCallPrimaryExpr", makeSuffixedExpr);
-  PrimaryExpr       = V"SelfId" * (V"SelfCall" + V"SelfIndex")
-                    + V"Id"
-                    + tagC("Paren", sym("(") * expect(V"Expr", "ExprParen") * expect(sym(")"), "CParenExpr"));
-  NoCallPrimaryExpr = tagC("String", V"String") + V"Table" + V"TableCompr";
-  Index             = tagC("DotIndex", sym("." * -P".") * expect(V"StrId", "NameIndex"))
-                    + tagC("ArrayIndex", sym("[" * -P(S"=[")) * expect(V"Expr", "ExprIndex") * expect(sym("]"), "CBracketIndex"))
-                    + tagC("SafeDotIndex", sym("?." * -P".") * expect(V"StrId", "NameIndex"))
-                    + tagC("SafeArrayIndex", sym("?[" * -P(S"=[")) * expect(V"Expr", "ExprIndex") * expect(sym("]"), "CBracketIndex"));
-  MethodStub        = tagC("MethodStub", sym(":" * -P":") * expect(V"StrId", "NameMeth"))
-                    + tagC("SafeMethodStub", sym("?:" * -P":") * expect(V"StrId", "NameMeth"));
-  Call              = tagC("Call", V"FuncArgs")
-                    + tagC("SafeCall", P"?" * V"FuncArgs");
-  SelfCall          = tagC("MethodStub", V"StrId") * V"Call";
-  SelfIndex         = tagC("DotIndex", V"StrId");
+  SuffixedExpr      = Cf(V'PrimaryExpr' * (V'Index' + V'MethodStub' + V'Call')^0
+                    + V'NoCallPrimaryExpr' * -V'Call' * (V'Index' + V'MethodStub' + V'Call')^0
+                    + V'NoCallPrimaryExpr', makeSuffixedExpr);
+  PrimaryExpr       = V'SelfId' * (V'SelfCall' + V'SelfIndex')
+                    + V'Id'
+                    + tagC('Paren', sym('(') * expect(V'Expr', 'ExprParen') * expect(sym(')'), 'CParenExpr'));
+  NoCallPrimaryExpr = tagC('String', V'String') + V'Table' + V'TableCompr';
+  Index             = tagC('DotIndex', sym('.' * -P'.') * expect(V'StrId', 'NameIndex'))
+                    + tagC('ArrayIndex', sym('[' * -P(S'=[')) * expect(V'Expr', 'ExprIndex') * expect(sym(']'), 'CBracketIndex'))
+                    + tagC('SafeDotIndex', sym('?.' * -P'.') * expect(V'StrId', 'NameIndex'))
+                    + tagC('SafeArrayIndex', sym('?[' * -P(S'=[')) * expect(V'Expr', 'ExprIndex') * expect(sym(']'), 'CBracketIndex'));
+  MethodStub        = tagC('MethodStub', sym(':' * -P':') * expect(V'StrId', 'NameMeth'))
+                    + tagC('SafeMethodStub', sym('?:' * -P':') * expect(V'StrId', 'NameMeth'));
+  Call              = tagC('Call', V'FuncArgs')
+                    + tagC('SafeCall', P'?' * V'FuncArgs');
+  SelfCall          = tagC('MethodStub', V'StrId') * V'Call';
+  SelfIndex         = tagC('DotIndex', V'StrId');
 
-  FuncDef   = (kw("function") * V"FuncBody");
-  FuncArgs  = sym("(") * commaSep(V"Expr", "ArgList")^-1 * expect(sym(")"), "CParenArgs")
-            + V"Table"
-            + tagC("String", V"String");
+  FuncDef   = (kw('function') * V'FuncBody');
+  FuncArgs  = sym('(') * commaSep(V'Expr', 'ArgList')^-1 * expect(sym(')'), 'CParenArgs')
+            + V'Table'
+            + tagC('String', V'String');
 
-  Table      = tagC("Table", sym("{") * V"FieldList"^-1 * expect(sym("}"), "CBraceTable"));
-  FieldList  = sepBy(V"Field", V"FieldSep") * V"FieldSep"^-1;
-  Field      = tagC("Pair", V"FieldKey" * expect(sym("="), "EqField") * expect(V"Expr", "ExprField"))
-             + V"Expr";
-  FieldKey   = sym("[" * -P(S"=[")) * expect(V"Expr", "ExprFKey") * expect(sym("]"), "CBracketFKey")
-             + V"StrId" * #("=" * -P"=");
-  FieldSep   = sym(",") + sym(";");
+  Table      = tagC('Table', sym('{') * V'FieldList'^-1 * expect(sym('}'), 'CBraceTable'));
+  FieldList  = sepBy(V'Field', V'FieldSep') * V'FieldSep'^-1;
+  Field      = tagC('Pair', V'FieldKey' * expect(sym('='), 'EqField') * expect(V'Expr', 'ExprField'))
+             + V'Expr';
+  FieldKey   = sym('[' * -P(S'=[')) * expect(V'Expr', 'ExprFKey') * expect(sym(']'), 'CBracketFKey')
+             + V'StrId' * #('=' * -P'=');
+  FieldSep   = sym(',') + sym(';');
 
-  TableCompr = tagC("TableCompr", sym("[") * V"Block" * expect(sym("]"), "CBracketTableCompr"));
+  TableCompr = tagC('TableCompr', sym('[') * V'Block' * expect(sym(']'), 'CBracketTableCompr'));
 
-  SelfId = tagC("Id", sym"@" / "self");
-  Id     = tagC("Id", V"Name") + V"SelfId";
-  AttributeSelfId = tagC("AttributeId", sym"@" / "self" * V"Attribute"^-1);
-  AttributeId     = tagC("AttributeId", V"Name" * V"Attribute"^-1) + V"AttributeSelfId";
-  StrId  = tagC("String", V"Name");
+  SelfId = tagC('Id', sym'@' / 'self');
+  Id     = tagC('Id', V'Name') + V'SelfId';
+  AttributeSelfId = tagC('AttributeId', sym'@' / 'self' * V'Attribute'^-1);
+  AttributeId     = tagC('AttributeId', V'Name' * V'Attribute'^-1) + V'AttributeSelfId';
+  StrId  = tagC('String', V'Name');
 
-  Attribute = sym("<") * expect(kw"const" / "const" + kw"close" / "close", "UnknownAttribute") * expect(sym(">"), "CBracketAttribute");
+  Attribute = sym('<') * expect(kw'const' / 'const' + kw'close' / 'close', 'UnknownAttribute') * expect(sym('>'), 'CBracketAttribute');
 
   -- lexer
-  Skip     = (V"Space" + V"Comment")^0;
+  Skip     = (V'Space' + V'Comment')^0;
   Space    = space^1;
-  Comment  = P"--" * V"LongStr" / function () return end
-           + P"--" * (P(1) - P"\n")^0;
+  Comment  = P'--' * V'LongStr' / function () return end
+           + P'--' * (P(1) - P'\n')^0;
 
-  Name      = token(-V"Reserved" * C(V"Ident"));
-  Reserved  = V"Keywords" * -V"IdRest";
-  Keywords  = P"and" + "break" + "do" + "elseif" + "else" + "end"
-            + "false" + "for" + "function" + "goto" + "if" + "in"
-            + "local" + "nil" + "not" + "or" + "repeat" + "return"
-            + "then" + "true" + "until" + "while";
-  Ident     = V"IdStart" * V"IdRest"^0;
-  IdStart   = alpha + P"_";
-  IdRest    = alnum + P"_";
+  Name      = token(-V'Reserved' * C(V'Ident'));
+  Reserved  = V'Keywords' * -V'IdRest';
+  Keywords  = P'and' + 'break' + 'do' + 'elseif' + 'else' + 'end'
+            + 'false' + 'for' + 'function' + 'goto' + 'if' + 'in'
+            + 'local' + 'nil' + 'not' + 'or' + 'repeat' + 'return'
+            + 'then' + 'true' + 'until' + 'while';
+  Ident     = V'IdStart' * V'IdRest'^0;
+  IdStart   = alpha + P'_';
+  IdRest    = alnum + P'_';
 
-  Number   = token(C(V"Hex" + V"Float" + V"Int"));
-  Hex      = (P"0x" + "0X") * ((xdigit^0 * V"DeciHex") + (expect(xdigit^1, "DigitHex") * V"DeciHex"^-1)) * V"ExpoHex"^-1;
-  Float    = V"Decimal" * V"Expo"^-1
-           + V"Int" * V"Expo";
-  Decimal  = digit^1 * "." * digit^0
-           + P"." * -P"." * expect(digit^1, "DigitDeci");
-  DeciHex  = P"." * xdigit^0;
-  Expo     = S"eE" * S"+-"^-1 * expect(digit^1, "DigitExpo");
-  ExpoHex  = S"pP" * S"+-"^-1 * expect(xdigit^1, "DigitExpo");
+  Number   = token(C(V'Hex' + V'Float' + V'Int'));
+  Hex      = (P'0x' + '0X') * ((xdigit^0 * V'DeciHex') + (expect(xdigit^1, 'DigitHex') * V'DeciHex'^-1)) * V'ExpoHex'^-1;
+  Float    = V'Decimal' * V'Expo'^-1
+           + V'Int' * V'Expo';
+  Decimal  = digit^1 * '.' * digit^0
+           + P'.' * -P'.' * expect(digit^1, 'DigitDeci');
+  DeciHex  = P'.' * xdigit^0;
+  Expo     = S'eE' * S'+-'^-1 * expect(digit^1, 'DigitExpo');
+  ExpoHex  = S'pP' * S'+-'^-1 * expect(xdigit^1, 'DigitExpo');
   Int      = digit^1;
 
-  String    = token(V"ShortStr" + V"LongStr");
-  ShortStr  = P'"' * Cs((V"EscSeq" + (P(1)-S'"\n'))^0) * expect(P'"', "Quote")
-            + P"'" * Cs((V"EscSeq" + (P(1)-S"'\n"))^0) * expect(P"'", "Quote");
+  String    = token(V'ShortStr' + V'LongStr');
+  ShortStr  = P[["]] * Cs((V'EscSeq' + (P(1)-S[["\n]]))^0) * expect(P[["]], 'Quote')
+            + P[[']] * Cs((V'EscSeq' + (P(1)-S[['\n]]))^0) * expect(P[[']], 'Quote');
 
-  EscSeq = P"\\" / ""  -- remove backslash
-         * ( P"a" / "\a"
-           + P"b" / "\b"
-           + P"f" / "\f"
-           + P"n" / "\n"
-           + P"r" / "\r"
-           + P"t" / "\t"
-           + P"v" / "\v"
+  EscSeq = P'\\' / ''  -- remove backslash
+         * ( P'a' / '\a'
+           + P'b' / '\b'
+           + P'f' / '\f'
+           + P'n' / '\n'
+           + P'r' / '\r'
+           + P't' / '\t'
+           + P'v' / '\v'
 
-           + P"\n" / "\n"
-           + P"\r" / "\n"
+           + P'\n' / '\n'
+           + P'\r' / '\n'
 
-           + P"\\" / "\\"
-           + P"\"" / "\""
-           + P"\'" / "\'"
+           + P'\\' / '\\'
+           + P'\'' / '\''
+           + P'\'' / '\''
 
-           + P"z" * space^0  / ""
+           + P'z' * space^0  / ''
 
            + digit * digit^-2 / tonumber / string.char
-           + P"x" * expect(C(xdigit * xdigit), "HexEsc") * Cc(16) / tonumber / string.char
-           + P"u" * expect("{", "OBraceUEsc")
-                  * expect(C(xdigit^1), "DigitUEsc") * Cc(16)
-                  * expect("}", "CBraceUEsc")
+           + P'x' * expect(C(xdigit * xdigit), 'HexEsc') * Cc(16) / tonumber / string.char
+           + P'u' * expect('{', 'OBraceUEsc')
+                  * expect(C(xdigit^1), 'DigitUEsc') * Cc(16)
+                  * expect('}', 'CBraceUEsc')
                   / tonumber
                   / (utf8 and utf8.char or string.char)  -- true max is \u{10FFFF}
                                                          -- utf8.char needs Lua 5.3
                                                          -- string.char works only until \u{FF}
 
-           + throw("EscSeq")
+           + throw('EscSeq')
            );
 
-  LongStr  = V"Open" * C((P(1) - V"CloseEq")^0) * expect(V"Close", "CloseLStr") / function (s, eqs) return s end;
-  Open     = "[" * Cg(V"Equals", "openEq") * "[" * P"\n"^-1;
-  Close    = "]" * C(V"Equals") * "]";
-  Equals   = P"="^0;
-  CloseEq  = Cmt(V"Close" * Cb("openEq"), function (s, i, closeEq, openEq) return #openEq == #closeEq end);
+  LongStr  = V'Open' * C((P(1) - V'CloseEq')^0) * expect(V'Close', 'CloseLStr') / function (s, eqs) return s end;
+  Open     = '[' * Cg(V'Equals', 'openEq') * '[' * P'\n'^-1;
+  Close    = ']' * C(V'Equals') * ']';
+  Equals   = P'='^0;
+  CloseEq  = Cmt(V'Close' * Cb('openEq'), function (s, i, closeEq, openEq) return #openEq == #closeEq end);
 
-  OrOp      = kw("or")   / "or";
-  AndOp     = kw("and")  / "and";
-  RelOp     = sym("~=")  / "ne"
-            + sym("==")  / "eq"
-            + sym("<=")  / "le"
-            + sym(">=")  / "ge"
-            + sym("<")   / "lt"
-            + sym(">")   / "gt";
-  BOrOp     = sym("|")   / "bor";
-  BXorOp    = sym("~" * -P"=") / "bxor";
-  BAndOp    = sym("&")   / "band";
-  ShiftOp   = sym("<<")  / "shl"
-            + sym(">>")  / "shr";
-  ConcatOp  = sym("..")  / "concat";
-  AddOp     = sym("+")   / "add"
-            + sym("-")   / "sub";
-  MulOp     = sym("*")   / "mul"
-            + sym("//")  / "idiv"
-            + sym("/")   / "div"
-            + sym("%")   / "mod";
-  UnaryOp   = kw("not")  / "not"
-            + sym("-")   / "unm"
-            + sym("#")   / "len"
-            + sym("~")   / "bnot";
-  PowOp     = sym("^")   / "pow";
-  BinOp     = V"OrOp" + V"AndOp" + V"BOrOp" + V"BXorOp" + V"BAndOp" + V"ShiftOp" + V"ConcatOp" + V"AddOp" + V"MulOp" + V"PowOp";
+  OrOp      = kw('or')   / 'or';
+  AndOp     = kw('and')  / 'and';
+  RelOp     = sym('~=')  / 'ne'
+            + sym('==')  / 'eq'
+            + sym('<=')  / 'le'
+            + sym('>=')  / 'ge'
+            + sym('<')   / 'lt'
+            + sym('>')   / 'gt';
+  BOrOp     = sym('|')   / 'bor';
+  BXorOp    = sym('~' * -P'=') / 'bxor';
+  BAndOp    = sym('&')   / 'band';
+  ShiftOp   = sym('<<')  / 'shl'
+            + sym('>>')  / 'shr';
+  ConcatOp  = sym('..')  / 'concat';
+  AddOp     = sym('+')   / 'add'
+            + sym('-')   / 'sub';
+  MulOp     = sym('*')   / 'mul'
+            + sym('//')  / 'idiv'
+            + sym('/')   / 'div'
+            + sym('%')   / 'mod';
+  UnaryOp   = kw('not')  / 'not'
+            + sym('-')   / 'unm'
+            + sym('#')   / 'len'
+            + sym('~')   / 'bnot';
+  PowOp     = sym('^')   / 'pow';
+  BinOp     = V'OrOp' + V'AndOp' + V'BOrOp' + V'BXorOp' + V'BAndOp' + V'ShiftOp' + V'ConcatOp' + V'AddOp' + V'MulOp' + V'PowOp';
 }
 -- }}}
 
 -- {{{ parse macros
 local macroidentifier = {
-  expect(V"MacroIdentifier", "InvalidStat") * expect(P(-1), "Extra"),
+  expect(V'MacroIdentifier', 'InvalidStat') * expect(P(-1), 'Extra'),
 
-  MacroIdentifier   = tagC("MacroFunction", V"Id" * sym("(") * V"MacroFunctionArgs" * expect(sym(")"), "CParenPList"))
-                    + V"Id";
+  MacroIdentifier   = tagC('MacroFunction', V'Id' * sym('(') * V'MacroFunctionArgs' * expect(sym(')'), 'CParenPList'))
+                    + V'Id';
 
-  MacroFunctionArgs = V"NameList" * (sym(",") * expect(tagC("Dots", sym("...")), "ParList"))^-1 / addDots
-                    + Ct(tagC("Dots", sym("...")))
+  MacroFunctionArgs = V'NameList' * (sym(',') * expect(tagC('Dots', sym('...')), 'ParList'))^-1 / addDots
+                    + Ct(tagC('Dots', sym('...')))
                     + Ct(Cc());
 
 }
@@ -781,7 +781,7 @@ for k,v in pairs(G) do if macroidentifier[k] == nil then macroidentifier[k] = v 
 -- {{{ parse
 local parser = {}
 
-local validator = require("lepton.lpt-parser.validator")
+local validator = require('lepton.lpt-parser.validator')
 local validate = validator.validate
 local syntaxerror = validator.syntaxerror
 
