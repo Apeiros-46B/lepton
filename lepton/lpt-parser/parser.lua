@@ -199,7 +199,7 @@ local function throw(label)
     error('Label not found: ' .. label)
 end
 
-local function expect (patt, label)
+local function expect(patt, label)
     return patt + throw(label)
 end
 -- }}}
@@ -431,7 +431,7 @@ local function searchEndRec (block, isRecCall) -- recursively search potential '
     return nil
 end
 
-local function searchEnd (s, p, t) -- match time capture which try to restructure the AST to free an 'end' for us
+local function searchEnd(s, p, t) -- match time capture which try to restructure the AST to free an 'end' for us
     local r = searchEndRec(fixStructure(t))
     if not r then
         return false
@@ -439,7 +439,7 @@ local function searchEnd (s, p, t) -- match time capture which try to restructur
     return true, r
 end
 
-local function expectBlockOrSingleStatWithStartEnd (start, startLabel, stopLabel, canFollow) -- will try a SingleStat if start doesn't match
+local function expectBlockOrSingleStatWithStartEnd(start, startLabel, stopLabel, canFollow) -- will try a SingleStat if start doesn't match
     if canFollow then
         return (-start * V'SingleStatBlock' * canFollow^-1)
         + (expect(start, startLabel) * ((V'Block' * (canFollow + kw('end')))
@@ -451,17 +451,17 @@ local function expectBlockOrSingleStatWithStartEnd (start, startLabel, stopLabel
     end
 end
 
-local function expectBlockWithEnd (label) -- can't work *optionnaly* with SingleStat unfortunatly
+local function expectBlockWithEnd(label) -- can't work *optionnaly* with SingleStat unfortunatly
     return (V'Block' * kw('end'))
     + (Cmt(V'Block', searchEnd) + throw(label))
 end
 
-local function maybeBlockWithEnd () -- same as above but don't error if it doesn't match
+local function maybeBlockWithEnd() -- same as above but don't error if it doesn't match
     return (V'BlockNoErr' * kw('end'))
     + Cmt(V'BlockNoErr', searchEnd)
 end
 
-local function maybe (patt) -- fail pattern instead of propagating errors
+local function maybe(patt) -- fail pattern instead of propagating errors
     return #patt/0 * patt
 end
 
@@ -486,24 +486,24 @@ end
 local stacks = {
     lexpr = {}
 }
-local function push (f)
+local function push(f)
     return Cmt(P'', function()
         table.insert(stacks[f], true)
         return true
     end)
 end
-local function pop (f)
+local function pop(f)
     return Cmt(P'', function()
         table.remove(stacks[f])
         return true
     end)
 end
-local function when (f)
+local function when(f)
     return Cmt(P'', function()
         return #stacks[f] > 0
     end)
 end
-local function set (f, patt) -- patt *must* succeed (or throw an error) to preserve stack integrity
+local function set(f, patt) -- patt *must* succeed (or throw an error) to preserve stack integrity
     return push(f) * patt * pop(f)
 end
 -- }}}
@@ -694,8 +694,8 @@ local G = { V'Lua',
   Int      = digit^1;
 
   String    = token(V'ShortStr' + V'LongStr');
-  ShortStr  = P[["]] * Cs((V'EscSeq' + (P(1)-S[["\n]]))^0) * expect(P[["]], 'Quote')
-            + P[[']] * Cs((V'EscSeq' + (P(1)-S[['\n]]))^0) * expect(P[[']], 'Quote');
+  ShortStr  = P'"' * Cs((V'EscSeq' + (P(1)-S'"\n'))^0) * expect(P'"', 'Quote')
+            + P"'" * Cs((V'EscSeq' + (P(1)-S"'\n"))^0) * expect(P"'", 'Quote');
 
   EscSeq = P'\\' / ''  -- remove backslash
          * ( P'a' / '\a'
@@ -710,7 +710,7 @@ local G = { V'Lua',
            + P'\r' / '\n'
 
            + P'\\' / '\\'
-           + P'\'' / '\''
+           + P'\"' / '\"'
            + P'\'' / '\''
 
            + P'z' * space^0  / ''
