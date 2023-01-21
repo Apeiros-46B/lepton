@@ -133,7 +133,9 @@ local labels = {
     { 'ErrCParenPList', [[expected ')' to close the parameter list]] },
     { 'ErrOFunc', [[expected '{' after the parameter list]] },
     { 'ErrCFunc', [[expected '}' to close the function body]] },
-    { 'ErrFuncArrow', [[expected '->' after short function parameter list]] },
+    { 'ErrArrowFuncArrow', [[expected '->' after the arrow function parameter(s)]] },
+    { 'ErrOArrowFunc', [[expected '{' after '->']] },
+    { 'ErrCArrowFunc', [[expected '}' to close the arrow function]] },
     { 'ErrParList', [[expected a variable name or '...' after ',']] },
 
     { 'ErrLabel', [[expected a label name after '::']] },
@@ -266,7 +268,7 @@ local function commaSep(patt, label)
     return sepBy(patt, sym(','), label)
 end
 
-local function tagDo (block)
+local function tagDo(block)
     block.tag = 'Do'
     return block
 end
@@ -283,7 +285,7 @@ local function addDots(params, dots)
     return params
 end
 
-local function insertIndex (t, index)
+local function insertIndex(t, index)
     return { tag = 'Index', pos = t.pos, [1] = t, [2] = index }
 end
 
@@ -312,7 +314,19 @@ local function makeSuffixedExpr(t1, t2)
     end
 end
 
-local function fixShortFunc(t)
+-- local function printT(layer, t)
+--     local indent = (' '):rep(layer * 4)
+--     for k, v in pairs(t) do
+--         if type(v) == 'table' then
+--             print(indent .. k .. ':')
+--             printT(layer + 1, v)
+--         else
+--             print(indent .. k .. ': ' .. tostring(v))
+--         end
+--     end
+-- end
+
+local function fixArrowFunc(t)
     if t[1] == ':' then -- self method
         table.insert(t[2], 1, { tag = 'Id', 'self' })
         table.remove(t, 1)
@@ -464,28 +478,12 @@ local function eEnd(label)
     return e(sym('}'), label)
 end
 
-local function eBlkEnd(label) -- can't work *optionnaly* with SingleStat unfortunatly
-    return (V'Block' * sym('}'))
-    + (Cmt(V'Block', searchEnd) + throw(label))
-end
-
-local function eBlkStartEnd(startLabel, stopLabel, canFollow) -- will try a SingleStat if start doesn't match
-    local start = sym('{')
-    local _end  = sym('}')
+local function eBlkStartEnd(startLabel, endLabel, canFollow)
     if canFollow then
-        return (-start * V'SingleStatBlock' * canFollow^-1)
-        + (e(start, startLabel) * ((V'Block' * (canFollow + _end))
-        + (Cmt(V'Block', searchEnd) + throw(stopLabel))))
+        return eStart(startLabel) * V'Block' * eEnd(endLabel) * canFollow^-1
     else
-        return (-start * V'SingleStatBlock')
-        + (e(start, startLabel) * ((V'Block' * _end)
-        + (Cmt(V'Block', searchEnd) + throw(stopLabel))))
+        return eStart(startLabel) * V'Block' * eEnd(endLabel)
     end
-end
-
-local function mbBlockEnd() -- same as above but don't error if it doesn't match
-    return (V'BlockNoErr' * sym('}'))
-    + Cmt(V'BlockNoErr', searchEnd)
 end
 
 local function mb(patt) -- fail pattern instead of propagating errors
@@ -554,8 +552,8 @@ local G = { V'Lua',
 
     IfStat      = tagC('If', V'IfPart');
     IfPart      = kw('if') * set('lexpr', e(parenAround(V'Expr'), 'ExprIf')) * eBlkStartEnd('OIf', 'CIf', V'ElseIfPart' + V'ElsePart');
-    ElseIfPart  = eEnd('CIf') * kw('elseif') * set('lexpr', e(V'Expr', 'ExprEIf')) * eBlkStartEnd('OEIf', 'CIf', V'ElseIfPart' + V'ElsePart');
-    ElsePart    = eEnd('CIf') * kw('else') * eBlkStartEnd('OElse', 'CIf');
+    ElseIfPart  = kw('elseif') * set('lexpr', e(parenAround(V'Expr'), 'ExprEIf')) * eBlkStartEnd('OEIf', 'CIf', V'ElseIfPart' + V'ElsePart');
+    ElsePart    = kw('else') * eBlkStartEnd('OElse', 'CIf');
 
     DoStat      = kw('do') * eBlkStartEnd('ODo', 'CDo') / tagDo;
     WhileStat   = tagC('While', kw('while') * set('lexpr', e(parenAround(V'Expr'), 'ExprWhile')) * V'WhileBody');
@@ -583,7 +581,8 @@ local G = { V'Lua',
     AttributeAssign = tagC('Local', V'NameList' * (sym('=') * e(V'ExprList', 'EListLAssign') + Ct(Cc())))
                     + tagC('Local', V'DestructuringNameList' * sym('=') * e(V'ExprList', 'EListLAssign'));
 
-    Assignment   = tagC('Set', (V'VarList' + V'DestructuringNameList') * V'BinOp'^-1 * (P'=' / '=') * ((V'BinOp' - P'-') + #(P'-' * V'Space') * V'BinOp')^-1 * V'Skip' * e(V'ExprList', 'EListAssign'));
+    Assignment   = tagC('Set', (V'VarList' + V'DestructuringNameList') * V'BinOp'^-1 * ((P'=' - '==') / '=')
+                 * ((V'BinOp' - P'-') + #(P'-' * V'Space') * V'BinOp')^-1 * V'Skip' * e(V'ExprList', 'EListAssign'));
 
     FuncStat    = tagC('Set', kw('function') * e(V'FuncName', 'FuncName') * V'FuncBody') / fixFuncStat;
     FuncName    = Cf(V'Id' * (sym('.') * e(V'StrId', 'NameFunc1'))^0, insertIndex)
@@ -594,12 +593,12 @@ local G = { V'Lua',
                 + Ct(tagC('Dots', sym('...')))
                 + Ct(Cc()); -- Cc({}) generates a bug since the {} would be shared across parses
 
-    ShortFuncDef    = tagC('Function', V'ShortFuncParams' * sym('->') * sym('{') * mbBlockEnd()) / fixShortFunc;
-    ShortFuncParams = (sym(':') / ':')^-1 * parenAround(V'ParList');
+    ArrowFuncDef    = tagC('Function', V'ArrowFuncParams' * sym('->') * V'ArrowFuncBody') / fixArrowFunc;
+    ArrowFuncParams = (sym(':') / ':')^-1 * (parenAround(V'ParList') + tagC('NamedPar', V'NamedPar'));
+    ArrowFuncBody   = (-sym('{') * V'Block' * -sym('}')) + eBlkStartEnd('OArrowFunc', 'CArrowFunc');
 
     NamedParList  = tagC('NamedParList', commaSep(V'NamedPar'));
-    NamedPar      = tagC('ParPair', V'ParKey' * e(sym('='), 'EqField') * e(V'Expr', 'ExprField'))
-                  + V'Id';
+    NamedPar      = tagC('ParPair', V'ParKey' * e(sym('='), 'EqField') * e(V'Expr', 'ExprField')) + V'Id';
     ParKey        = V'Id' * #('=' * -P'=');
 
     LabelStat       = tagC('Label', sym('::') * e(V'Name', 'Label') * e(sym('::'), 'CloseLabel'));
@@ -643,7 +642,7 @@ local G = { V'Lua',
                 + tagC('Dots', sym('...'))
                 + V'FuncDef'
                 + (when('lexpr') * tagC('LetExpr', mb(V'DestructuringNameList') * sym('=') * -sym('=') * e(V'ExprList', 'EListLAssign')))
-                + V'ShortFuncDef'
+                + V'ArrowFuncDef'
                 + V'SuffixedExpr'
                 + V'StatExpr';
 
@@ -683,7 +682,7 @@ local G = { V'Lua',
 
     TableCompr = tagC('TableCompr', sym('[') * V'Block' * e(sym(']'), 'CBracketTableCompr'));
 
-    SelfId = tagC('Id', sym'@' / 'self');
+    SelfId = tagC('Id', sym('@') / 'self');
     Id     = tagC('Id', V'Name') + V'SelfId';
     AttributeSelfId = tagC('AttributeId', sym'@' / 'self' * V'Attribute'^-1);
     AttributeId     = tagC('AttributeId', V'Name' * V'Attribute'^-1) + V'AttributeSelfId';
@@ -788,19 +787,24 @@ local G = { V'Lua',
 }
 -- }}}
 
--- {{{ parse macros
+-- {{{ macro grammar
 local macroidentifier = {
-  e(V'MacroIdentifier', 'InvalidStat') * e(P(-1), 'Extra'),
+    e(V'MacroIdentifier', 'InvalidStat') * e(P(-1), 'Extra'),
 
-  MacroIdentifier   = tagC('MacroFunction', V'Id' * sym('(') * V'MacroFunctionArgs' * e(sym(')'), 'CParenPList'))
-                    + V'Id';
+    MacroIdentifier   = tagC('MacroFunction', V'Id' * sym('(') * V'MacroFunctionArgs' * e(sym(')'), 'CParenPList'))
+                      + V'Id';
 
-  MacroFunctionArgs = V'NameList' * (sym(',') * e(tagC('Dots', sym('...')), 'ParList'))^-1 / addDots
-                    + Ct(tagC('Dots', sym('...')))
-                    + Ct(Cc());
-
+    MacroFunctionArgs = V'NameList' * (sym(',') * e(tagC('Dots', sym('...')), 'ParList'))^-1 / addDots
+                      + Ct(tagC('Dots', sym('...')))
+                      + Ct(Cc());
 }
-for k,v in pairs(G) do if macroidentifier[k] == nil then macroidentifier[k] = v end end -- copy other rules from main syntax
+
+-- copy other rules from main syntax
+for k, v in pairs(G) do
+    if macroidentifier[k] == nil then
+        macroidentifier[k] = v
+    end
+end
 -- }}}
 
 -- {{{ parse

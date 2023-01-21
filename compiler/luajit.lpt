@@ -1,38 +1,38 @@
-targetName = "LuaJIT"
+targetName = 'LuaJIT'
 
 UNPACK = (list, i, j)
-	return "unpack(" .. list .. (i and (", " .. i .. (j and (", " .. j) or "")) or "") .. ")"
+	return 'unpack(' .. list .. (i and (', ' .. i .. (j and (', ' .. j) or '')) or '') .. ')'
 end
 
 tags._opid.band = (left, right)
-	addRequire("bit", "band", "band")
-	return var("band") .. "(" .. lua(left) .. ", " .. lua(right) .. ")"
+	addRequire('bit', 'band', 'band')
+	return var('band') .. '(' .. lua(left) .. ', ' .. lua(right) .. ')'
 end
 tags._opid.bor = (left, right)
-	addRequire("bit", "bor", "bor")
-	return var("bor") .. "(" .. lua(left) .. ", " .. lua(right) .. ")"
+	addRequire('bit', 'bor', 'bor')
+	return var('bor') .. '(' .. lua(left) .. ', ' .. lua(right) .. ')'
 end
 tags._opid.bxor = (left, right)
-	addRequire("bit", "bxor", "bxor")
-	return var("bxor") .. "(" .. lua(left) .. ", " .. lua(right) .. ")"
+	addRequire('bit', 'bxor', 'bxor')
+	return var('bxor') .. '(' .. lua(left) .. ', ' .. lua(right) .. ')'
 end
 tags._opid.shl = (left, right)
-	addRequire("bit", "lshift", "lshift")
-	return var("lshift") .. "(" .. lua(left) .. ", " .. lua(right) .. ")"
+	addRequire('bit', 'lshift', 'lshift')
+	return var('lshift') .. '(' .. lua(left) .. ', ' .. lua(right) .. ')'
 end
 tags._opid.shr = (left, right)
-	addRequire("bit", "rshift", "rshift")
-	return var("rshift") .. "(" .. lua(left) .. ", " .. lua(right) .. ")"
+	addRequire('bit', 'rshift', 'rshift')
+	return var('rshift') .. '(' .. lua(left) .. ', ' .. lua(right) .. ')'
 end
 tags._opid.bnot = (right)
-	addRequire("bit", "bnot", "bnot")
-	return var("bnot") .. "(" .. lua(right) .. ")"
+	addRequire('bit', 'bnot', 'bnot')
+	return var('bnot') .. '(' .. lua(right) .. ')'
 end
 
-#placeholder("patch")
+#placeholder('patch')
 
 #local patch = output
-#output = ""
-#import("compiler.lua52", { preprocessorEnv = { patch = patch }, loadPackage = false })
+#output = ''
+#import('compiler.lua52', { preprocessorEnv = { patch = patch }, loadPackage = false })
 
 return lua52

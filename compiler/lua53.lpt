@@ -1,18 +1,18 @@
-targetName = "Lua 5.3"
+targetName = 'Lua 5.3'
 
 -- Unsuported features
 tags.AttributeId = (t)
 	if t[2] then
-		error("target "..targetName.." does not support variable attributes")
+		error('target '..targetName..' does not support variable attributes')
 	else
 		return t[1]
 	end
 end
 
-#placeholder("patch")
+#placeholder('patch')
 
 #local patch = output
-#output = ""
-#import("compiler.lua54", { preprocessorEnv = { patch = patch }, loadPackage = false })
+#output = ''
+#import('compiler.lua54', { preprocessorEnv = { patch = patch }, loadPackage = false })
 
 return lua54

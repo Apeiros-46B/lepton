@@ -1,6 +1,6 @@
-local util = require("lepton.util")
+local util = require('lepton.util')
 
-local targetName = "Lua 5.4"
+local targetName = 'Lua 5.4'
 
 local unpack = unpack or table.unpack
 
@@ -8,7 +8,7 @@ return function(code, ast, options, macros={functions={}, variables={}})
 	--- Line mapping
 	local lastInputPos = 1 -- last token position in the input code
 	local prevLinePos = 1 -- last token position in the previous line of code in the input code
-	local lastSource = options.chunkname or "nil" -- last found code source name (from the original file)
+	local lastSource = options.chunkname or 'nil' -- last found code source name (from the original file)
 	local lastLine = 1 -- last found line number (from the original file)
 
 	--- Newline management
@@ -18,20 +18,20 @@ return function(code, ast, options, macros={functions={}, variables={}})
 		local r = options.newline..string.rep(options.indentation, indentLevel)
 		if options.mapLines then
 			local sub = code:sub(lastInputPos)
-			local source, line = sub:sub(1, sub:find("\n")):match(".*%-%- (.-)%:(%d+)\n")
+			local source, line = sub:sub(1, sub:find('\n')):match('.*%-%- (.-)%:(%d+)\n')
 
 			if source and line then
 				lastSource = source
 				lastLine = tonumber(line)
 			else
-				for _ in code:sub(prevLinePos, lastInputPos):gmatch("\n") do
+				for _ in code:sub(prevLinePos, lastInputPos):gmatch('\n') do
 					lastLine += 1
 				end
 			end
 
 			prevLinePos = lastInputPos
 
-			r = " -- "..lastSource..":"..lastLine..r
+			r = ' -- '..lastSource..':'..lastLine..r
 		end
 		return r
 	end
@@ -50,26 +50,26 @@ return function(code, ast, options, macros={functions={}, variables={}})
 	-- Used for context-sensitive syntax.
 	local states = {
 		push = {}, -- push stack variable names
-		destructuring = {}, -- list of variable that need to be assigned from a destructure {id = "parent variable", "field1", "field2"...}
+		destructuring = {}, -- list of variable that need to be assigned from a destructure {id = 'parent variable', 'field1', 'field2'...}
 		scope = {}, -- list of variables defined in the current scope
 		macroargs = {} -- currently defined arguemnts from a macro function
 	}
-	-- Push a new value on top of the stack "name". Returns an empty string for chaining.
+	-- Push a new value on top of the stack 'name'. Returns an empty string for chaining.
 	local function push(name, state)
 		table.insert(states[name], state)
-		return ""
+		return ''
 	end
-	-- Remove the value on top of the stack "name". Returns an empty string for chaining.
+	-- Remove the value on top of the stack 'name'. Returns an empty string for chaining.
 	local function pop(name)
 		table.remove(states[name])
-		return ""
+		return ''
 	end
-	-- Set the value on top of the stack "name". Returns an empty string for chaining.
+	-- Set the value on top of the stack 'name'. Returns an empty string for chaining.
 	local function set(name, state)
 		states[name][#states[name]] = state
-		return ""
+		return ''
 	end
-	-- Returns the value on top of the stack "name".
+	-- Returns the value on top of the stack 'name'.
 	local function peek(name)
 		return states[name][#states[name]]
 	end
@@ -82,8 +82,8 @@ return function(code, ast, options, macros={functions={}, variables={}})
 
 	-- Returns the prefixed temporary variable name.
 	local function tmp()
-		local scope = peek("scope")
-		local var = "%s_%s":format(options.variablePrefix, #scope)
+		local scope = peek('scope')
+		local var = '%s_%s':format(options.variablePrefix, #scope)
 		table.insert(scope, var)
 		return var
 	end
@@ -92,23 +92,23 @@ return function(code, ast, options, macros={functions={}, variables={}})
 	local nomacro = { variables = {}, functions = {} }
 
 	--- Module management
-	local required = {} -- { ["full require expression"] = true, ... }
-	local requireStr = ""
-	-- Add the module "mod" to the list of modules to require, and load its field "field" (or the whole module if nil) into the variable "name".
+	local required = {} -- { ['full require expression'] = true, ... }
+	local requireStr = ''
+	-- Add the module 'mod' to the list of modules to require, and load its field 'field' (or the whole module if nil) into the variable 'name'.
 	local function addRequire(mod, name, field)
-		local req = "require(%q)%s":format(mod, field and "."..field or "")
+		local req = 'require(%q)%s':format(mod, field and '.'..field or '')
 		if not required[req] then
-			requireStr ..= "local %s = %s%s":format(var(name), req, options.newline)
+			requireStr ..= 'local %s = %s%s':format(var(name), req, options.newline)
 			required[req] = true
 		end
 	end
 
 	--- AST traversal helpers
-	local loop = { "While", "Repeat", "Fornum", "Forin", "WhileExpr", "RepeatExpr", "FornumExpr", "ForinExpr" } -- loops tags (can contain continue)
-	local func = { "Function", "TableCompr", "DoExpr", "WhileExpr", "RepeatExpr", "IfExpr", "FornumExpr", "ForinExpr" } -- function scope tags (can contain push)
+	local loop = { 'While', 'Repeat', 'Fornum', 'Forin', 'WhileExpr', 'RepeatExpr', 'FornumExpr', 'ForinExpr' } -- loops tags (can contain continue)
+	local func = { 'Function', 'TableCompr', 'DoExpr', 'WhileExpr', 'RepeatExpr', 'IfExpr', 'FornumExpr', 'ForinExpr' } -- function scope tags (can contain push)
 
-	-- Returns the first node or subnode from the list "list" which tag is in the list "tags", or nil if there were none.
-	-- Won't recursively follow nodes which have a tag in "nofollow".
+	-- Returns the first node or subnode from the list 'list' which tag is in the list 'tags', or nil if there were none.
+	-- Won't recursively follow nodes which have a tag in 'nofollow'.
 	local function any(list, tags, nofollow={})
 		local tagsCheck = {}
 		for _, tag in ipairs(tags) do
@@ -119,7 +119,7 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			nofollowCheck[tag] = true
 		end
 		for _, node in ipairs(list) do
-			if type(node) == "table" then
+			if type(node) == 'table' then
 				if tagsCheck[node.tag] then
 					return node
 				end
@@ -145,7 +145,7 @@ return function(code, ast, options, macros={functions={}, variables={}})
 		end
 		local found = {}
 		for _, node in ipairs(list) do
-			if type(node) == "table" then
+			if type(node) == 'table' then
 				if not nofollowCheck[node.tag] then
 					for _, n in ipairs(search(node, tags, nofollow)) do
 						table.insert(found, n)
@@ -178,7 +178,7 @@ return function(code, ast, options, macros={functions={}, variables={}})
 
 	--- Lua compiler
 	local tags
-	-- Recursively returns the compiled AST Lua code, set "forceTag" to override the tag type and pass additional arguments to the tag constructor if needed.
+	-- Recursively returns the compiled AST Lua code, set 'forceTag' to override the tag type and pass additional arguments to the tag constructor if needed.
 	local function lua(ast, forceTag, ...)
 		if options.mapLines and ast.pos then
 			lastInputPos = ast.pos
@@ -188,16 +188,16 @@ return function(code, ast, options, macros={functions={}, variables={}})
 
 	--- Lua function calls writer
 	local UNPACK = (list, i, j) -- table.unpack
-		return "table.unpack("..list..(i and (", "..i..(j and (", "..j) or "")) or "")..")"
+		return 'table.unpack('..list..(i and (', '..i..(j and (', '..j) or '')) or '')..')'
 	end
-	local APPEND = (t, toAppend) -- append values "toAppend" (multiple values possible) to t
-		return "do"..indent().."local "..var("a").." = table.pack("..toAppend..")"..newline().."table.move("..var("a")..", 1, "..var("a")..".n, #"..t.."+1, "..t..")"..unindent().."end"
+	local APPEND = (t, toAppend) -- append values 'toAppend' (multiple values possible) to t
+		return 'do'..indent()..'local '..var('a')..' = table.pack('..toAppend..')'..newline()..'table.move('..var('a')..', 1, '..var('a')..'.n, #'..t..'+1, '..t..')'..unindent()..'end'
 	end
 	local CONTINUE_START = () -- at the start of loops using continue
-		return "do"..indent()
+		return 'do'..indent()
 	end
 	local CONTINUE_STOP = () -- at the start of loops using continue
-		return unindent().."end"..newline().."::"..var"continue".."::"
+		return unindent()..'end'..newline()..'::'..var'continue'..'::'
 	end
 	local DESTRUCTURING_ASSIGN = (destructured, newlineAfter=false, noLocal=false) -- to define values from a destructuring assignement
 		local vars = {}
@@ -205,35 +205,35 @@ return function(code, ast, options, macros={functions={}, variables={}})
 		for _, list in ipairs(destructured) do
 			for _, v in ipairs(list) do
 				local var, val
-				if v.tag == "Id" or v.tag == "AttributeId" then
+				if v.tag == 'Id' or v.tag == 'AttributeId' then
 					var = v
-					val = { tag = "Index", { tag = "Id", list.id }, { tag = "String", v[1] } }
-				elseif v.tag == "Pair" then
+					val = { tag = 'Index', { tag = 'Id', list.id }, { tag = 'String', v[1] } }
+				elseif v.tag == 'Pair' then
 					var = v[2]
-					val = { tag = "Index", { tag = "Id", list.id }, v[1] }
+					val = { tag = 'Index', { tag = 'Id', list.id }, v[1] }
 				else
-					error("unknown destructuring element type: "..tostring(v.tag))
+					error('unknown destructuring element type: '..tostring(v.tag))
 				end
 				if destructured.rightOp and destructured.leftOp then
-					val = { tag = "Op", destructured.rightOp, var, { tag = "Op", destructured.leftOp, val, var } }
+					val = { tag = 'Op', destructured.rightOp, var, { tag = 'Op', destructured.leftOp, val, var } }
 				elseif destructured.rightOp then
-					val = { tag = "Op", destructured.rightOp, var, val }
+					val = { tag = 'Op', destructured.rightOp, var, val }
 				elseif destructured.leftOp then
-					val = { tag = "Op", destructured.leftOp, val, var }
+					val = { tag = 'Op', destructured.leftOp, val, var }
 				end
 				table.insert(vars, lua(var))
 				table.insert(values, lua(val))
 			end
 		end
 		if #vars > 0 then
-			local decl = noLocal and "" or "local "
+			local decl = noLocal and '' or 'local '
 			if newlineAfter then
-				return decl..table.concat(vars, ", ").." = "..table.concat(values, ", ")..newline()
+				return decl..table.concat(vars, ', ')..' = '..table.concat(values, ', ')..newline()
 			else
-				return newline()..decl..table.concat(vars, ", ").." = "..table.concat(values, ", ")
+				return newline()..decl..table.concat(vars, ', ')..' = '..table.concat(values, ', ')
 			end
 		else
-			return ""
+			return ''
 		end
 	end
 
@@ -241,14 +241,14 @@ return function(code, ast, options, macros={functions={}, variables={}})
 	tags = setmetatable({
 		-- block: { stat* } --
 		Block = (t)
-			local hasPush = peek("push") == nil and any(t, { "Push" }, func) -- push in block and push context not yet defined
+			local hasPush = peek('push') == nil and any(t, { 'Push' }, func) -- push in block and push context not yet defined
 			if hasPush and hasPush == t[#t] then -- if the first push is the last statement, it's just a return
-				hasPush.tag = "Return"
+				hasPush.tag = 'Return'
 				hasPush = false
 			end
-			local r = push("scope", {})
+			local r = push('scope', {})
 			if hasPush then
-				r ..= push("push", var"push").."local "..var"push".." = {}"..newline()
+				r ..= push('push', var'push')..'local '..var'push'..' = {}'..newline()
 			end
 			for i=1, #t-1, 1 do
 				r ..= lua(t[i])..newline()
@@ -256,17 +256,17 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			if t[#t] then
 				r ..= lua(t[#t])
 			end
-			if hasPush and (t[#t] and t[#t].tag ~= "Return") then -- add return only if needed
-				r ..= newline().."return "..UNPACK(var"push")..pop("push")
+			if hasPush and (t[#t] and t[#t].tag ~= 'Return') then -- add return only if needed
+				r ..= newline()..'return '..UNPACK(var'push')..pop('push')
 			end
-			return r..pop("scope")
+			return r..pop('scope')
 		end,
 
 		-- stat --
 
 		-- Do{ stat* }
 		Do = (t)
-			return "do"..indent()..lua(t, "Block")..unindent().."end"
+			return 'do'..indent()..lua(t, 'Block')..unindent()..'end'
 		end,
 		-- Set{ {lhs+} (opid? = opid?)? {expr+} }
 		Set = (t)
@@ -275,7 +275,7 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			local vars, values = {}, {}
 			local destructuringVars, destructuringValues = {}, {}
 			for i, n in ipairs(t[1]) do
-				if n.tag == "DestructuringId" then
+				if n.tag == 'DestructuringId' then
 					table.insert(destructuringVars, n)
 					table.insert(destructuringValues, expr[i])
 				else
@@ -285,57 +285,57 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			end
 			--
 			if #t == 2 or #t == 3 then
-				local r = ""
+				local r = ''
 				if #vars > 0 then
-					r = lua(vars, "_lhs").." = "..lua(values, "_lhs")
+					r = lua(vars, '_lhs')..' = '..lua(values, '_lhs')
 				end
 				if #destructuringVars > 0 then
 					local destructured = {}
-					r ..= "local "..push("destructuring", destructured)..lua(destructuringVars, "_lhs")..pop("destructuring").." = "..lua(destructuringValues, "_lhs")
+					r ..= 'local '..push('destructuring', destructured)..lua(destructuringVars, '_lhs')..pop('destructuring')..' = '..lua(destructuringValues, '_lhs')
 					return r..DESTRUCTURING_ASSIGN(destructured, nil, true)
 				end
 				return r
 			elseif #t == 4 then
-				if t[3] == "=" then
-					local r = ""
+				if t[3] == '=' then
+					local r = ''
 					if #vars > 0 then
-						r ..= lua(vars, "_lhs").." = "..lua({ t[2], vars[1], { tag = "Paren", values[1] } }, "Op")
+						r ..= lua(vars, '_lhs')..' = '..lua({ t[2], vars[1], { tag = 'Paren', values[1] } }, 'Op')
 						for i=2, math.min(#t[4], #vars), 1 do
-							r ..= ", "..lua({ t[2], vars[i], { tag = "Paren", values[i] } }, "Op")
+							r ..= ', '..lua({ t[2], vars[i], { tag = 'Paren', values[i] } }, 'Op')
 						end
 					end
 					if #destructuringVars > 0 then
 						local destructured = { rightOp = t[2] }
-						r ..= "local "..push("destructuring", destructured)..lua(destructuringVars, "_lhs")..pop("destructuring").." = "..lua(destructuringValues, "_lhs")
+						r ..= 'local '..push('destructuring', destructured)..lua(destructuringVars, '_lhs')..pop('destructuring')..' = '..lua(destructuringValues, '_lhs')
 						return r..DESTRUCTURING_ASSIGN(destructured, nil, true)
 					end
 					return r
 				else
-					local r  = ""
+					local r  = ''
 					if #vars > 0 then
-						r ..= lua(vars, "_lhs").." = "..lua({ t[3], { tag = "Paren", values[1] }, vars[1] }, "Op")
+						r ..= lua(vars, '_lhs')..' = '..lua({ t[3], { tag = 'Paren', values[1] }, vars[1] }, 'Op')
 						for i=2, math.min(#t[4], #t[1]), 1 do
-							r ..= ", "..lua({ t[3], { tag = "Paren", values[i] }, vars[i] }, "Op")
+							r ..= ', '..lua({ t[3], { tag = 'Paren', values[i] }, vars[i] }, 'Op')
 						end
 					end
 					if #destructuringVars > 0 then
 						local destructured = { leftOp = t[3] }
-						r ..= "local "..push("destructuring", destructured)..lua(destructuringVars, "_lhs")..pop("destructuring").." = "..lua(destructuringValues, "_lhs")
+						r ..= 'local '..push('destructuring', destructured)..lua(destructuringVars, '_lhs')..pop('destructuring')..' = '..lua(destructuringValues, '_lhs')
 						return r..DESTRUCTURING_ASSIGN(destructured, nil, true)
 					end
 					return r
 				end
 			else -- You are mad.
-				local r = ""
+				local r = ''
 				if #vars > 0 then
-					r ..= lua(vars, "_lhs").." = "..lua({ t[2], vars[1], { tag = "Op", t[4], { tag = "Paren", values[1] }, vars[1] } }, "Op")
+					r ..= lua(vars, '_lhs')..' = '..lua({ t[2], vars[1], { tag = 'Op', t[4], { tag = 'Paren', values[1] }, vars[1] } }, 'Op')
 					for i=2, math.min(#t[5], #t[1]), 1 do
-						r ..= ", "..lua({ t[2], vars[i], { tag = "Op", t[4], { tag = "Paren", values[i] }, vars[i] } }, "Op")
+						r ..= ', '..lua({ t[2], vars[i], { tag = 'Op', t[4], { tag = 'Paren', values[i] }, vars[i] } }, 'Op')
 					end
 				end
 				if #destructuringVars > 0 then
 					local destructured = { rightOp = t[2], leftOp = t[4] }
-					r ..= "local "..push("destructuring", destructured)..lua(destructuringVars, "_lhs")..pop("destructuring").." = "..lua(destructuringValues, "_lhs")
+					r ..= 'local '..push('destructuring', destructured)..lua(destructuringVars, '_lhs')..pop('destructuring')..' = '..lua(destructuringValues, '_lhs')
 					return r..DESTRUCTURING_ASSIGN(destructured, nil, true)
 				end
 				return r
@@ -343,18 +343,18 @@ return function(code, ast, options, macros={functions={}, variables={}})
 		end,
 		-- While{ expr block }
 		While = (t)
-			local r = ""
-			local hasContinue = any(t[2], { "Continue" }, loop)
-			local lets = search({ t[1] }, { "LetExpr" })
+			local r = ''
+			local hasContinue = any(t[2], { 'Continue' }, loop)
+			local lets = search({ t[1] }, { 'LetExpr' })
 			if #lets > 0 then
-				r ..= "do"..indent()
+				r ..= 'do'..indent()
 				for _, l in ipairs(lets) do
-					r ..= lua(l, "Let")..newline()
+					r ..= lua(l, 'Let')..newline()
 				end
 			end
-			r ..= "while "..lua(t[1]).." do"..indent()
+			r ..= 'while '..lua(t[1])..' do'..indent()
 			if #lets > 0 then
-				r ..= "do"..indent()
+				r ..= 'do'..indent()
 			end
 			if hasContinue then
 				r ..= CONTINUE_START()
@@ -363,19 +363,19 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			if hasContinue then
 				r ..= CONTINUE_STOP()
 			end
-			r ..= unindent().."end"
+			r ..= unindent()..'end'
 			if #lets > 0 then
 				for _, l in ipairs(lets) do
-					r ..= newline()..lua(l, "Set")
+					r ..= newline()..lua(l, 'Set')
 				end
-				r ..= unindent().."end"..unindent().."end"
+				r ..= unindent()..'end'..unindent()..'end'
 			end
 			return r
 		end,
 		-- Repeat{ block expr }
 		Repeat = (t)
-			local hasContinue = any(t[1], { "Continue" }, loop)
-			local r = "repeat"..indent()
+			local hasContinue = any(t[1], { 'Continue' }, loop)
+			local r = 'repeat'..indent()
 			if hasContinue then
 				r ..= CONTINUE_START()
 			end
@@ -383,50 +383,50 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			if hasContinue then
 				r ..= CONTINUE_STOP()
 			end
-			r ..= unindent().."until "..lua(t[2])
+			r ..= unindent()..'until '..lua(t[2])
 			return r
 		end,
 		-- If{ (lexpr block)+ block? }
 		If = (t)
-			local r = ""
+			local r = ''
 			local toClose = 0 -- blocks that need to be closed at the end of the if
-			local lets = search({ t[1] }, { "LetExpr" })
+			local lets = search({ t[1] }, { 'LetExpr' })
 			if #lets > 0 then
-				r ..= "do"..indent()
+				r ..= 'do'..indent()
 				toClose += 1
 				for _, l in ipairs(lets) do
-					r ..= lua(l, "Let")..newline()
+					r ..= lua(l, 'Let')..newline()
 				end
 			end
-			r ..= "if "..lua(t[1]).." then"..indent()..lua(t[2])..unindent()
+			r ..= 'if '..lua(t[1])..' then'..indent()..lua(t[2])..unindent()
 			for i=3, #t-1, 2 do
-				lets = search({ t[i] }, { "LetExpr" })
+				lets = search({ t[i] }, { 'LetExpr' })
 				if #lets > 0 then
-					r ..= "else"..indent()
+					r ..= 'else'..indent()
 					toClose += 1
 					for _, l in ipairs(lets) do
-						r ..= lua(l, "Let")..newline()
+						r ..= lua(l, 'Let')..newline()
 					end
 				else
-					r ..= "else"
+					r ..= 'else'
 				end
-				r ..= "if "..lua(t[i]).." then"..indent()..lua(t[i+1])..unindent()
+				r ..= 'if '..lua(t[i])..' then'..indent()..lua(t[i+1])..unindent()
 			end
 			if #t % 2 == 1 then
-				r ..= "else"..indent()..lua(t[#t])..unindent()
+				r ..= 'else'..indent()..lua(t[#t])..unindent()
 			end
-			r ..= "end"
+			r ..= 'end'
 			for i=1, toClose do
-				r ..= unindent().."end"
+				r ..= unindent()..'end'
 			end
 			return r
 		end,
 		-- Fornum{ ident expr expr expr? block }
 		Fornum = (t)
-			local r = "for "..lua(t[1]).." = "..lua(t[2])..", "..lua(t[3])
+			local r = 'for '..lua(t[1])..' = '..lua(t[2])..', '..lua(t[3])
 			if #t == 5 then
-				local hasContinue = any(t[5], { "Continue" }, loop)
-				r ..= ", "..lua(t[4]).." do"..indent()
+				local hasContinue = any(t[5], { 'Continue' }, loop)
+				r ..= ', '..lua(t[4])..' do'..indent()
 				if hasContinue then
 					r ..= CONTINUE_START()
 				end
@@ -434,10 +434,10 @@ return function(code, ast, options, macros={functions={}, variables={}})
 				if hasContinue then
 					r ..= CONTINUE_STOP()
 				end
-				return r..unindent().."end"
+				return r..unindent()..'end'
 			else
-				local hasContinue = any(t[4], { "Continue" }, loop)
-				r ..= " do"..indent()
+				local hasContinue = any(t[4], { 'Continue' }, loop)
+				r ..= ' do'..indent()
 				if hasContinue then
 					r ..= CONTINUE_START()
 				end
@@ -445,14 +445,14 @@ return function(code, ast, options, macros={functions={}, variables={}})
 				if hasContinue then
 					r ..= CONTINUE_STOP()
 				end
-				return r..unindent().."end"
+				return r..unindent()..'end'
 			end
 		end,
 		-- Forin{ {ident+} {expr+} block }
 		Forin = (t)
 			local destructured = {}
-			local hasContinue = any(t[3], { "Continue" }, loop)
-			local r = "for "..push("destructuring", destructured)..lua(t[1], "_lhs")..pop("destructuring").." in "..lua(t[2], "_lhs").." do"..indent()
+			local hasContinue = any(t[3], { 'Continue' }, loop)
+			local r = 'for '..push('destructuring', destructured)..lua(t[1], '_lhs')..pop('destructuring')..' in '..lua(t[2], '_lhs')..' do'..indent()
 			if hasContinue then
 				r ..= CONTINUE_START()
 			end
@@ -460,79 +460,79 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			if hasContinue then
 				r ..= CONTINUE_STOP()
 			end
-			return r..unindent().."end"
+			return r..unindent()..'end'
 		end,
 		-- Local{ {attributeident+} {expr+}? }
 		Local = (t)
 			local destructured = {}
-			local r = "local "..push("destructuring", destructured)..lua(t[1], "_lhs")..pop("destructuring")
+			local r = 'local '..push('destructuring', destructured)..lua(t[1], '_lhs')..pop('destructuring')
 			if t[2][1] then
-				r ..= " = "..lua(t[2], "_lhs")
+				r ..= ' = '..lua(t[2], '_lhs')
 			end
 			return r..DESTRUCTURING_ASSIGN(destructured)
 		end,
 		-- Let{ {ident+} {expr+}? }
 		Let = (t)
 			local destructured = {}
-			local nameList = push("destructuring", destructured)..lua(t[1], "_lhs")..pop("destructuring")
-			local r = "local "..nameList
+			local nameList = push('destructuring', destructured)..lua(t[1], '_lhs')..pop('destructuring')
+			local r = 'local '..nameList
 			if t[2][1] then
-				if all(t[2], { "Nil", "Dots", "Boolean", "Number", "String" }) then -- predeclaration doesn't matter here
-					r ..= " = "..lua(t[2], "_lhs")
+				if all(t[2], { 'Nil', 'Dots', 'Boolean', 'Number', 'String' }) then -- predeclaration doesn't matter here
+					r ..= ' = '..lua(t[2], '_lhs')
 				else
-					r ..= newline()..nameList.." = "..lua(t[2], "_lhs")
+					r ..= newline()..nameList..' = '..lua(t[2], '_lhs')
 				end
 			end
 			return r..DESTRUCTURING_ASSIGN(destructured)
 		end,
 		-- Localrec{ {ident} {expr} }
 		Localrec = (t)
-			return "local function "..lua(t[1][1])..lua(t[2][1], "_functionWithoutKeyword")
+			return 'local function '..lua(t[1][1])..lua(t[2][1], '_functionWithoutKeyword')
 		end,
 		-- Goto{ <string> }
 		Goto = (t)
-			return "goto "..lua(t, "Id")
+			return 'goto '..lua(t, 'Id')
 		end,
 		-- Label{ <string> }
 		Label = (t)
-			return "::"..lua(t, "Id").."::"
+			return '::'..lua(t, 'Id')..'::'
 		end,
 		-- Return{ <expr*> }
 		Return = (t)
-			local push = peek("push")
+			local push = peek('push')
 			if push then
-				local r = ""
+				local r = ''
 				for _, val in ipairs(t) do
-					r ..= push.."[#"..push.."+1] = "..lua(val)..newline()
+					r ..= push..'[#'..push..'+1] = '..lua(val)..newline()
 				end
-				return r.."return "..UNPACK(push)
+				return r..'return '..UNPACK(push)
 			else
-				return "return "..lua(t, "_lhs")
+				return 'return '..lua(t, '_lhs')
 			end
 		end,
 		-- Push{ <expr*> }
 		Push = (t)
-			local var = assert(peek("push"), "no context given for push")
-			r = ""
+			local var = assert(peek('push'), 'no context given for push')
+			r = ''
 			for i=1, #t-1, 1 do
-				r ..= var.."[#"..var.."+1] = "..lua(t[i])..newline()
+				r ..= var..'[#'..var..'+1] = '..lua(t[i])..newline()
 			end
 			if t[#t] then
-				if t[#t].tag == "Call" then
+				if t[#t].tag == 'Call' then
 					r ..= APPEND(var, lua(t[#t]))
 				else
-					r ..= var.."[#"..var.."+1] = "..lua(t[#t])
+					r ..= var..'[#'..var..'+1] = '..lua(t[#t])
 				end
 			end
 			return r
 		end,
 		-- Break
 		Break = ()
-			return "break"
+			return 'break'
 		end,
 		-- Continue
 		Continue = ()
-			return "goto "..var"continue"
+			return 'goto '..var'continue'
 		end,
 		-- apply (below)
 
@@ -540,18 +540,18 @@ return function(code, ast, options, macros={functions={}, variables={}})
 
 		-- Nil
 		Nil = ()
-			return "nil"
+			return 'nil'
 		end,
 		-- Dots
 		Dots = ()
-			local macroargs = peek("macroargs")
-			if macroargs and not nomacro.variables["..."] and macroargs["..."] then
-				nomacro.variables["..."] = true
-				local r = lua(macroargs["..."], "_lhs")
-				nomacro.variables["..."] = nil
+			local macroargs = peek('macroargs')
+			if macroargs and not nomacro.variables['...'] and macroargs['...'] then
+				nomacro.variables['...'] = true
+				local r = lua(macroargs['...'], '_lhs')
+				nomacro.variables['...'] = nil
 				return r
 			else
-				return "..."
+				return '...'
 			end
 		end,
 		-- Boolean{ <boolean> }
@@ -564,86 +564,86 @@ return function(code, ast, options, macros={functions={}, variables={}})
 		end,
 		-- String{ <string> }
 		String = (t)
-			return "%q":format(t[1])
+			return '%q':format(t[1])
 		end,
 		-- Function{ { ( `ParPair{ Id expr } | `Id{ <string> } )* `Dots? } block }
 		_functionWithoutKeyword = (t)
-			local r = "("
+			local r = '('
 			local decl = {}
 			if t[1][1] then
-				if t[1][1].tag == "ParPair" then
+				if t[1][1].tag == 'ParPair' then
 					local id = lua(t[1][1][1])
 					indentLevel += 1
-					table.insert(decl, "if "..id.." == nil then "..id.." = "..lua(t[1][1][2]).." end")
+					table.insert(decl, 'if '..id..' == nil then '..id..' = '..lua(t[1][1][2])..' end')
 					indentLevel -= 1
 					r ..= id
 				else
 					r ..= lua(t[1][1])
 				end
 				for i=2, #t[1], 1 do
-					if t[1][i].tag == "ParPair" then
+					if t[1][i].tag == 'ParPair' then
 						local id = lua(t[1][i][1])
 						indentLevel += 1
-						table.insert(decl, "if "..id.." == nil then "..id.." = "..lua(t[1][i][2]).." end")
+						table.insert(decl, 'if '..id..' == nil then '..id..' = '..lua(t[1][i][2])..' end')
 						indentLevel -= 1
-						r ..= ", " ..id
+						r ..= ', ' ..id
 					else
-						r ..= ", "..lua(t[1][i])
+						r ..= ', '..lua(t[1][i])
 					end
 				end
 			end
-			r ..= ")"..indent()
+			r ..= ')'..indent()
 			for _, d in ipairs(decl) do
 				r ..= d..newline()
 			end
-			if t[2][#t[2]] and t[2][#t[2]].tag == "Push" then -- convert final push to return
-				t[2][#t[2]].tag = "Return"
+			if t[2][#t[2]] and t[2][#t[2]].tag == 'Push' then -- convert final push to return
+				t[2][#t[2]].tag = 'Return'
 			end
-			local hasPush = any(t[2], { "Push" }, func)
+			local hasPush = any(t[2], { 'Push' }, func)
 			if hasPush then
-				r ..= push("push", var"push").."local "..var"push".." = {}"..newline()
+				r ..= push('push', var'push')..'local '..var'push'..' = {}'..newline()
 			else
-				push("push", false) -- no push here (make sure higher push doesn't affect us)
+				push('push', false) -- no push here (make sure higher push doesn't affect us)
 			end
 			r ..= lua(t[2])
-			if hasPush and (t[2][#t[2]] and t[2][#t[2]].tag ~= "Return") then -- add return only if needed
-				r ..= newline().."return "..UNPACK(var"push")
+			if hasPush and (t[2][#t[2]] and t[2][#t[2]].tag ~= 'Return') then -- add return only if needed
+				r ..= newline()..'return '..UNPACK(var'push')
 			end
-			pop("push")
-			return r..unindent().."end"
+			pop('push')
+			return r..unindent()..'end'
 		end,
 		Function = (t)
-			return "function"..lua(t, "_functionWithoutKeyword")
+			return 'function'..lua(t, '_functionWithoutKeyword')
 		end,
 		-- Table{ ( `Pair{ expr expr } | expr )* }
 		Pair = (t)
-			return "["..lua(t[1]).."] = "..lua(t[2])
+			return '['..lua(t[1])..'] = '..lua(t[2])
 		end,
 		Table = (t)
 			if #t == 0 then
-				return "{}"
+				return '{}'
 			elseif #t == 1 then
-				return "{ "..lua(t, "_lhs").." }"
+				return '{ '..lua(t, '_lhs')..' }'
 			else
-				return "{"..indent()..lua(t, "_lhs", nil, true)..unindent().."}"
+				return '{'..indent()..lua(t, '_lhs', nil, true)..unindent()..'}'
 			end
 		end,
 		-- TableCompr{ block }
 		TableCompr = (t)
-			return push("push", "self").."(function()"..indent().."local self = {}"..newline()..lua(t[1])..newline().."return self"..unindent().."end)()"..pop("push")
+			return push('push', 'self')..'(function()'..indent()..'local self = {}'..newline()..lua(t[1])..newline()..'return self'..unindent()..'end)()'..pop('push')
 		end,
 		-- Op{ opid expr expr? }
 		Op = (t)
 			local r
 			if #t == 2 then
-				if type(tags._opid[t[1]]) == "string" then
-					r = tags._opid[t[1]].." "..lua(t[2])
+				if type(tags._opid[t[1]]) == 'string' then
+					r = tags._opid[t[1]]..' '..lua(t[2])
 				else
 					r = tags._opid[t[1]](t[2])
 				end
 			else
-				if type(tags._opid[t[1]]) == "string" then
-					r = lua(t[2]).." "..tags._opid[t[1]].." "..lua(t[3])
+				if type(tags._opid[t[1]]) == 'string' then
+					r = lua(t[2])..' '..tags._opid[t[1]]..' '..lua(t[3])
 				else
 					r = tags._opid[t[1]](t[2], t[3])
 				end
@@ -652,26 +652,26 @@ return function(code, ast, options, macros={functions={}, variables={}})
 		end,
 		-- Paren{ expr }
 		Paren = (t)
-			return "("..lua(t[1])..")"
+			return '('..lua(t[1])..')'
 		end,
 		-- MethodStub{ expr expr }
 		MethodStub = (t)
-			return "(function()"..indent() ..
-					"local "..var"object".." = "..lua(t[1])..newline()..
-					"local "..var"method".." = "..var"object".."."..lua(t[2], "Id")..newline() ..
-					"if "..var"method".." == nil then return nil end"..newline()..
-					"return function(...) return "..var"method".."("..var"object"..", ...) end"..unindent()..
-				"end)()"
+			return '(function()'..indent() ..
+					'local '..var'object'..' = '..lua(t[1])..newline()..
+					'local '..var'method'..' = '..var'object'..'.'..lua(t[2], 'Id')..newline() ..
+					'if '..var'method'..' == nil then return nil end'..newline()..
+					'return function(...) return '..var'method'..'('..var'object'..', ...) end'..unindent()..
+				'end)()'
 		end,
 		-- SafeMethodStub{ expr expr }
 		SafeMethodStub = (t)
-			return "(function()"..indent() ..
-					"local "..var"object".." = "..lua(t[1])..newline()..
-					"if "..var"object".." == nil then return nil end"..newline()..
-					"local "..var"method".." = "..var"object".."."..lua(t[2], "Id")..newline() ..
-					"if "..var"method".." == nil then return nil end"..newline()..
-					"return function(...) return "..var"method".."("..var"object"..", ...) end"..unindent()..
-				"end)()"
+			return '(function()'..indent() ..
+					'local '..var'object'..' = '..lua(t[1])..newline()..
+					'if '..var'object'..' == nil then return nil end'..newline()..
+					'local '..var'method'..' = '..var'object'..'.'..lua(t[2], 'Id')..newline() ..
+					'if '..var'method'..' == nil then return nil end'..newline()..
+					'return function(...) return '..var'method'..'('..var'object'..', ...) end'..unindent()..
+				'end)()'
 		end,
 		-- statexpr (below)
 		-- apply (below)
@@ -684,108 +684,108 @@ return function(code, ast, options, macros={functions={}, variables={}})
 
 		-- statexpr --
 		_statexpr = (t, stat)
-			local hasPush = any(t, { "Push" }, func)
-			local r = "(function()"..indent()
+			local hasPush = any(t, { 'Push' }, func)
+			local r = '(function()'..indent()
 			if hasPush then
-				r ..= push("push", var"push").."local "..var"push".." = {}"..newline()
+				r ..= push('push', var'push')..'local '..var'push'..' = {}'..newline()
 			else
-				push("push", false) -- no push here (make sure higher push don't affect us)
+				push('push', false) -- no push here (make sure higher push don't affect us)
 			end
 			r ..= lua(t, stat)
 			if hasPush then
-				r ..= newline().."return "..UNPACK(var"push")
+				r ..= newline()..'return '..UNPACK(var'push')
 			end
-			pop("push")
-			r ..= unindent().."end)()"
+			pop('push')
+			r ..= unindent()..'end)()'
 			return r
 		end,
 		-- DoExpr{ stat* }
 		DoExpr = (t)
-			if t[#t].tag == "Push" then -- convert final push to return
-				t[#t].tag = "Return"
+			if t[#t].tag == 'Push' then -- convert final push to return
+				t[#t].tag = 'Return'
 			end
-			return lua(t, "_statexpr", "Do")
+			return lua(t, '_statexpr', 'Do')
 		end,
 		-- WhileExpr{ expr block }
 		WhileExpr = (t)
-			return lua(t, "_statexpr", "While")
+			return lua(t, '_statexpr', 'While')
 		end,
 		-- RepeatExpr{ block expr }
 		RepeatExpr = (t)
-			return lua(t, "_statexpr", "Repeat")
+			return lua(t, '_statexpr', 'Repeat')
 		end,
 		-- IfExpr{ (expr block)+ block? }
 		IfExpr = (t)
 			for i=2, #t do -- convert final pushes to returns
 				local block = t[i]
-				if block[#block] and block[#block].tag == "Push" then
-					block[#block].tag = "Return"
+				if block[#block] and block[#block].tag == 'Push' then
+					block[#block].tag = 'Return'
 				end
 			end
-			return lua(t, "_statexpr", "If")
+			return lua(t, '_statexpr', 'If')
 		end,
 		-- FornumExpr{ ident expr expr expr? block }
 		FornumExpr = (t)
-			return lua(t, "_statexpr", "Fornum")
+			return lua(t, '_statexpr', 'Fornum')
 		end,
 		-- ForinExpr{ {ident+} {expr+} block }
 		ForinExpr = (t)
-			return lua(t, "_statexpr", "Forin")
+			return lua(t, '_statexpr', 'Forin')
 		end,
 
 		-- apply --
 
 		-- Call{ expr expr* }
 		Call = (t)
-			if t[1].tag == "String" or t[1].tag == "Table" then
-				return "("..lua(t[1])..")("..lua(t, "_lhs", 2)..")"
-			elseif t[1].tag == "Id" and not nomacro.functions[t[1][1]] and macros.functions[t[1][1]] then
+			if t[1].tag == 'String' or t[1].tag == 'Table' then
+				return '('..lua(t[1])..')('..lua(t, '_lhs', 2)..')'
+			elseif t[1].tag == 'Id' and not nomacro.functions[t[1][1]] and macros.functions[t[1][1]] then
 				local macro = macros.functions[t[1][1]]
 				local replacement = macro.replacement
 				local r
 				nomacro.functions[t[1][1]] = true
-				if type(replacement) == "function" then
+				if type(replacement) == 'function' then
 					local args = {}
 					for i=2, #t do
 						table.insert(args, lua(t[i]))
 					end
 					r = replacement(unpack(args))
 				else
-					local macroargs = util.merge(peek("macroargs"))
+					local macroargs = util.merge(peek('macroargs'))
 					for i, arg in ipairs(macro.args) do
-						if arg.tag == "Dots" then
-							macroargs["..."] = [for j=i+1, #t do t[j] end]
-						elseif arg.tag == "Id" then
+						if arg.tag == 'Dots' then
+							macroargs['...'] = [for j=i+1, #t do t[j] end]
+						elseif arg.tag == 'Id' then
 							if t[i+1] == nil then
-								error("bad argument #%s to macro %s (value expected)":format(i, t[1][1]))
+								error('bad argument #%s to macro %s (value expected)':format(i, t[1][1]))
 							end
 							macroargs[arg[1]] = t[i+1]
 						else
-							error("unexpected argument type %s in macro %s":format(arg.tag, t[1][1]))
+							error('unexpected argument type %s in macro %s':format(arg.tag, t[1][1]))
 						end
 					end
-					push("macroargs", macroargs)
+					push('macroargs', macroargs)
 					r = lua(replacement)
-					pop("macroargs")
+					pop('macroargs')
 				end
 				nomacro.functions[t[1][1]] = nil
 				return r
-			elseif t[1].tag == "MethodStub" then -- method call
-				if t[1][1].tag == "String" or t[1][1].tag == "Table" then
-					return "("..lua(t[1][1]).."):"..lua(t[1][2], "Id").."("..lua(t, "_lhs", 2)..")"
+			elseif t[1].tag == 'MethodStub' then -- method call
+				if t[1][1].tag == 'String' or t[1][1].tag == 'Table' then
+					return '('..lua(t[1][1])..'):'..lua(t[1][2], 'Id')..'('..lua(t, '_lhs', 2)..')'
 				else
-					return lua(t[1][1])..":"..lua(t[1][2], "Id").."("..lua(t, "_lhs", 2)..")"
+					return lua(t[1][1])..':'..lua(t[1][2], 'Id')..'('..lua(t, '_lhs', 2)..')'
 				end
 			else
-				return lua(t[1]).."("..lua(t, "_lhs", 2)..")"
+				return lua(t[1])..'('..lua(t, '_lhs', 2)..')'
 			end
 		end,
 		-- SafeCall{ expr expr* }
 		SafeCall = (t)
-			if t[1].tag ~= "Id" then -- side effect possible, only evaluate each expr once (or already in a safe context)
-				return lua(t, "SafeIndex")
+			if t[1].tag ~= 'Id' then -- side effect possible, only evaluate each expr once (or already in a safe context)
+				return lua(t, 'SafeIndex')
 			else -- no side effects possible
-				return "("..lua(t[1]).." ~= nil and "..lua(t[1]).."("..lua(t, "_lhs", 2)..") or nil)"
+				return '('..lua(t[1])..' ~= nil and '..lua(t[1])..'('..lua(t, '_lhs', 2)..') or nil)'
 			end
 		end,
 
@@ -795,24 +795,24 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			if t[start] then
 				r = lua(t[start])
 				for i=start+1, #t, 1 do
-					r ..= ","..(newlines and newline() or " ")..lua(t[i])
+					r ..= ','..(newlines and newline() or ' ')..lua(t[i])
 				end
 			else
-				r = ""
+				r = ''
 			end
 			return r
 		end,
 		-- Id{ <string> }
 		Id = (t)
 			local r = t[1]
-			local macroargs = peek("macroargs")
+			local macroargs = peek('macroargs')
 			if not nomacro.variables[t[1]] then
 				nomacro.variables[t[1]] = true
 				if macroargs and macroargs[t[1]] then -- replace with macro argument
 					r = lua(macroargs[t[1]])
 				elseif macros.variables[t[1]] ~= nil then -- replace with macro variable
 					local macro = macros.variables[t[1]]
-					if type(macro) == "function" then
+					if type(macro) == 'function' then
 						r = macro()
 					else
 						r = lua(macro)
@@ -825,7 +825,7 @@ return function(code, ast, options, macros={functions={}, variables={}})
 		-- AttributeId{ <string> <string>? }
 		AttributeId = (t)
 			if t[2] then
-				return t[1] .. " <" .. t[2] .. ">"
+				return t[1] .. ' <' .. t[2] .. '>'
 			else
 				return t[1]
 			end
@@ -835,7 +835,7 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			if t.id then -- destructing already done before, use parent variable as id
 				return t.id
 			else
-				local d = assert(peek("destructuring"), "DestructuringId not in a destructurable assignement")
+				local d = assert(peek('destructuring'), 'DestructuringId not in a destructurable assignement')
 				local vars = { id = tmp() }
 				for j=1, #t, 1 do
 					table.insert(vars, t[j])
@@ -847,51 +847,51 @@ return function(code, ast, options, macros={functions={}, variables={}})
 		end,
 		-- Index{ expr expr }
 		Index = (t)
-			if t[1].tag == "String" or t[1].tag == "Table" then
-				return "("..lua(t[1])..")["..lua(t[2]).."]"
+			if t[1].tag == 'String' or t[1].tag == 'Table' then
+				return '('..lua(t[1])..')['..lua(t[2])..']'
 			else
-				return lua(t[1]).."["..lua(t[2]).."]"
+				return lua(t[1])..'['..lua(t[2])..']'
 			end
 		end,
 		-- SafeIndex{ expr expr }
 		SafeIndex = (t)
-			if t[1].tag ~= "Id" then -- side effect possible, only evaluate each expr once (or already in a safe context)
+			if t[1].tag ~= 'Id' then -- side effect possible, only evaluate each expr once (or already in a safe context)
 				local l = {} -- list of immediately chained safeindex, from deepest to nearest (to simply generated code)
-				while t.tag == "SafeIndex" or t.tag == "SafeCall" do
+				while t.tag == 'SafeIndex' or t.tag == 'SafeCall' do
 					table.insert(l, 1, t)
 					t = t[1]
 				end
-				local r = "(function()"..indent().."local "..var"safe".." = "..lua(l[1][1])..newline() -- base expr
+				local r = '(function()'..indent()..'local '..var'safe'..' = '..lua(l[1][1])..newline() -- base expr
 				for _, e in ipairs(l) do
-					r ..= "if "..var"safe".." == nil then return nil end"..newline()
-					if e.tag == "SafeIndex" then
-						r ..= var"safe".." = "..var"safe".."["..lua(e[2]).."]"..newline()
+					r ..= 'if '..var'safe'..' == nil then return nil end'..newline()
+					if e.tag == 'SafeIndex' then
+						r ..= var'safe'..' = '..var'safe'..'['..lua(e[2])..']'..newline()
 					else
-						r ..= var"safe".." = "..var"safe".."("..lua(e, "_lhs", 2)..")"..newline()
+						r ..= var'safe'..' = '..var'safe'..'('..lua(e, '_lhs', 2)..')'..newline()
 					end
 				end
-				r ..= "return "..var"safe"..unindent().."end)()"
+				r ..= 'return '..var'safe'..unindent()..'end)()'
 				return r
 			else -- no side effects possible
-				return "("..lua(t[1]).." ~= nil and "..lua(t[1]).."["..lua(t[2]).."] or nil)"
+				return '('..lua(t[1])..' ~= nil and '..lua(t[1])..'['..lua(t[2])..'] or nil)'
 			end
 		end,
 
 		-- opid --
 		_opid = {
-			add = "+", sub = "-", mul = "*", div = "/",
-			idiv = "//", mod = "%", pow = "^", concat = "..",
-			band = "&", bor = "|", bxor = "~", shl = "<<", shr = ">>",
-			eq = "==", ne = "~=", lt = "<", gt = ">", le = "<=", ge = ">=",
-			["and"] = "and", ["or"] = "or", unm = "-", len = "#", bnot = "~", ["not"] = "not"
+			add = '+', sub = '-', mul = '*', div = '/',
+			idiv = '//', mod = '%', pow = '^', concat = '..',
+			band = '&', bor = '|', bxor = '~', shl = '<<', shr = '>>',
+			eq = '==', ne = '~=', lt = '<', gt = '>', le = '<=', ge = '>=',
+			['and'] = 'and', ['or'] = 'or', unm = '-', len = '#', bnot = '~', ['not'] = 'not'
 		}
 	}, {
 		__index = (self, key)
-			error("don't know how to compile a "..tostring(key).." to "..targetName)
+			error("don't know how to compile a " .. tostring(key) .. ' to ' .. targetName)
 		end
 	})
 
-	#placeholder("patch")
+	#placeholder('patch')
 
 	local code = lua(ast)..newline()
 	return requireStr..code

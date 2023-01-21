@@ -66,7 +66,8 @@ function var2str (var)
     str = str .. exp2str(var[2])
     str = str .. " }"
   else
-    error("expecting a variable, but got a " .. tag)
+    -- error("expecting a variable, but got a " .. tag)
+    str = str .. ' "' .. var[1] .. '"'
   end
   return str
 end
@@ -168,7 +169,8 @@ function exp2str (exp)
          tag == "Index" then -- `Index{ expr expr }
     str = var2str(exp)
   else
-    error("expecting an expression, but got a " .. tag)
+    -- error("expecting an expression, but got a " .. tag)
+    str = str .. ' "' .. exp[1] .. '"'
   end
   return str
 end
@@ -285,7 +287,8 @@ function stm2str (stm)
     end
     str = str .. " }"
   else
-    error("expecting a statement, but got a " .. tag)
+    -- error("expecting a statement, but got a " .. tag)
+    str = str .. ' "' .. stm[1] .. '"'
   end
   return str
 end

@@ -1,38 +1,38 @@
-targetName = "Lua 5.1"
+targetName = 'Lua 5.1'
 
 states.continue = {} -- when in a loop that use continue
 
 CONTINUE_START = ()
-	return "local " .. var("break") .. newline() .. "repeat" .. indent() .. push("continue", var("break"))
+	return 'local ' .. var('break') .. newline() .. 'repeat' .. indent() .. push('continue', var('break'))
 end
 CONTINUE_STOP = ()
-	return pop("continue") .. unindent() .. "until true" .. newline() .. "if " .. var("break") .. " then break end"
+	return pop('continue') .. unindent() .. 'until true' .. newline() .. 'if ' .. var('break') .. ' then break end'
 end
 
 tags.Continue = ()
-	return "break"
+	return 'break'
 end
 tags.Break = ()
-	local inContinue = peek("continue")
+	local inContinue = peek('continue')
 	if inContinue then
-		return inContinue .. " = true" .. newline() .. "break"
+		return inContinue .. ' = true' .. newline() .. 'break'
 	else
-		return "break"
+		return 'break'
 	end
 end
 
 -- Unsuported features
 tags.Goto = ()
-	error("target "..targetName.." does not support gotos")
+	error('target ' .. targetName .. ' does not support gotos')
 end
 tags.Label = ()
-	error("target "..targetName.." does not support goto labels")
+	error('target ' .. targetName .. ' does not support goto labels')
 end
 
-#placeholder("patch")
+#placeholder('patch')
 
 #local patch = output
-#output = ""
-#import("compiler.luajit", { preprocessorEnv = { patch = patch }, loadPackage = false })
+#output = ''
+#import('compiler.luajit', { preprocessorEnv = { patch = patch }, loadPackage = false })
 
 return luajit

@@ -1,32 +1,32 @@
 local lepton = {
-	VERSION = "1.0.0"
+	VERSION = '1.0.0'
 }
-package.loaded["lepton"] = lepton
+package.loaded['lepton'] = lepton
 
-#import("lepton.util")
-#import("lepton.serpent")
+#import('lepton.util')
+#import('lepton.serpent')
 
-#import("compiler.lua54")
-#import("compiler.lua53")
-#import("compiler.lua52")
-#import("compiler.luajit")
-#import("compiler.lua51")
+#import('compiler.lua54')
+#import('compiler.lua53')
+#import('compiler.lua52')
+#import('compiler.luajit')
+#import('compiler.lua51')
 
-#import("lepton.lpt-parser.scope")
-#import("lepton.lpt-parser.validator")
-#import("lepton.lpt-parser.pp")
-#import("lepton.lpt-parser.parser")
+#import('lepton.lpt-parser.scope')
+#import('lepton.lpt-parser.validator')
+#import('lepton.lpt-parser.pp')
+#import('lepton.lpt-parser.parser')
 
 local unpack = unpack or table.unpack
 
 --- Default options.
 lepton.default = {
-	target = "lua54",
-	indentation = "",
-	newline = "\n",
-	variablePrefix = "__LPT_",
+	target = 'lua54',
+	indentation = '',
+	newline = '\n',
+	variablePrefix = '__LPT_',
 	mapLines = true,
-	chunkname = "nil",
+	chunkname = 'nil',
 	rewriteErrors = true,
 	builtInMacros = true,
 	preprocessorEnv = {},
@@ -34,16 +34,16 @@ lepton.default = {
 }
 
 -- Autodetect version
-if _VERSION == "Lua 5.1" then
+if _VERSION == 'Lua 5.1' then
 	if package.loaded.jit then
-		lepton.default.target = "luajit"
+		lepton.default.target = 'luajit'
 	else
-		lepton.default.target = "lua51"
+		lepton.default.target = 'lua51'
 	end
-elseif _VERSION == "Lua 5.2" then
-	lepton.default.target = "lua52"
-elseif _VERSION == "Lua 5.3" then
-	lepton.default.target = "lua53"
+elseif _VERSION == 'Lua 5.2' then
+	lepton.default.target = 'lua52'
+elseif _VERSION == 'Lua 5.3' then
+	lepton.default.target = 'lua53'
 end
 
 --- Run the preprocessor
@@ -62,40 +62,40 @@ function lepton.preprocess(input, options={}, _env)
 
 	-- add auto imports
 	for _, mod in ipairs(options.import) do
-		input =.. "#import(%q, {loadLocal=false})\n":format(mod)
+		input =.. '#import(%q, {loadLocal=false})\n':format(mod)
 	end
 
 	-- generate preprocessor code
-	local preprocessor = ""
+	local preprocessor = ''
 	local i = 0
 	local inLongString = false
 	local inComment = false
-	for line in (input.."\n"):gmatch("(.-\n)") do
+	for line in (input..'\n'):gmatch('(.-\n)') do
 		i += 1
 		-- Simple multiline comment/string detection
 		if inComment then
-			inComment = not line:match("%]%]")
+			inComment = not line:match('%]%]')
 		elseif inLongString then
-			inLongString = not line:match("%]%]")
+			inLongString = not line:match('%]%]')
 		else
-			if line:match("[^%-]%[%[") then
+			if line:match('[^%-]%[%[') then
 				inLongString = true
-			elseif line:match("%-%-%[%[") then
+			elseif line:match('%-%-%[%[') then
 				inComment = true
 			end
 		end
-		if not inComment and not inLongString and line:match("^%s*#") and not line:match("^#!") then -- exclude shebang
-			preprocessor ..= line:gsub("^%s*#", "")
+		if not inComment and not inLongString and line:match('^%s*#') and not line:match('^#!') then -- exclude shebang
+			preprocessor ..= line:gsub('^%s*#', '')
 		else
 			local l = line:sub(1, -2)
-			if not inLongString and options.mapLines and not l:match("%-%- (.-)%:(%d+)$") then
-				preprocessor ..= ("write(%q)"):format(l .. " -- "..options.chunkname..":" .. i) .. "\n"
+			if not inLongString and options.mapLines and not l:match('%-%- (.-)%:(%d+)$') then
+				preprocessor ..= ('write(%q)'):format(l .. ' -- '..options.chunkname..':' .. i) .. '\n'
 			else
-				preprocessor ..= ("write(%q)"):format(line:sub(1, -2)) .. "\n"
+				preprocessor ..= ('write(%q)'):format(line:sub(1, -2)) .. '\n'
 			end
 		end
 	end
-	preprocessor ..= "return output"
+	preprocessor ..= 'return output'
 
 	-- make preprocessor environement
 	local exportenv = {}
@@ -103,7 +103,7 @@ function lepton.preprocess(input, options={}, _env)
 	--- lepton library table
 	env.lepton = lepton
 	--- Current preprocessor output
-	env.output = ""
+	env.output = ''
 	--- Import an external lepton/Lua module into the generated file
 	-- Notable options:
 	-- * loadLocal (true): true to automatically load the module into a local variable
@@ -111,7 +111,7 @@ function lepton.preprocess(input, options={}, _env)
 	-- @tparam modpath string module path
 	-- @tparam margs table preprocessor options to use when preprocessessing the module
 	env.import = function(modpath, margs={})
-		local filepath = assert(util.search(modpath, {"lpt", "lua"}), "No module named \""..modpath.."\"")
+		local filepath = assert(util.search(modpath, {'lpt', 'lua'}), 'No module named \''..modpath..'\'')
 
 		-- open module file
 		local f = io.open(filepath)
@@ -119,36 +119,36 @@ function lepton.preprocess(input, options={}, _env)
 
 		margs = util.merge(options, { chunkname = filepath, loadLocal = true, loadPackage = true }, margs)
 		margs.import = {} -- no need for recursive import
-		local modcontent, modmacros, modenv = assert(lepton.preprocess(f:read("*a"), margs))
+		local modcontent, modmacros, modenv = assert(lepton.preprocess(f:read('*a'), margs))
 		macros = util.recmerge(macros, modmacros)
 		for k, v in pairs(modenv) do env[k] = v end
 		f:close()
 
 		-- get module name (ex: module name of path.to.module is module)
-		local modname = modpath:match("[^%.]+$")
+		local modname = modpath:match('[^%.]+$')
 
 		env.write(
-			"-- MODULE "..modpath.." --\n"..
-			"local function _()\n"..
-				modcontent.."\n"..
-			"end\n"..
-			(margs.loadLocal and ("local %s = _() or %s\n"):format(modname, modname) or "").. -- auto require
-			(margs.loadPackage and ("package.loaded[%q] = %s or true\n"):format(modpath, margs.loadLocal and modname or "_()") or "").. -- add to package.loaded
-			"-- END OF MODULE "..modpath.." --"
+			'-- MODULE '..modpath..' --\n'..
+			'local function _()\n'..
+				modcontent..'\n'..
+			'end\n'..
+			(margs.loadLocal and ('local %s = _() or %s\n'):format(modname, modname) or '').. -- auto require
+			(margs.loadPackage and ('package.loaded[%q] = %s or true\n'):format(modpath, margs.loadLocal and modname or '_()') or '').. -- add to package.loaded
+			'-- END OF MODULE '..modpath..' --'
 		)
 	end
 	--- Include another file content in the preprocessor output.
 	-- @tparam file string filepath
 	env.include = function(file)
 		local f = io.open(file)
-		if not f then error("can't open the file "..file.." to include") end
-		env.write(f:read("*a"))
+		if not f then error("can't open the file "..file..' to include') end
+		env.write(f:read('*a'))
 		f:close()
 	end
 	--- Write a line in the preprocessor output.
 	-- @tparam ... string strings to write (similar to print)
 	env.write = function(...)
-		env.output ..= table.concat({...}, "\t") .. "\n"
+		env.output ..= table.concat({...}, '\t') .. '\n'
 	end
 	--- Will be replaced with the content of the variable with the given name, if it exists.
 	-- @tparam name string variable name
@@ -161,29 +161,29 @@ function lepton.preprocess(input, options={}, _env)
 		-- parse identifier
 		local iast, ierr = parser.parsemacroidentifier(identifier, options.chunkname)
 		if not iast then
-			return error("in macro identifier: %s":format(tostring(ierr)))
+			return error('in macro identifier: %s':format(tostring(ierr)))
 		end
 		-- parse replacement value
-		if type(replacement) == "string" then
+		if type(replacement) == 'string' then
 			local rast, rerr = parser.parse(replacement, options.chunkname)
 			if not rast then
-				return error("in macro replacement: %s":format(tostring(rerr)))
+				return error('in macro replacement: %s':format(tostring(rerr)))
 			end
 			-- when giving a single value as a replacement, bypass the implicit push
-			if #rast == 1 and rast[1].tag == "Push" and rast[1].implicit then
+			if #rast == 1 and rast[1].tag == 'Push' and rast[1].implicit then
 				rast = rast[1][1]
 			end
 			replacement = rast
-		elseif type(replacement) ~= "function" then
+		elseif type(replacement) ~= 'function' then
 			error("bad argument #2 to 'define' (string or function expected)")
 		end
 		-- add macros
-		if iast.tag == "MacroFunction" then
+		if iast.tag == 'MacroFunction' then
 			macros.functions[iast[1][1]] = { args = iast[2], replacement = replacement }
-		elseif iast.tag == "Id" then
+		elseif iast.tag == 'Id' then
 			macros.variables[iast[1]] = replacement
 		else
-			error("invalid macro type %s":format(tostring(iast.tag)))
+			error('invalid macro type %s':format(tostring(iast.tag)))
 		end
 	end
 	env.set = function(identifier, value)
@@ -193,9 +193,9 @@ function lepton.preprocess(input, options={}, _env)
 
 	-- default macros
 	if options.builtInMacros then
-		env.define("__STR__(x)", function(x) return ("%q"):format(x) end)
-		local s = require("lepton.serpent")
-		env.define("__CONSTEXPR__(expr)", function(expr)
+		env.define('__STR__(x)', function(x) return ('%q'):format(x) end)
+		local s = require('lepton.serpent')
+		env.define('__CONSTEXPR__(expr)', function(expr)
 			return s.block(assert(lepton.load(expr))(), {fatal = true})
 		end)
 	end
@@ -203,18 +203,18 @@ function lepton.preprocess(input, options={}, _env)
 	-- compile & load preprocessor
 	local preprocess, err = lepton.compile(preprocessor, options)
 	if not preprocess then
-		return nil, "in preprocessor: "..err
+		return nil, 'in preprocessor: '..err
 	end
 
-	preprocess, err = util.load(preprocessor, "lepton preprocessor", env)
+	preprocess, err = util.load(preprocessor, 'lepton preprocessor', env)
 	if not preprocess then
-		return nil, "in preprocessor: "..err
+		return nil, 'in preprocessor: '..err
 	end
 
 	-- execute preprocessor
 	local success, output = pcall(preprocess)
 	if not success then
-		return nil, "in preprocessor: "..output
+		return nil, 'in preprocessor: '..output
 	end
 
 	return output, macros, exportenv
@@ -236,7 +236,7 @@ function lepton.compile(input, options={}, macros)
 		return nil, errmsg
 	end
 
-	return require("compiler."..options.target)(input, ast, options, macros)
+	return require('compiler.'..options.target)(input, ast, options, macros)
 end
 
 --- Preprocess & compile code
@@ -263,9 +263,9 @@ local codeCache = {}
 function lepton.loadfile(filepath, env, options)
 	local f, err = io.open(filepath)
 	if not f then
-		return nil, "cannot open %s":format(tostring(err))
+		return nil, 'cannot open %s':format(tostring(err))
 	end
-	local content = f:read("*a")
+	local content = f:read('*a')
 	f:close()
 
 	return lepton.load(content, filepath, env, options)
@@ -283,13 +283,13 @@ function lepton.load(chunk, chunkname, env, options={})
 
 	codeCache[options.chunkname] = code
 	local f
-	f, err = util.load(code, "=%s(%s)":format(options.chunkname, "compiled lepton"), env)
+	f, err = util.load(code, '=%s(%s)':format(options.chunkname, 'compiled lepton'), env)
 
 	-- Um. lepton isn't supposed to generate invalid Lua code, so this is a major issue.
 	-- This is not going to raise an error because this is supposed to behave similarly to Lua's load function.
 	-- But the error message will likely be useless unless you know how lepton works.
 	if f == nil then
-		return f, "lepton unexpectedly generated invalid code: "..err
+		return f, 'lepton unexpectedly generated invalid code: '..err
 	end
 
 	if options.rewriteErrors == false then
@@ -327,37 +327,37 @@ end
 -- Use it in xpcall to rewrite stacktraces to display lepton source file lines instead of compiled Lua lines.
 function lepton.messageHandler(message, noTraceback)
 	message = tostring(message)
-	if not noTraceback and not message:match("\nstack traceback:\n") then
+	if not noTraceback and not message:match('\nstack traceback:\n') then
 		message = debug.traceback(message, 2)
 	end
-	return message:gsub("(\n?%s*)([^\n]-)%:(%d+)%:", function(indentation, source, line)
+	return message:gsub('(\n?%s*)([^\n]-)%:(%d+)%:', function(indentation, source, line)
 		line = tonumber(line)
 
 		local originalFile
-		local strName = source:match("^(.-)%(compiled lepton%)$")
+		local strName = source:match('^(.-)%(compiled lepton%)$')
 		if strName then
 			if codeCache[strName] then
 				originalFile = codeCache[strName]
 				source = strName
 			end
 		else
-			if fi = io.open(source, "r") then
-				originalFile = fi:read("*a")
+			if fi = io.open(source, 'r') then
+				originalFile = fi:read('*a')
 				fi:close()
 			end
 		end
 
 		if originalFile then
 			local i = 0
-			for l in (originalFile.."\n"):gmatch("([^\n]*)\n") do
+			for l in (originalFile..'\n'):gmatch('([^\n]*)\n') do
 				i = i +1
 				if i == line then
-					local extSource, lineMap = l:match(".*%-%- (.-)%:(%d+)$")
+					local extSource, lineMap = l:match('.*%-%- (.-)%:(%d+)$')
 					if lineMap then
 						if extSource ~= source then
-							return indentation .. extSource .. ":" .. lineMap .. "(" .. extSource .. ":" .. line .. "):"
+							return indentation .. extSource .. ':' .. lineMap .. '(' .. extSource .. ':' .. line .. '):'
 						else
-							return indentation .. extSource .. ":" .. lineMap .. "(" .. line .. "):"
+							return indentation .. extSource .. ':' .. lineMap .. '(' .. line .. '):'
 						end
 					end
 					break
@@ -369,12 +369,12 @@ end
 
 --- lepton package searcher function. Use the existing package.path.
 function lepton.searcher(modpath)
-	local filepath = util.search(modpath, {"lpt"})
+	local filepath = util.search(modpath, {'lpt'})
 	if not filepath then
-		if _VERSION == "Lua 5.4" then
-			return "no lepton file in package.path"
+		if _VERSION == 'Lua 5.4' then
+			return 'no lepton file in package.path'
 		else
-			return "\n\tno lepton file in package.path"
+			return '\n\tno lepton file in package.path'
 		end
 	end
 	return (modpath) -- 2nd argument is not passed in Lua 5.1, so a closure is required
@@ -389,7 +389,7 @@ end
 
 --- Register the lepton package searcher.
 function lepton.setup()
-	local searchers = if _VERSION == "Lua 5.1" then
+	local searchers = if _VERSION == 'Lua 5.1' then
 		package.loaders
 	else
 		package.searchers
