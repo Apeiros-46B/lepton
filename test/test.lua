@@ -349,7 +349,7 @@ test('default parameters', [[
 ]], 'SANDWICHbatru')
 -- }}}
 
--- {{{ @ self alias
+-- {{{ @ as self alias
 test('@ as self alias', [[
     local a = {}
     function a:hey() {
@@ -357,7 +357,7 @@ test('@ as self alias', [[
     }
     return a:hey()
 ]], true)
-test('@ as self alias with arrow function', [[
+test('@ as self alias with arrow method', [[
     local a = {}
     a.hey = :() -> @ == self
     return a:hey()
@@ -371,7 +371,7 @@ test('@ as self alias and indexation', [[
     }
     return a:hey()
 ]], 'Hoi')
-test('@ as self alias and indexation with arrow function', [[
+test('@ as self alias and indexation with arrow method', [[
     local a = {
         foo = 'Hoi'
     }
@@ -387,7 +387,7 @@ test('@name indexation', [[
     }
     return a:hey()
 ]], 'Hoi')
-test('@name indexation with arrow function', [[
+test('@name indexation with arrow method', [[
     local a = {
         foo = 'Hoi'
     }
@@ -406,7 +406,7 @@ test('@name method call', [[
     }
     return a:hey()
 ]], 'Hoi')
-test('@name method call with arrow function', [[
+test('@name method call with arrow method', [[
     local a = {
         foo = 'Hoi',
         bar = :() -> {
@@ -425,7 +425,7 @@ test('@[expt] indexation', [[
     }
     return a:hey()
 ]], 'Hoi')
-test('@[expt] indexation with arrow function', [[
+test('@[expt] indexation with arrow method', [[
     local a = {
         foo = 'Hoi'
     }
@@ -434,8 +434,20 @@ test('@[expt] indexation with arrow function', [[
 ]], 'Hoi')
 -- }}}
 
--- {{{ arrow function
+-- {{{ arrow functions
 -- {{{ basic tests
+test('arrow function', [[
+    local a = (x) -> {
+        return x
+    }
+    return a(5)
+]], 5)
+test('arrow method', [[
+    local a = :(x) -> {
+        return self + x
+    }
+    return a(2, 3)
+]], 5)
 test('arrow function', [[
     local a = (x) -> {
         return x
@@ -636,7 +648,7 @@ test('continue keyword in repeat, used with break', [[
 ]], '135')
 test('continue keyword in fornum', [[
     local a = ''
-    for (i = 1, 10) {
+    for (i : 1, 10) {
         if (i % 2 == 0) {
             continue
         }
@@ -646,7 +658,7 @@ test('continue keyword in fornum', [[
 ]], '13579')
 test('continue keyword in fornum, used with break', [[
     local a = ''
-    for (i = 1, 10) {
+    for (i : 1, 10) {
         if (i % 2 == 0) {
             continue
         }
@@ -687,7 +699,7 @@ test('continue keyword in for, used with break', [[
 -- {{{ push keyword
 test('push keyword', [[
     function a() {
-        for (i = 1, 5) {
+        for (i : 1, 5) {
             push i, 'next'
         }
         return 'done'
@@ -736,17 +748,17 @@ test('repeat statement expressions', [[
     return table.concat({a, b, tostring(c)})
 ]], '12nil')
 test('for statement expressions', [[
-    a, b, c = for (i = 1, 2) { i }
+    a, b, c = for (i : 1, 2) { i }
     return table.concat({a, b, tostring(c)})
 ]], '12nil')
 -- }}}
 
 -- {{{ table comprehension
 test('table comprehension sequence', [[
-    return table.concat([for (i = 1, 10) { i }])
+    return table.concat([for (i : 1, 10) { i }])
 ]], '12345678910')
 test('table comprehension associative/self', [[
-    a = [for (i = 1, 10) { @[i] = true }]
+    a = [for (i : 1, 10) { @[i] = true }]
     return a[1] && a[10]
 ]], true)
 test('table comprehension variable length', [[

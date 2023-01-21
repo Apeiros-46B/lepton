@@ -114,7 +114,7 @@ local labels = {
     { 'ErrForRangeComma', [[expected ',' to split the start and end of the range]] },
     { 'ErrForRangeEnd', [[expected an ending expression for the numeric range]] },
     { 'ErrForRangeStep', [[expected a step expression for the numeric range after ',']] },
-    { 'ErrInFor', [[expected '=' or ':' after the variable(s)]] },
+    { 'ErrInFor', [[expected ':' after the variable(s)]] },
     { 'ErrEListFor', [[expected one or more expressions after ':']] },
     { 'ErrCFor', [[expected 'end' to close the for loop]] },
 
@@ -314,18 +314,6 @@ local function makeSuffixedExpr(t1, t2)
     end
 end
 
--- local function printT(layer, t)
---     local indent = (' '):rep(layer * 4)
---     for k, v in pairs(t) do
---         if type(v) == 'table' then
---             print(indent .. k .. ':')
---             printT(layer + 1, v)
---         else
---             print(indent .. k .. ': ' .. tostring(v))
---         end
---     end
--- end
-
 local function fixArrowFunc(t)
     if t[1] == ':' then -- self method
         table.insert(t[2], 1, { tag = 'Id', 'self' })
@@ -335,6 +323,19 @@ local function fixArrowFunc(t)
     t.is_short = true
     return t
 end
+
+-- TODO: version for => self methods
+-- local function fixArrowFunc(t)
+--     require('lepton.lpt-parser.pp').dump(t)
+--     if t[2].tag == 'SelfArrow' then -- self method
+--         table.insert(t[1], 1, { tag = 'Id', 'self' })
+--         table.remove(t, 2)
+--         t.is_method = true
+--     end
+--     t.is_short = true
+--     require('lepton.lpt-parser.pp').dump(t)
+--     return t
+-- end
 
 local function markImplicit(t)
     t.implicit = true
@@ -365,109 +366,6 @@ local function fixStructure(t) -- fix the AST structure if needed
         i = i + 1
     end
     return t
-end
-
-local function searchEndRec(block, isRecCall) -- recursively search potential 'end' keyword wrongly consumed by a short anonymous function on stat end (yeah, too late to change the syntax to something easier to parse)
-    for i, stat in ipairs(block) do
-        -- Non recursive statements
-        if stat.tag == 'Set' or stat.tag == 'Push' or stat.tag == 'Return' or stat.tag == 'Local' or stat.tag == 'Let' or stat.tag == 'Localrec' then
-            local exprlist
-
-            if stat.tag == 'Set' or stat.tag == 'Local' or stat.tag == 'Let' or stat.tag == 'Localrec' then
-                exprlist = stat[#stat]
-            elseif stat.tag == 'Push' or stat.tag == 'Return' then
-                exprlist = stat
-            end
-
-            local last = exprlist[#exprlist] -- last value in ExprList
-
-            -- Stuff parse shittily only for short function declaration which are not method and whith strictly one variable name between the parenthesis.
-            -- Otherwise it's invalid Lua anyway, so not my problem.
-            if last.tag == 'Function' and last.is_short and not last.is_method and #last[1] == 1 then
-                local p = i
-                for j, fstat in ipairs(last[2]) do
-                    p = i + j
-                    table.insert(block, p, fstat) -- copy stats from func body to block
-
-                    if stat.move_up_block then -- extracted stats inherit move_up_block from statement
-                        fstat.move_up_block = (fstat.move_up_block or 0) + stat.move_up_block
-                    end
-
-                    if block.is_singlestatblock then -- if it's a single stat block, mark them to move them outside of the block
-                        fstat.move_up_block = (fstat.move_up_block or 0) + 1
-                    end
-                end
-
-                exprlist[#exprlist] = last[1] -- replace func with paren and expressions
-                exprlist[#exprlist].tag = 'Paren'
-
-                if not isRecCall then -- if superfluous statements won't be moved in a next recursion, let fixStructure handle things
-                    for j=p+1, #block, 1 do
-                        block[j].move_up_block = (block[j].move_up_block or 0) + 1
-                    end
-                end
-
-                return block, i
-
-            -- I lied, stuff can also be recursive here (StatExpr & Function)
-            elseif last.tag:match('Expr$') then
-                local r = searchEndRec({ last })
-                if r then
-                    for j=2, #r, 1 do
-                        table.insert(block, i+j-1, r[j]) -- move back superflous statements from our new table to our real block
-                    end
-                    return block, i
-                end
-            elseif last.tag == 'Function' then
-                local r = searchEndRec(last[2])
-                if r then
-                    return block, i
-                end
-            end
-
-        -- Recursive statements
-        elseif stat.tag:match('^If') or stat.tag:match('^While') or stat.tag:match('^Repeat') or stat.tag:match('^Do') or stat.tag:match('^Fornum') or stat.tag:match('^Forin') then
-            local blocks
-
-            if stat.tag:match('^If') or stat.tag:match('^While') or stat.tag:match('^Repeat') or stat.tag:match('^Fornum') or stat.tag:match('^Forin') then
-                blocks = stat
-            elseif stat.tag:match('^Do') then
-                blocks = { stat }
-            end
-
-            for _, iblock in ipairs(blocks) do
-                if iblock.tag == 'Block' then -- blocks
-                    local oldLen = #iblock
-                    local newiBlock, newEnd = searchEndRec(iblock, true)
-                    if newiBlock then -- if end in the block
-                        local p = i
-                        for j=newEnd+(#iblock-oldLen)+1, #iblock, 1 do -- move all statements after the newely added statements to the parent block
-                            p = p + 1
-                            table.insert(block, p, iblock[j])
-                            iblock[j] = nil
-                        end
-
-                        if not isRecCall then -- if superfluous statements won't be moved in a next recursion, let fixStructure handle things
-                            for j=p+1, #block, 1 do
-                                block[j].move_up_block = (block[j].move_up_block or 0) + 1
-                            end
-                        end
-
-                        return block, i
-                    end
-                end
-            end
-        end
-    end
-    return nil
-end
-
-local function searchEnd(s, p, t) -- match time capture which try to restructure the AST to free an 'end' for us
-    local r = searchEndRec(fixStructure(t))
-    if not r then
-        return false
-    end
-    return true, r
 end
 
 local function eStart(label)
@@ -547,7 +445,7 @@ local G = { V'Lua',
                 + sym(';');
     BlockEnd    = P'return' + sym('}') + (sym('}') * 'elseif') + (sym('}') * 'else') + (sym('}') * 'until') + ']' + -1 + V'ImplicitPushStat' + V'Assignment';
 
-    SingleStatBlock = tagC('Block', V'Stat' + V'RetStat' + V'ImplicitPushStat') / function(t) t.is_singlestatblock = true return t end;
+    SingleStatBlock = tagC('Block', V'Stat' + V'RetStat' + V'ImplicitPushStat');
     BlockNoErr      = tagC('Block', V'Stat'^0 * ((V'RetStat' + V'ImplicitPushStat') * sym(';')^-1)^-1); -- used to check if something a valid block without throwing an error
 
     IfStat      = tagC('If', V'IfPart');
@@ -561,7 +459,7 @@ local G = { V'Lua',
     RepeatStat  = tagC('Repeat', kw('repeat') * eBlkStartEnd('ORep', 'CRep') * e(kw('until'), 'UntilRep') * e(parenAround(V'Expr'), 'ExprRep'));
 
     ForStat   = kw('for') * e(V'ForNum' + V'ForIn', 'ForRange');
-    ForNum    = tagC('Fornum', parenAround(V'Id' * sym('=') * V'NumRange') * V'ForBody');
+    ForNum    = tagC('Fornum', parenAround(V'Id' * sym(':') * V'NumRange') * V'ForBody');
     NumRange  = e(V'Expr', 'ForRangeStart') * e(sym(','), 'ForRangeComma') * e(V'Expr', 'ForRangeEnd')
               * (sym(':') * e(V'Expr', 'ForRangeStep'))^-1;
     ForIn     = tagC('Forin', parenAround(V'DestructuringNameList' * e(sym(':'), 'InFor') * e(V'ExprList', 'EListFor')) * V'ForBody');
@@ -581,8 +479,8 @@ local G = { V'Lua',
     AttributeAssign = tagC('Local', V'NameList' * (sym('=') * e(V'ExprList', 'EListLAssign') + Ct(Cc())))
                     + tagC('Local', V'DestructuringNameList' * sym('=') * e(V'ExprList', 'EListLAssign'));
 
-    Assignment   = tagC('Set', (V'VarList' + V'DestructuringNameList') * V'BinOp'^-1 * ((P'=' - '==') / '=')
-                 * ((V'BinOp' - P'-') + #(P'-' * V'Space') * V'BinOp')^-1 * V'Skip' * e(V'ExprList', 'EListAssign'));
+    Assignment  = tagC('Set', (V'VarList' + V'DestructuringNameList') * V'BinOp'^-1 * ((P'=' - '==') / '=')
+                * ((V'BinOp' - P'-') + #(P'-' * V'Space') * V'BinOp')^-1 * V'Skip' * e(V'ExprList', 'EListAssign'));
 
     FuncStat    = tagC('Set', kw('function') * e(V'FuncName', 'FuncName') * V'FuncBody') / fixFuncStat;
     FuncName    = Cf(V'Id' * (sym('.') * e(V'StrId', 'NameFunc1'))^0, insertIndex)
@@ -595,7 +493,7 @@ local G = { V'Lua',
 
     ArrowFuncDef    = tagC('Function', V'ArrowFuncParams' * sym('->') * V'ArrowFuncBody') / fixArrowFunc;
     ArrowFuncParams = (sym(':') / ':')^-1 * (parenAround(V'ParList') + tagC('NamedPar', V'NamedPar'));
-    ArrowFuncBody   = (-sym('{') * V'Block' * -sym('}')) + eBlkStartEnd('OArrowFunc', 'CArrowFunc');
+    ArrowFuncBody   = (-sym('{') * tagC('Block', tagC('Push', V'Expr')) * -sym('}')) + eBlkStartEnd('OArrowFunc', 'CArrowFunc');
 
     NamedParList  = tagC('NamedParList', commaSep(V'NamedPar'));
     NamedPar      = tagC('ParPair', V'ParKey' * e(sym('='), 'EqField') * e(V'Expr', 'ExprField')) + V'Id';
@@ -618,8 +516,7 @@ local G = { V'Lua',
 
     DestructuringId          = tagC('DestructuringId', sym('{') * V'DestructuringIdFieldList' * e(sym('}'), 'CBraceDestructuring')) + V'Id',
     DestructuringIdFieldList = sepBy(V'DestructuringIdField', V'FieldSep') * V'FieldSep'^-1;
-    DestructuringIdField     = tagC('Pair', V'FieldKey' * e(sym('='), 'DestructuringEqField') * e(V'Id', 'DestructuringExprField'))
-                             + V'Id';
+    DestructuringIdField     = tagC('Pair', V'FieldKey' * e(sym('='), 'DestructuringEqField') * e(V'Id', 'DestructuringExprField')) + V'Id';
 
     Expr        = V'OrExpr';
     OrExpr      = chainOp(V'AndExpr', V'OrOp', 'OrExpr');
@@ -641,8 +538,8 @@ local G = { V'Lua',
                 + tagC('Boolean', kw('true') * Cc(true))
                 + tagC('Dots', sym('...'))
                 + V'FuncDef'
-                + (when('lexpr') * tagC('LetExpr', mb(V'DestructuringNameList') * sym('=') * -sym('=') * e(V'ExprList', 'EListLAssign')))
                 + V'ArrowFuncDef'
+                + (when('lexpr') * tagC('LetExpr', mb(V'DestructuringNameList') * sym('=') * -sym('=') * e(V'ExprList', 'EListLAssign')))
                 + V'SuffixedExpr'
                 + V'StatExpr';
 
@@ -693,7 +590,7 @@ local G = { V'Lua',
     -- lexer
     Skip     = (V'Space' + V'Comment')^0;
     Space    = space^1;
-    Comment  = P'--' * V'LongStr' / function() end
+    Comment  = P'--' * V'LongStr' / 0
              + P'--' * (P(1) - P'\n')^0;
 
     Name      = token(-V'Reserved' * C(V'Ident'));
