@@ -384,6 +384,17 @@ local function eBlkStartEnd(startLabel, endLabel, canFollow)
     end
 end
 
+local function eBlkStartEndOrSingleStat(startLabel, endLabel, canFollow) -- will try a SingleStat if start doesn't match
+    local start = sym('{')
+    if canFollow then
+        return (-start * V'SingleStatBlock' * canFollow^-1)
+             + (eStart(startLabel) * V'Block' * (eEnd(endLabel) * canFollow + eEnd(endLabel)))
+    else
+        return (-start * V'SingleStatBlock')
+             + (eStart(startLabel) * V'Block' * eEnd(endLabel))
+    end
+end
+
 local function mb(patt) -- fail pattern instead of propagating errors
     return #patt/0 * patt
 end
@@ -449,21 +460,21 @@ local G = { V'Lua',
     BlockNoErr      = tagC('Block', V'Stat'^0 * ((V'RetStat' + V'ImplicitPushStat') * sym(';')^-1)^-1); -- used to check if something a valid block without throwing an error
 
     IfStat      = tagC('If', V'IfPart');
-    IfPart      = kw('if') * set('lexpr', e(parenAround(V'Expr'), 'ExprIf')) * eBlkStartEnd('OIf', 'CIf', V'ElseIfPart' + V'ElsePart');
-    ElseIfPart  = kw('elseif') * set('lexpr', e(parenAround(V'Expr'), 'ExprEIf')) * eBlkStartEnd('OEIf', 'CIf', V'ElseIfPart' + V'ElsePart');
-    ElsePart    = kw('else') * eBlkStartEnd('OElse', 'CIf');
+    IfPart      = kw('if') * set('lexpr', e(parenAround(V'Expr'), 'ExprIf')) * eBlkStartEndOrSingleStat('OIf', 'CIf', V'ElseIfPart' + V'ElsePart');
+    ElseIfPart  = kw('elseif') * set('lexpr', e(parenAround(V'Expr'), 'ExprEIf')) * eBlkStartEndOrSingleStat('OEIf', 'CIf', V'ElseIfPart' + V'ElsePart');
+    ElsePart    = kw('else') * eBlkStartEndOrSingleStat('OElse', 'CIf');
 
-    DoStat      = kw('do') * eBlkStartEnd('ODo', 'CDo') / tagDo;
+    DoStat      = kw('do') * eBlkStartEndOrSingleStat('ODo', 'CDo') / tagDo;
     WhileStat   = tagC('While', kw('while') * set('lexpr', e(parenAround(V'Expr'), 'ExprWhile')) * V'WhileBody');
-    WhileBody   = eBlkStartEnd('DoWhile', 'EndWhile');
-    RepeatStat  = tagC('Repeat', kw('repeat') * eBlkStartEnd('ORep', 'CRep') * e(kw('until'), 'UntilRep') * e(parenAround(V'Expr'), 'ExprRep'));
+    WhileBody   = eBlkStartEndOrSingleStat('DoWhile', 'EndWhile');
+    RepeatStat  = tagC('Repeat', kw('repeat') * eBlkStartEndOrSingleStat('ORep', 'CRep') * e(kw('until'), 'UntilRep') * e(parenAround(V'Expr'), 'ExprRep'));
 
     ForStat   = kw('for') * e(V'ForNum' + V'ForIn', 'ForRange');
     ForNum    = tagC('Fornum', parenAround(V'Id' * sym(':') * V'NumRange') * V'ForBody');
     NumRange  = e(V'Expr', 'ForRangeStart') * e(sym(','), 'ForRangeComma') * e(V'Expr', 'ForRangeEnd')
               * (sym(':') * e(V'Expr', 'ForRangeStep'))^-1;
     ForIn     = tagC('Forin', parenAround(V'DestructuringNameList' * e(sym(':'), 'InFor') * e(V'ExprList', 'EListFor')) * V'ForBody');
-    ForBody   = eBlkStartEnd('OFor', 'CFor');
+    ForBody   = eBlkStartEndOrSingleStat('OFor', 'CFor');
 
     LocalStat    = kw('local') * e(V'LocalFunc' + V'LocalAssign', 'DefLocal');
     LocalFunc    = tagC('Localrec', kw('function') * e(V'Id', 'NameLFunc') * V'FuncBody') / fixFuncStat;
@@ -485,7 +496,7 @@ local G = { V'Lua',
     FuncStat    = tagC('Set', kw('function') * e(V'FuncName', 'FuncName') * V'FuncBody') / fixFuncStat;
     FuncName    = Cf(V'Id' * (sym('.') * e(V'StrId', 'NameFunc1'))^0, insertIndex)
                 * (sym(':') * e(V'StrId', 'NameFunc2'))^-1 / markMethod;
-    FuncBody    = tagC('Function', V'FuncParams' * eBlkStartEnd('OFunc', 'CFunc'));
+    FuncBody    = tagC('Function', V'FuncParams' * eBlkStartEndOrSingleStat('OFunc', 'CFunc'));
     FuncParams  = e(sym('('), 'OParenPList') * V'ParList' * e(sym(')'), 'CParenPList');
     ParList     = V'NamedParList' * (sym(',') * e(tagC('Dots', sym('...')), 'ParList'))^-1 / addDots
                 + Ct(tagC('Dots', sym('...')))

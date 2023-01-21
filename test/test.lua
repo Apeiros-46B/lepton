@@ -769,6 +769,46 @@ test('table comprehension variable length', [[
 ]], 'heyhopfoobar')
 -- }}}
 
+-- {{{ one line statements
+-- one line statements
+test("one line if", [[
+	a = 5
+    if (false)
+		a = 0
+	return a
+]], 5)
+test("one line if-elseif", [[
+	a = 3
+	if (false)
+		a = 0
+	elseif (true)
+		a = 5
+	elseif (false)
+		a = -1
+	return a
+]], 5)
+test("one line for", [[
+	a = 0
+    for (i : 1, 5)
+		a = a + 1
+	return a
+]], 5)
+test("one line while", [[
+	a = 0
+    while (a < 5)
+		a = a + 1
+	return a
+]], 5)
+test("one line function", [[
+    a = 3
+    b = function(x)
+        a = x
+    a = 0
+    b(5)
+    return a
+]], 5)
+-- }}}
+
 -- {{{ suffixables
 -- {{{ string literals
 test('suffixable string literal method', [[
