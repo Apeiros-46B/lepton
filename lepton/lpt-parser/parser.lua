@@ -83,8 +83,9 @@ local Cf, Cg, Cmt, Cp, Cs, Ct = lpeg.Cf, lpeg.Cg, lpeg.Cmt, lpeg.Cp, lpeg.Cs, lp
 -- lpeglabel
 local Rec, T = lpeg.Rec, lpeg.T
 
-local alpha, digit, alnum = lpeg.alpha, lpeg.digit, lpeg.alnum
-local xdigit = lpeg.xdigit
+local alpha, alnum = lpeg.alpha, lpeg.alnum
+local digit = lpeg.digit + P'_'
+local xdigit = lpeg.xdigit + P'_'
 local space = lpeg.space
 -- }}}
 
@@ -188,6 +189,7 @@ local labels = {
     { 'ErrCBracketTableCompr', [[expected ']' to close the table comprehension]] },
 
     { 'ErrDigitHex', [[expected one or more hexadecimal digits after '0x']] },
+    { 'ErrDigitBin', [[expected one or more binary digits after '0b']] },
     { 'ErrDigitDeci', [[expected one or more digits after the decimal point]] },
     { 'ErrDigitExpo', [[expected one or more digits for the exponent]] },
 
@@ -627,13 +629,15 @@ local G = { V'Lua',
     IdStart     = alpha + P'_';
     IdRest      = alnum + P'_';
 
-    Number   = token(C(V'Hex' + V'Float' + V'Int'));
+    Number   = token(C(V'Hex' + V'Bin' + V'Float' + V'Int'));
     Hex      = (P'0x' + '0X') * ((xdigit^0 * V'DeciHex') + (e(xdigit^1, 'DigitHex') * V'DeciHex'^-1)) * V'ExpoHex'^-1;
+    Bin      = (P'0b' + '0B') * ((S'_01'^0 * V'DeciBin') + (e(S'_01'^1, 'DigitBin') * V'DeciBin'^-1));
     Float    = V'Decimal' * V'Expo'^-1
              + V'Int' * V'Expo';
     Decimal  = digit^1 * '.' * digit^0
              + P'.' * -P'.' * e(digit^1, 'DigitDeci');
     DeciHex  = P'.' * xdigit^0;
+    DeciBin  = P'.' * S'_01'^0;
     Expo     = S'eE' * S'+-'^-1 * e(digit^1, 'DigitExpo');
     ExpoHex  = S'pP' * S'+-'^-1 * e(xdigit^1, 'DigitExpo');
     Int      = digit^1;

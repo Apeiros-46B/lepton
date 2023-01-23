@@ -347,9 +347,6 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			local expr = t[#t]
             local r = {}
 			for i, n in ipairs(t[1]) do
-                -- table.insert(vars, n)
-                -- table.insert(values, expr[i])
-
                 local value = expr[i]
                 if value == nil then
                     break
@@ -580,7 +577,12 @@ return function(code, ast, options, macros={functions={}, variables={}})
 		end,
 		-- Number{ <string> }
 		Number = (t)
-			return tostring(t[1])
+			local n = tostring(t[1]):gsub('_', '')
+            -- binary literals
+            if match = n:match('^0b(.*)') then
+                n = tostring(tonumber(match, 2))
+            end
+            return n
 		end,
 		-- String{ <string> }
 		String = (t)
