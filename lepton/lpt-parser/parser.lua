@@ -460,7 +460,7 @@ local G = { V'Lua',
     Stat        = V'IfStat' + V'DoStat' + V'WhileStat' + V'RepeatStat' + V'ForStat'
                 + V'LocalStat' + V'FuncStat' + V'BreakStat' + V'LabelStat' + V'GoToStat'
                 + V'LetStat' + V'ConstStat' + V'CloseStat'
-                + V'FuncCall' + V'Assignment'
+                + V'FuncCall' + V'Assignment' + V'AppendAssignment'
                 + V'ContinueStat' + V'PushStat'
                 + sym(';');
     BlockEnd    = P'return' + sym('}') + ']' + -1 + V'ImplicitPushStat' + V'Assignment';
@@ -501,6 +501,8 @@ local G = { V'Lua',
 
     Assignment  = tagC('Set', (V'VarList' + V'DestructuringNameList') * V'BinOp'^-1 * ((P'=' - '==') / '=')
                 * ((V'BinOp' - P'-') + #(P'-' * V'Space') * V'BinOp')^-1 * V'Skip' * e(V'ExprList', 'EListAssign'));
+
+    AppendAssignment = tagC('AppendSet', V'VarList' * sym('#=') * e(V'ExprList', 'EListAssign'));
 
     FuncStat    = tagC('Set', kw('fn') * e(V'FuncName', 'FuncName') * V'FuncBody') / fixFuncStat;
     FuncName    = Cf(V'Id' * (sym('.') * e(V'StrId', 'NameFunc1'))^0, insertIndex)

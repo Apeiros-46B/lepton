@@ -730,7 +730,7 @@ test('if statement expressions', [[
     }
     return a
 ]], 'bar')
--- TODO: replacement for the do statement
+-- FIX: do statement
 test('do statement expressions', [[
     a = do {
         'bar'
@@ -1199,6 +1199,19 @@ test('table.concat operator', [[
 test('table.concat operator priority over concat', [[
     return { 'Hello', 'world' } +++ ' ' ++ '!'
 ]], 'Hello world!')
+-- }}}
+
+-- {{{ table append
+test('table append assignment', [[
+    local t = { 1, 2 }
+    t #= 3
+    return table.concat(t)
+]], '123')
+test('table append multiple assignment', [[
+    local t, u, v = { 1, 2 }, { 4, 5 }, { 7, 8 }
+    t, u, v #= 3, 6, 9
+    return table.concat({ table.concat(t), table.concat(u), table.concat(v) })
+]], '123456789')
 -- }}}
 -- }}}
 -- }}}

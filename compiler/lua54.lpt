@@ -341,6 +341,26 @@ return function(code, ast, options, macros={functions={}, variables={}})
 				return r
 			end
 		end,
+        -- TODO: support destructuring
+        AppendSet = (t)
+			-- extract vars and values
+			local expr = t[#t]
+            local r = {}
+			for i, n in ipairs(t[1]) do
+                -- table.insert(vars, n)
+                -- table.insert(values, expr[i])
+
+                local value = expr[i]
+                if value == nil then
+                    break
+                end
+
+                local var = lua(n)
+                r[i] = { var, '[#', var, '+1] = ', lua(value) }
+                r[i] = table.concat(r[i])
+			end
+            return table.concat(r, '; ')
+        end,
 		-- While{ expr block }
 		While = (t)
 			local r = ''

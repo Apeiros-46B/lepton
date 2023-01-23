@@ -384,6 +384,8 @@ function traverse_stm (env, stm)
         return traverse_block(env, stm)
     elseif tag == 'Set' then -- `Set{ {lhs+} (opid? = opid?)? {expr+} }
         return traverse_assignment(env, stm)
+    elseif tag == 'AppendSet' then
+        return traverse_assignment(env, stm)
     elseif tag == 'While' then -- `While{ expr block }
         return traverse_while(env, stm)
     elseif tag == 'Repeat' then -- `Repeat{ block expr }
