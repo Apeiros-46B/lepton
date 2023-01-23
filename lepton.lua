@@ -6962,14 +6962,14 @@ return # openEq == # closeEq -- ./lepton/lpt-parser/parser.lua:676
 end), -- ./lepton/lpt-parser/parser.lua:676
 ["OrOp"] = sym("||") / "or", -- ./lepton/lpt-parser/parser.lua:678
 ["AndOp"] = sym("&&") / "and", -- ./lepton/lpt-parser/parser.lua:679
-["RelOp"] = sym("!=") / "ne" + sym("==") / "eq" + sym("<=") / "le" + sym(">=") / "ge" + sym("<") / "lt" + sym(">") / "gt", -- ./lepton/lpt-parser/parser.lua:685
-["BOrOp"] = sym("|" - P("||")) / "bor", -- ./lepton/lpt-parser/parser.lua:686
-["BXorOp"] = sym("~") / "bxor", -- ./lepton/lpt-parser/parser.lua:687
-["BAndOp"] = sym("&" - P("&&")) / "band", -- ./lepton/lpt-parser/parser.lua:688
-["ShiftOp"] = sym("<<") / "shl" + sym(">>") / "shr", -- ./lepton/lpt-parser/parser.lua:690
-["ConcatOp"] = sym("++") / "concat", -- ./lepton/lpt-parser/parser.lua:691
-["AddOp"] = sym("+" - P("++")) / "add" + sym("-" - P("->")) / "sub", -- ./lepton/lpt-parser/parser.lua:693
-["MulOp"] = sym("*") / "mul" + sym("//") / "idiv" + sym("/") / "div" + sym("%" - P("%%")) / "mod" + sym("%%") / "divb", -- ./lepton/lpt-parser/parser.lua:698
+["RelOp"] = sym("!=") / "ne" + sym("==") / "eq" + sym("<=") / "le" + sym(">=") / "ge" + sym("<") / "lt" + sym(">") / "gt" + sym("%%") / "divb", -- ./lepton/lpt-parser/parser.lua:686
+["BOrOp"] = sym("|" - P("||")) / "bor", -- ./lepton/lpt-parser/parser.lua:687
+["BXorOp"] = sym("~") / "bxor", -- ./lepton/lpt-parser/parser.lua:688
+["BAndOp"] = sym("&" - P("&&")) / "band", -- ./lepton/lpt-parser/parser.lua:689
+["ShiftOp"] = sym("<<") / "shl" + sym(">>") / "shr", -- ./lepton/lpt-parser/parser.lua:691
+["ConcatOp"] = sym("++") / "concat", -- ./lepton/lpt-parser/parser.lua:692
+["AddOp"] = sym("+" - P("++")) / "add" + sym("-" - P("->")) / "sub", -- ./lepton/lpt-parser/parser.lua:694
+["MulOp"] = sym("*") / "mul" + sym("//") / "idiv" + sym("/") / "div" + sym("%" - P("%%")) / "mod", -- ./lepton/lpt-parser/parser.lua:698
 ["UnaryOp"] = sym("!") / "not" + sym("-") / "unm" + sym("#") / "len" + sym("~") / "bnot", -- ./lepton/lpt-parser/parser.lua:702
 ["PowOp"] = sym("^") / "pow", -- ./lepton/lpt-parser/parser.lua:703
 ["BinOp"] = V("OrOp") + V("AndOp") + V("BOrOp") + V("BXorOp") + V("BAndOp") + V("ShiftOp") + V("ConcatOp") + V("AddOp") + V("MulOp") + V("PowOp") -- ./lepton/lpt-parser/parser.lua:704
