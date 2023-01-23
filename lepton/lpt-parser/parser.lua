@@ -157,6 +157,7 @@ local labels = {
     { 'ErrBAndExpr', [[expected an expression after '&']] },
     { 'ErrShiftExpr', [[expected an expression after the bit shift]] },
     { 'ErrConcatExpr', [[expected an expression after '++']] },
+    { 'ErrTConcatExpr', [[expected an expression after '+++']] },
     { 'ErrAddExpr', [[expected an expression after the additive operator]] },
     { 'ErrMulExpr', [[expected an expression after the multiplicative operator]] },
     { 'ErrUnaryExpr', [[expected an expression after the unary operator]] },
@@ -545,7 +546,8 @@ local G = { V'Lua',
     BXorExpr    = chainOp(V'BAndExpr', V'BXorOp', 'BXorExpr');
     BAndExpr    = chainOp(V'ShiftExpr', V'BAndOp', 'BAndExpr');
     ShiftExpr   = chainOp(V'ConcatExpr', V'ShiftOp', 'ShiftExpr');
-    ConcatExpr  = V'AddExpr' * (V'ConcatOp' * e(V'ConcatExpr', 'ConcatExpr'))^-1 / binaryOp;
+    ConcatExpr  = V'TConcatExpr' * (V'ConcatOp' * e(V'ConcatExpr', 'ConcatExpr'))^-1 / binaryOp;
+    TConcatExpr = V'AddExpr' * (V'TConcatOp' * e(V'TConcatExpr', 'TConcatExpr'))^-1 / binaryOp;
     AddExpr     = chainOp(V'MulExpr', V'AddOp', 'AddExpr');
     MulExpr     = chainOp(V'UnaryExpr', V'MulOp', 'MulExpr');
     UnaryExpr   = V'UnaryOp' * e(V'UnaryExpr', 'UnaryExpr') / unaryOp
@@ -690,18 +692,20 @@ local G = { V'Lua',
     ShiftOp   = sym('<<')         / 'shl'
               + sym('>>')         / 'shr';
     ConcatOp  = sym('++')         / 'concat';
+    TConcatOp = sym('+++')        / 'tconcat'; -- table.concat sugar
     AddOp     = sym('+' - P'++')  / 'add'
               + sym('-' - P'->')  / 'sub';
+    AppendOp  = sym('#=')         / 'tappend'; -- t
     MulOp     = sym('*')          / 'mul'
               + sym('//')         / 'idiv'
               + sym('/')          / 'div'
               + sym('%' - P'%%')  / 'mod';
     UnaryOp   = sym('!')          / 'not'
               + sym('-')          / 'unm'
-              + sym('#')          / 'len'
+              + sym('#' - P'#=')  / 'len'
               + sym('~')          / 'bnot';
     PowOp     = sym('^')          / 'pow';
-    BinOp     = V'OrOp' + V'AndOp' + V'BOrOp' + V'BXorOp' + V'BAndOp' + V'ShiftOp' + V'ConcatOp' + V'AddOp' + V'MulOp' + V'PowOp';
+    BinOp     = V'OrOp' + V'AndOp' + V'BOrOp' + V'BXorOp' + V'BAndOp' + V'ShiftOp' + V'ConcatOp' + V'TConcatOp' + V'AddOp' + V'MulOp' + V'PowOp';
 }
 -- }}}
 

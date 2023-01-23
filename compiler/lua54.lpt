@@ -885,8 +885,14 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			eq = '==', ne = '~=', lt = '<', gt = '>', le = '<=', ge = '>=',
 			['and'] = 'and', ['or'] = 'or', unm = '-', len = '#', bnot = '~', ['not'] = 'not',
 
-            divb = (left, right) -- divisibility operator
+            -- divisibility operator
+            divb = (left, right)
                 return '((' .. lua(left) .. ') % (' .. lua(right) .. ') == 0)'
+            end,
+
+            -- table.concat sugar
+            tconcat = (left, right)
+                return 'table.concat(' .. lua(left) .. ', ' .. lua(right) .. ')'
             end,
 		}
 	}, {

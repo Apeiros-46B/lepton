@@ -1281,21 +1281,24 @@ end, -- ./compiler/lua54.lpt:876
 ["len"] = "#", -- ./compiler/lua54.lpt:886
 ["bnot"] = "~", -- ./compiler/lua54.lpt:886
 ["not"] = "not", -- ./compiler/lua54.lpt:886
-["divb"] = function(left, right) -- ./compiler/lua54.lpt:888
-return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:889
-end -- ./compiler/lua54.lpt:889
-} -- ./compiler/lua54.lpt:889
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:893
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:894
-end }) -- ./compiler/lua54.lpt:894
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:900
-return requireStr .. code -- ./compiler/lua54.lpt:901
-end -- ./compiler/lua54.lpt:901
-end -- ./compiler/lua54.lpt:901
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:906
-package["loaded"]["compiler.lua54"] = lua54 or true -- ./compiler/lua54.lpt:907
-local function _() -- ./compiler/lua54.lpt:910
-local function _() -- ./compiler/lua54.lpt:912
+["divb"] = function(left, right) -- ./compiler/lua54.lpt:889
+return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:890
+end, -- ./compiler/lua54.lpt:890
+["tconcat"] = function(left, right) -- ./compiler/lua54.lpt:894
+return "table.concat(" .. lua(left) .. ", " .. lua(right) .. ")" -- ./compiler/lua54.lpt:895
+end -- ./compiler/lua54.lpt:895
+} -- ./compiler/lua54.lpt:895
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:899
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:900
+end }) -- ./compiler/lua54.lpt:900
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:906
+return requireStr .. code -- ./compiler/lua54.lpt:907
+end -- ./compiler/lua54.lpt:907
+end -- ./compiler/lua54.lpt:907
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:912
+package["loaded"]["compiler.lua54"] = lua54 or true -- ./compiler/lua54.lpt:913
+local function _() -- ./compiler/lua54.lpt:916
+local function _() -- ./compiler/lua54.lpt:918
 local util = require("lepton.util") -- ./compiler/lua54.lpt:1
 local targetName = "Lua 5.4" -- ./compiler/lua54.lpt:3
 local unpack = unpack or table["unpack"] -- ./compiler/lua54.lpt:5
@@ -2219,13 +2222,16 @@ end, -- ./compiler/lua54.lpt:876
 ["len"] = "#", -- ./compiler/lua54.lpt:886
 ["bnot"] = "~", -- ./compiler/lua54.lpt:886
 ["not"] = "not", -- ./compiler/lua54.lpt:886
-["divb"] = function(left, right) -- ./compiler/lua54.lpt:888
-return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:889
-end -- ./compiler/lua54.lpt:889
-} -- ./compiler/lua54.lpt:889
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:893
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:894
-end }) -- ./compiler/lua54.lpt:894
+["divb"] = function(left, right) -- ./compiler/lua54.lpt:889
+return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:890
+end, -- ./compiler/lua54.lpt:890
+["tconcat"] = function(left, right) -- ./compiler/lua54.lpt:894
+return "table.concat(" .. lua(left) .. ", " .. lua(right) .. ")" -- ./compiler/lua54.lpt:895
+end -- ./compiler/lua54.lpt:895
+} -- ./compiler/lua54.lpt:895
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:899
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:900
+end }) -- ./compiler/lua54.lpt:900
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -2234,11 +2240,11 @@ else -- ./compiler/lua53.lpt:6
 return t[1] -- ./compiler/lua53.lpt:8
 end -- ./compiler/lua53.lpt:8
 end -- ./compiler/lua53.lpt:8
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:900
-return requireStr .. code -- ./compiler/lua54.lpt:901
-end -- ./compiler/lua54.lpt:901
-end -- ./compiler/lua54.lpt:901
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:906
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:906
+return requireStr .. code -- ./compiler/lua54.lpt:907
+end -- ./compiler/lua54.lpt:907
+end -- ./compiler/lua54.lpt:907
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:912
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22
@@ -3169,13 +3175,16 @@ end, -- ./compiler/lua54.lpt:876
 ["len"] = "#", -- ./compiler/lua54.lpt:886
 ["bnot"] = "~", -- ./compiler/lua54.lpt:886
 ["not"] = "not", -- ./compiler/lua54.lpt:886
-["divb"] = function(left, right) -- ./compiler/lua54.lpt:888
-return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:889
-end -- ./compiler/lua54.lpt:889
-} -- ./compiler/lua54.lpt:889
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:893
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:894
-end }) -- ./compiler/lua54.lpt:894
+["divb"] = function(left, right) -- ./compiler/lua54.lpt:889
+return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:890
+end, -- ./compiler/lua54.lpt:890
+["tconcat"] = function(left, right) -- ./compiler/lua54.lpt:894
+return "table.concat(" .. lua(left) .. ", " .. lua(right) .. ")" -- ./compiler/lua54.lpt:895
+end -- ./compiler/lua54.lpt:895
+} -- ./compiler/lua54.lpt:895
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:899
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:900
+end }) -- ./compiler/lua54.lpt:900
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -3209,11 +3218,11 @@ end -- ./compiler/lua52.lpt:23
 tags["_opid"]["bnot"] = function(right) -- ./compiler/lua52.lpt:25
 return "bit32.bnot(" .. lua(right) .. ")" -- ./compiler/lua52.lpt:26
 end -- ./compiler/lua52.lpt:26
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:900
-return requireStr .. code -- ./compiler/lua54.lpt:901
-end -- ./compiler/lua54.lpt:901
-end -- ./compiler/lua54.lpt:901
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:906
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:906
+return requireStr .. code -- ./compiler/lua54.lpt:907
+end -- ./compiler/lua54.lpt:907
+end -- ./compiler/lua54.lpt:907
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:912
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22
@@ -4148,13 +4157,16 @@ end, -- ./compiler/lua54.lpt:876
 ["len"] = "#", -- ./compiler/lua54.lpt:886
 ["bnot"] = "~", -- ./compiler/lua54.lpt:886
 ["not"] = "not", -- ./compiler/lua54.lpt:886
-["divb"] = function(left, right) -- ./compiler/lua54.lpt:888
-return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:889
-end -- ./compiler/lua54.lpt:889
-} -- ./compiler/lua54.lpt:889
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:893
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:894
-end }) -- ./compiler/lua54.lpt:894
+["divb"] = function(left, right) -- ./compiler/lua54.lpt:889
+return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:890
+end, -- ./compiler/lua54.lpt:890
+["tconcat"] = function(left, right) -- ./compiler/lua54.lpt:894
+return "table.concat(" .. lua(left) .. ", " .. lua(right) .. ")" -- ./compiler/lua54.lpt:895
+end -- ./compiler/lua54.lpt:895
+} -- ./compiler/lua54.lpt:895
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:899
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:900
+end }) -- ./compiler/lua54.lpt:900
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -4216,11 +4228,11 @@ tags["_opid"]["bnot"] = function(right) -- ./compiler/luajit.lpt:27
 addRequire("bit", "bnot", "bnot") -- ./compiler/luajit.lpt:28
 return var("bnot") .. "(" .. lua(right) .. ")" -- ./compiler/luajit.lpt:29
 end -- ./compiler/luajit.lpt:29
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:900
-return requireStr .. code -- ./compiler/lua54.lpt:901
-end -- ./compiler/lua54.lpt:901
-end -- ./compiler/lua54.lpt:901
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:906
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:906
+return requireStr .. code -- ./compiler/lua54.lpt:907
+end -- ./compiler/lua54.lpt:907
+end -- ./compiler/lua54.lpt:907
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:912
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22
@@ -5159,13 +5171,16 @@ end, -- ./compiler/lua54.lpt:876
 ["len"] = "#", -- ./compiler/lua54.lpt:886
 ["bnot"] = "~", -- ./compiler/lua54.lpt:886
 ["not"] = "not", -- ./compiler/lua54.lpt:886
-["divb"] = function(left, right) -- ./compiler/lua54.lpt:888
-return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:889
-end -- ./compiler/lua54.lpt:889
-} -- ./compiler/lua54.lpt:889
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:893
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:894
-end }) -- ./compiler/lua54.lpt:894
+["divb"] = function(left, right) -- ./compiler/lua54.lpt:889
+return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:890
+end, -- ./compiler/lua54.lpt:890
+["tconcat"] = function(left, right) -- ./compiler/lua54.lpt:894
+return "table.concat(" .. lua(left) .. ", " .. lua(right) .. ")" -- ./compiler/lua54.lpt:895
+end -- ./compiler/lua54.lpt:895
+} -- ./compiler/lua54.lpt:895
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:899
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:900
+end }) -- ./compiler/lua54.lpt:900
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -5252,11 +5267,11 @@ end -- ./compiler/lua51.lpt:26
 tags["Label"] = function() -- ./compiler/lua51.lpt:28
 error("target " .. targetName .. " does not support goto labels") -- ./compiler/lua51.lpt:29
 end -- ./compiler/lua51.lpt:29
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:900
-return requireStr .. code -- ./compiler/lua54.lpt:901
-end -- ./compiler/lua54.lpt:901
-end -- ./compiler/lua54.lpt:901
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:906
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:906
+return requireStr .. code -- ./compiler/lua54.lpt:907
+end -- ./compiler/lua54.lpt:907
+end -- ./compiler/lua54.lpt:907
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:912
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22
@@ -6413,611 +6428,618 @@ local labels = { -- ./lepton/lpt-parser/parser.lua:92
 "expected an expression after '++'" -- ./lepton/lpt-parser/parser.lua:159
 }, -- ./lepton/lpt-parser/parser.lua:159
 { -- ./lepton/lpt-parser/parser.lua:160
-"ErrAddExpr", -- ./lepton/lpt-parser/parser.lua:160
-"expected an expression after the additive operator" -- ./lepton/lpt-parser/parser.lua:160
+"ErrTConcatExpr", -- ./lepton/lpt-parser/parser.lua:160
+"expected an expression after '+++'" -- ./lepton/lpt-parser/parser.lua:160
 }, -- ./lepton/lpt-parser/parser.lua:160
 { -- ./lepton/lpt-parser/parser.lua:161
-"ErrMulExpr", -- ./lepton/lpt-parser/parser.lua:161
-"expected an expression after the multiplicative operator" -- ./lepton/lpt-parser/parser.lua:161
+"ErrAddExpr", -- ./lepton/lpt-parser/parser.lua:161
+"expected an expression after the additive operator" -- ./lepton/lpt-parser/parser.lua:161
 }, -- ./lepton/lpt-parser/parser.lua:161
 { -- ./lepton/lpt-parser/parser.lua:162
-"ErrUnaryExpr", -- ./lepton/lpt-parser/parser.lua:162
-"expected an expression after the unary operator" -- ./lepton/lpt-parser/parser.lua:162
+"ErrMulExpr", -- ./lepton/lpt-parser/parser.lua:162
+"expected an expression after the multiplicative operator" -- ./lepton/lpt-parser/parser.lua:162
 }, -- ./lepton/lpt-parser/parser.lua:162
 { -- ./lepton/lpt-parser/parser.lua:163
-"ErrPowExpr", -- ./lepton/lpt-parser/parser.lua:163
-"expected an expression after '^'" -- ./lepton/lpt-parser/parser.lua:163
+"ErrUnaryExpr", -- ./lepton/lpt-parser/parser.lua:163
+"expected an expression after the unary operator" -- ./lepton/lpt-parser/parser.lua:163
 }, -- ./lepton/lpt-parser/parser.lua:163
-{ -- ./lepton/lpt-parser/parser.lua:165
-"ErrExprParen", -- ./lepton/lpt-parser/parser.lua:165
-"expected an expression after '('" -- ./lepton/lpt-parser/parser.lua:165
-}, -- ./lepton/lpt-parser/parser.lua:165
+{ -- ./lepton/lpt-parser/parser.lua:164
+"ErrPowExpr", -- ./lepton/lpt-parser/parser.lua:164
+"expected an expression after '^'" -- ./lepton/lpt-parser/parser.lua:164
+}, -- ./lepton/lpt-parser/parser.lua:164
 { -- ./lepton/lpt-parser/parser.lua:166
-"ErrCParenExpr", -- ./lepton/lpt-parser/parser.lua:166
-"expected ')' to close the expression" -- ./lepton/lpt-parser/parser.lua:166
+"ErrExprParen", -- ./lepton/lpt-parser/parser.lua:166
+"expected an expression after '('" -- ./lepton/lpt-parser/parser.lua:166
 }, -- ./lepton/lpt-parser/parser.lua:166
 { -- ./lepton/lpt-parser/parser.lua:167
-"ErrNameIndex", -- ./lepton/lpt-parser/parser.lua:167
-"expected a field name after '.'" -- ./lepton/lpt-parser/parser.lua:167
+"ErrCParenExpr", -- ./lepton/lpt-parser/parser.lua:167
+"expected ')' to close the expression" -- ./lepton/lpt-parser/parser.lua:167
 }, -- ./lepton/lpt-parser/parser.lua:167
 { -- ./lepton/lpt-parser/parser.lua:168
-"ErrExprIndex", -- ./lepton/lpt-parser/parser.lua:168
-"expected an expression after '['" -- ./lepton/lpt-parser/parser.lua:168
+"ErrNameIndex", -- ./lepton/lpt-parser/parser.lua:168
+"expected a field name after '.'" -- ./lepton/lpt-parser/parser.lua:168
 }, -- ./lepton/lpt-parser/parser.lua:168
 { -- ./lepton/lpt-parser/parser.lua:169
-"ErrCBracketIndex", -- ./lepton/lpt-parser/parser.lua:169
-"expected ']' to close the indexing expression" -- ./lepton/lpt-parser/parser.lua:169
+"ErrExprIndex", -- ./lepton/lpt-parser/parser.lua:169
+"expected an expression after '['" -- ./lepton/lpt-parser/parser.lua:169
 }, -- ./lepton/lpt-parser/parser.lua:169
 { -- ./lepton/lpt-parser/parser.lua:170
-"ErrNameMeth", -- ./lepton/lpt-parser/parser.lua:170
-"expected a method name after ':'" -- ./lepton/lpt-parser/parser.lua:170
+"ErrCBracketIndex", -- ./lepton/lpt-parser/parser.lua:170
+"expected ']' to close the indexing expression" -- ./lepton/lpt-parser/parser.lua:170
 }, -- ./lepton/lpt-parser/parser.lua:170
 { -- ./lepton/lpt-parser/parser.lua:171
-"ErrMethArgs", -- ./lepton/lpt-parser/parser.lua:171
-"expected some arguments for the method call (or '()')" -- ./lepton/lpt-parser/parser.lua:171
+"ErrNameMeth", -- ./lepton/lpt-parser/parser.lua:171
+"expected a method name after ':'" -- ./lepton/lpt-parser/parser.lua:171
 }, -- ./lepton/lpt-parser/parser.lua:171
-{ -- ./lepton/lpt-parser/parser.lua:173
-"ErrArgList", -- ./lepton/lpt-parser/parser.lua:173
-"expected an expression after ',' in the argument list" -- ./lepton/lpt-parser/parser.lua:173
-}, -- ./lepton/lpt-parser/parser.lua:173
+{ -- ./lepton/lpt-parser/parser.lua:172
+"ErrMethArgs", -- ./lepton/lpt-parser/parser.lua:172
+"expected some arguments for the method call (or '()')" -- ./lepton/lpt-parser/parser.lua:172
+}, -- ./lepton/lpt-parser/parser.lua:172
 { -- ./lepton/lpt-parser/parser.lua:174
-"ErrOParenArgs", -- ./lepton/lpt-parser/parser.lua:174
-"expected '(' before the argument list" -- ./lepton/lpt-parser/parser.lua:174
+"ErrArgList", -- ./lepton/lpt-parser/parser.lua:174
+"expected an expression after ',' in the argument list" -- ./lepton/lpt-parser/parser.lua:174
 }, -- ./lepton/lpt-parser/parser.lua:174
 { -- ./lepton/lpt-parser/parser.lua:175
-"ErrCParenArgs", -- ./lepton/lpt-parser/parser.lua:175
-"expected ')' to close the argument list" -- ./lepton/lpt-parser/parser.lua:175
+"ErrOParenArgs", -- ./lepton/lpt-parser/parser.lua:175
+"expected '(' before the argument list" -- ./lepton/lpt-parser/parser.lua:175
 }, -- ./lepton/lpt-parser/parser.lua:175
-{ -- ./lepton/lpt-parser/parser.lua:177
-"ErrCBraceTable", -- ./lepton/lpt-parser/parser.lua:177
-"expected '}' to close the table constructor" -- ./lepton/lpt-parser/parser.lua:177
-}, -- ./lepton/lpt-parser/parser.lua:177
+{ -- ./lepton/lpt-parser/parser.lua:176
+"ErrCParenArgs", -- ./lepton/lpt-parser/parser.lua:176
+"expected ')' to close the argument list" -- ./lepton/lpt-parser/parser.lua:176
+}, -- ./lepton/lpt-parser/parser.lua:176
 { -- ./lepton/lpt-parser/parser.lua:178
-"ErrEqField", -- ./lepton/lpt-parser/parser.lua:178
-"expected '=' after the table key" -- ./lepton/lpt-parser/parser.lua:178
+"ErrCBraceTable", -- ./lepton/lpt-parser/parser.lua:178
+"expected '}' to close the table constructor" -- ./lepton/lpt-parser/parser.lua:178
 }, -- ./lepton/lpt-parser/parser.lua:178
 { -- ./lepton/lpt-parser/parser.lua:179
-"ErrExprField", -- ./lepton/lpt-parser/parser.lua:179
-"expected an expression after '='" -- ./lepton/lpt-parser/parser.lua:179
+"ErrEqField", -- ./lepton/lpt-parser/parser.lua:179
+"expected '=' after the table key" -- ./lepton/lpt-parser/parser.lua:179
 }, -- ./lepton/lpt-parser/parser.lua:179
 { -- ./lepton/lpt-parser/parser.lua:180
-"ErrExprFKey", -- ./lepton/lpt-parser/parser.lua:180
-"expected an expression after '[' for the table key" -- ./lepton/lpt-parser/parser.lua:180
+"ErrExprField", -- ./lepton/lpt-parser/parser.lua:180
+"expected an expression after '='" -- ./lepton/lpt-parser/parser.lua:180
 }, -- ./lepton/lpt-parser/parser.lua:180
 { -- ./lepton/lpt-parser/parser.lua:181
-"ErrCBracketFKey", -- ./lepton/lpt-parser/parser.lua:181
-"expected ']' to close the table key" -- ./lepton/lpt-parser/parser.lua:181
+"ErrExprFKey", -- ./lepton/lpt-parser/parser.lua:181
+"expected an expression after '[' for the table key" -- ./lepton/lpt-parser/parser.lua:181
 }, -- ./lepton/lpt-parser/parser.lua:181
-{ -- ./lepton/lpt-parser/parser.lua:183
-"ErrCBraceDestructuring", -- ./lepton/lpt-parser/parser.lua:183
-"expected '}' to close the destructuring variable list" -- ./lepton/lpt-parser/parser.lua:183
-}, -- ./lepton/lpt-parser/parser.lua:183
+{ -- ./lepton/lpt-parser/parser.lua:182
+"ErrCBracketFKey", -- ./lepton/lpt-parser/parser.lua:182
+"expected ']' to close the table key" -- ./lepton/lpt-parser/parser.lua:182
+}, -- ./lepton/lpt-parser/parser.lua:182
 { -- ./lepton/lpt-parser/parser.lua:184
-"ErrDestructuringEqField", -- ./lepton/lpt-parser/parser.lua:184
-"expected '=' after the table key in destructuring variable list" -- ./lepton/lpt-parser/parser.lua:184
+"ErrCBraceDestructuring", -- ./lepton/lpt-parser/parser.lua:184
+"expected '}' to close the destructuring variable list" -- ./lepton/lpt-parser/parser.lua:184
 }, -- ./lepton/lpt-parser/parser.lua:184
 { -- ./lepton/lpt-parser/parser.lua:185
-"ErrDestructuringExprField", -- ./lepton/lpt-parser/parser.lua:185
-"expected an identifier after '=' in destructuring variable list" -- ./lepton/lpt-parser/parser.lua:185
+"ErrDestructuringEqField", -- ./lepton/lpt-parser/parser.lua:185
+"expected '=' after the table key in destructuring variable list" -- ./lepton/lpt-parser/parser.lua:185
 }, -- ./lepton/lpt-parser/parser.lua:185
-{ -- ./lepton/lpt-parser/parser.lua:187
-"ErrCBracketTableCompr", -- ./lepton/lpt-parser/parser.lua:187
-"expected ']' to close the table comprehension" -- ./lepton/lpt-parser/parser.lua:187
-}, -- ./lepton/lpt-parser/parser.lua:187
-{ -- ./lepton/lpt-parser/parser.lua:189
-"ErrDigitHex", -- ./lepton/lpt-parser/parser.lua:189
-"expected one or more hexadecimal digits after '0x'" -- ./lepton/lpt-parser/parser.lua:189
-}, -- ./lepton/lpt-parser/parser.lua:189
+{ -- ./lepton/lpt-parser/parser.lua:186
+"ErrDestructuringExprField", -- ./lepton/lpt-parser/parser.lua:186
+"expected an identifier after '=' in destructuring variable list" -- ./lepton/lpt-parser/parser.lua:186
+}, -- ./lepton/lpt-parser/parser.lua:186
+{ -- ./lepton/lpt-parser/parser.lua:188
+"ErrCBracketTableCompr", -- ./lepton/lpt-parser/parser.lua:188
+"expected ']' to close the table comprehension" -- ./lepton/lpt-parser/parser.lua:188
+}, -- ./lepton/lpt-parser/parser.lua:188
 { -- ./lepton/lpt-parser/parser.lua:190
-"ErrDigitDeci", -- ./lepton/lpt-parser/parser.lua:190
-"expected one or more digits after the decimal point" -- ./lepton/lpt-parser/parser.lua:190
+"ErrDigitHex", -- ./lepton/lpt-parser/parser.lua:190
+"expected one or more hexadecimal digits after '0x'" -- ./lepton/lpt-parser/parser.lua:190
 }, -- ./lepton/lpt-parser/parser.lua:190
 { -- ./lepton/lpt-parser/parser.lua:191
-"ErrDigitExpo", -- ./lepton/lpt-parser/parser.lua:191
-"expected one or more digits for the exponent" -- ./lepton/lpt-parser/parser.lua:191
+"ErrDigitDeci", -- ./lepton/lpt-parser/parser.lua:191
+"expected one or more digits after the decimal point" -- ./lepton/lpt-parser/parser.lua:191
 }, -- ./lepton/lpt-parser/parser.lua:191
-{ -- ./lepton/lpt-parser/parser.lua:193
-"ErrQuote", -- ./lepton/lpt-parser/parser.lua:193
-"unclosed string" -- ./lepton/lpt-parser/parser.lua:193
-}, -- ./lepton/lpt-parser/parser.lua:193
+{ -- ./lepton/lpt-parser/parser.lua:192
+"ErrDigitExpo", -- ./lepton/lpt-parser/parser.lua:192
+"expected one or more digits for the exponent" -- ./lepton/lpt-parser/parser.lua:192
+}, -- ./lepton/lpt-parser/parser.lua:192
 { -- ./lepton/lpt-parser/parser.lua:194
-"ErrHexEsc", -- ./lepton/lpt-parser/parser.lua:194
-"expected exactly two hexadecimal digits after '\\x'" -- ./lepton/lpt-parser/parser.lua:194
+"ErrQuote", -- ./lepton/lpt-parser/parser.lua:194
+"unclosed string" -- ./lepton/lpt-parser/parser.lua:194
 }, -- ./lepton/lpt-parser/parser.lua:194
 { -- ./lepton/lpt-parser/parser.lua:195
-"ErrOBraceUEsc", -- ./lepton/lpt-parser/parser.lua:195
-"expected '{' after '\\u'" -- ./lepton/lpt-parser/parser.lua:195
+"ErrHexEsc", -- ./lepton/lpt-parser/parser.lua:195
+"expected exactly two hexadecimal digits after '\\x'" -- ./lepton/lpt-parser/parser.lua:195
 }, -- ./lepton/lpt-parser/parser.lua:195
 { -- ./lepton/lpt-parser/parser.lua:196
-"ErrDigitUEsc", -- ./lepton/lpt-parser/parser.lua:196
-"expected one or more hexadecimal digits for the UTF-8 code point" -- ./lepton/lpt-parser/parser.lua:196
+"ErrOBraceUEsc", -- ./lepton/lpt-parser/parser.lua:196
+"expected '{' after '\\u'" -- ./lepton/lpt-parser/parser.lua:196
 }, -- ./lepton/lpt-parser/parser.lua:196
 { -- ./lepton/lpt-parser/parser.lua:197
-"ErrCBraceUEsc", -- ./lepton/lpt-parser/parser.lua:197
-"expected '}' after the code point" -- ./lepton/lpt-parser/parser.lua:197
+"ErrDigitUEsc", -- ./lepton/lpt-parser/parser.lua:197
+"expected one or more hexadecimal digits for the UTF-8 code point" -- ./lepton/lpt-parser/parser.lua:197
 }, -- ./lepton/lpt-parser/parser.lua:197
 { -- ./lepton/lpt-parser/parser.lua:198
-"ErrEscSeq", -- ./lepton/lpt-parser/parser.lua:198
-"invalid escape sequence" -- ./lepton/lpt-parser/parser.lua:198
+"ErrCBraceUEsc", -- ./lepton/lpt-parser/parser.lua:198
+"expected '}' after the code point" -- ./lepton/lpt-parser/parser.lua:198
 }, -- ./lepton/lpt-parser/parser.lua:198
 { -- ./lepton/lpt-parser/parser.lua:199
-"ErrCloseLStr", -- ./lepton/lpt-parser/parser.lua:199
-"unclosed long string" -- ./lepton/lpt-parser/parser.lua:199
+"ErrEscSeq", -- ./lepton/lpt-parser/parser.lua:199
+"invalid escape sequence" -- ./lepton/lpt-parser/parser.lua:199
 }, -- ./lepton/lpt-parser/parser.lua:199
-{ -- ./lepton/lpt-parser/parser.lua:201
-"ErrUnknownAttribute", -- ./lepton/lpt-parser/parser.lua:201
-"unknown variable attribute" -- ./lepton/lpt-parser/parser.lua:201
-}, -- ./lepton/lpt-parser/parser.lua:201
+{ -- ./lepton/lpt-parser/parser.lua:200
+"ErrCloseLStr", -- ./lepton/lpt-parser/parser.lua:200
+"unclosed long string" -- ./lepton/lpt-parser/parser.lua:200
+}, -- ./lepton/lpt-parser/parser.lua:200
 { -- ./lepton/lpt-parser/parser.lua:202
-"ErrCBracketAttribute", -- ./lepton/lpt-parser/parser.lua:202
-"expected '>' to close the variable attribute" -- ./lepton/lpt-parser/parser.lua:202
-} -- ./lepton/lpt-parser/parser.lua:202
-} -- ./lepton/lpt-parser/parser.lua:202
-local function throw(label) -- ./lepton/lpt-parser/parser.lua:205
-label = "Err" .. label -- ./lepton/lpt-parser/parser.lua:206
-for i, labelinfo in ipairs(labels) do -- ./lepton/lpt-parser/parser.lua:208
-if labelinfo[1] == label then -- ./lepton/lpt-parser/parser.lua:209
-return T(i) -- ./lepton/lpt-parser/parser.lua:210
-end -- ./lepton/lpt-parser/parser.lua:210
-end -- ./lepton/lpt-parser/parser.lua:210
-error("Label not found: " .. label) -- ./lepton/lpt-parser/parser.lua:214
-end -- ./lepton/lpt-parser/parser.lua:214
-local function e(patt, label) -- ./lepton/lpt-parser/parser.lua:217
-return patt + throw(label) -- ./lepton/lpt-parser/parser.lua:218
-end -- ./lepton/lpt-parser/parser.lua:218
-local function token(patt) -- ./lepton/lpt-parser/parser.lua:223
-return patt * V("Skip") -- ./lepton/lpt-parser/parser.lua:224
-end -- ./lepton/lpt-parser/parser.lua:224
-local function sym(str) -- ./lepton/lpt-parser/parser.lua:227
-return token(P(str)) -- ./lepton/lpt-parser/parser.lua:228
-end -- ./lepton/lpt-parser/parser.lua:228
-local function kw(str) -- ./lepton/lpt-parser/parser.lua:231
-return token(P(str) * - V("IdRest")) -- ./lepton/lpt-parser/parser.lua:232
-end -- ./lepton/lpt-parser/parser.lua:232
-local function parenAround(expr) -- ./lepton/lpt-parser/parser.lua:235
-return sym("(") * expr * sym(")") -- ./lepton/lpt-parser/parser.lua:236
-end -- ./lepton/lpt-parser/parser.lua:236
-local function tagC(tag, patt) -- ./lepton/lpt-parser/parser.lua:239
-return Ct(Cg(Cp(), "pos") * Cg(Cc(tag), "tag") * patt) -- ./lepton/lpt-parser/parser.lua:240
-end -- ./lepton/lpt-parser/parser.lua:240
-local function unaryOp(op, e) -- ./lepton/lpt-parser/parser.lua:243
-return { -- ./lepton/lpt-parser/parser.lua:244
-["tag"] = "Op", -- ./lepton/lpt-parser/parser.lua:244
-["pos"] = e["pos"], -- ./lepton/lpt-parser/parser.lua:244
-[1] = op, -- ./lepton/lpt-parser/parser.lua:244
-[2] = e -- ./lepton/lpt-parser/parser.lua:244
-} -- ./lepton/lpt-parser/parser.lua:244
-end -- ./lepton/lpt-parser/parser.lua:244
-local function binaryOp(e1, op, e2) -- ./lepton/lpt-parser/parser.lua:247
-if not op then -- ./lepton/lpt-parser/parser.lua:248
-return e1 -- ./lepton/lpt-parser/parser.lua:249
-else -- ./lepton/lpt-parser/parser.lua:249
-return { -- ./lepton/lpt-parser/parser.lua:251
-["tag"] = "Op", -- ./lepton/lpt-parser/parser.lua:251
-["pos"] = e1["pos"], -- ./lepton/lpt-parser/parser.lua:251
-[1] = op, -- ./lepton/lpt-parser/parser.lua:251
-[2] = e1, -- ./lepton/lpt-parser/parser.lua:251
-[3] = e2 -- ./lepton/lpt-parser/parser.lua:251
-} -- ./lepton/lpt-parser/parser.lua:251
-end -- ./lepton/lpt-parser/parser.lua:251
-end -- ./lepton/lpt-parser/parser.lua:251
-local function sepBy(patt, sep, label) -- ./lepton/lpt-parser/parser.lua:255
-if label then -- ./lepton/lpt-parser/parser.lua:256
-return patt * Cg(sep * e(patt, label)) ^ 0 -- ./lepton/lpt-parser/parser.lua:257
-else -- ./lepton/lpt-parser/parser.lua:257
-return patt * Cg(sep * patt) ^ 0 -- ./lepton/lpt-parser/parser.lua:259
-end -- ./lepton/lpt-parser/parser.lua:259
-end -- ./lepton/lpt-parser/parser.lua:259
-local function chainOp(patt, sep, label) -- ./lepton/lpt-parser/parser.lua:263
-return Cf(sepBy(patt, sep, label), binaryOp) -- ./lepton/lpt-parser/parser.lua:264
-end -- ./lepton/lpt-parser/parser.lua:264
-local function commaSep(patt, label) -- ./lepton/lpt-parser/parser.lua:267
-return sepBy(patt, sym(","), label) -- ./lepton/lpt-parser/parser.lua:268
-end -- ./lepton/lpt-parser/parser.lua:268
-local function tagDo(block) -- ./lepton/lpt-parser/parser.lua:271
-block["tag"] = "Do" -- ./lepton/lpt-parser/parser.lua:272
-return block -- ./lepton/lpt-parser/parser.lua:273
-end -- ./lepton/lpt-parser/parser.lua:273
-local function fixFuncStat(func) -- ./lepton/lpt-parser/parser.lua:276
-if func[1]["is_method"] then -- ./lepton/lpt-parser/parser.lua:277
-table["insert"](func[2][1], 1, { -- ./lepton/lpt-parser/parser.lua:277
-["tag"] = "Id", -- ./lepton/lpt-parser/parser.lua:277
-[1] = "self" -- ./lepton/lpt-parser/parser.lua:277
-}) -- ./lepton/lpt-parser/parser.lua:277
-end -- ./lepton/lpt-parser/parser.lua:277
-func[1] = { func[1] } -- ./lepton/lpt-parser/parser.lua:278
-func[2] = { func[2] } -- ./lepton/lpt-parser/parser.lua:279
-return func -- ./lepton/lpt-parser/parser.lua:280
-end -- ./lepton/lpt-parser/parser.lua:280
-local function addDots(params, dots) -- ./lepton/lpt-parser/parser.lua:283
-if dots then -- ./lepton/lpt-parser/parser.lua:284
-table["insert"](params, dots) -- ./lepton/lpt-parser/parser.lua:284
-end -- ./lepton/lpt-parser/parser.lua:284
-return params -- ./lepton/lpt-parser/parser.lua:285
+"ErrUnknownAttribute", -- ./lepton/lpt-parser/parser.lua:202
+"unknown variable attribute" -- ./lepton/lpt-parser/parser.lua:202
+}, -- ./lepton/lpt-parser/parser.lua:202
+{ -- ./lepton/lpt-parser/parser.lua:203
+"ErrCBracketAttribute", -- ./lepton/lpt-parser/parser.lua:203
+"expected '>' to close the variable attribute" -- ./lepton/lpt-parser/parser.lua:203
+} -- ./lepton/lpt-parser/parser.lua:203
+} -- ./lepton/lpt-parser/parser.lua:203
+local function throw(label) -- ./lepton/lpt-parser/parser.lua:206
+label = "Err" .. label -- ./lepton/lpt-parser/parser.lua:207
+for i, labelinfo in ipairs(labels) do -- ./lepton/lpt-parser/parser.lua:209
+if labelinfo[1] == label then -- ./lepton/lpt-parser/parser.lua:210
+return T(i) -- ./lepton/lpt-parser/parser.lua:211
+end -- ./lepton/lpt-parser/parser.lua:211
+end -- ./lepton/lpt-parser/parser.lua:211
+error("Label not found: " .. label) -- ./lepton/lpt-parser/parser.lua:215
+end -- ./lepton/lpt-parser/parser.lua:215
+local function e(patt, label) -- ./lepton/lpt-parser/parser.lua:218
+return patt + throw(label) -- ./lepton/lpt-parser/parser.lua:219
+end -- ./lepton/lpt-parser/parser.lua:219
+local function token(patt) -- ./lepton/lpt-parser/parser.lua:224
+return patt * V("Skip") -- ./lepton/lpt-parser/parser.lua:225
+end -- ./lepton/lpt-parser/parser.lua:225
+local function sym(str) -- ./lepton/lpt-parser/parser.lua:228
+return token(P(str)) -- ./lepton/lpt-parser/parser.lua:229
+end -- ./lepton/lpt-parser/parser.lua:229
+local function kw(str) -- ./lepton/lpt-parser/parser.lua:232
+return token(P(str) * - V("IdRest")) -- ./lepton/lpt-parser/parser.lua:233
+end -- ./lepton/lpt-parser/parser.lua:233
+local function parenAround(expr) -- ./lepton/lpt-parser/parser.lua:236
+return sym("(") * expr * sym(")") -- ./lepton/lpt-parser/parser.lua:237
+end -- ./lepton/lpt-parser/parser.lua:237
+local function tagC(tag, patt) -- ./lepton/lpt-parser/parser.lua:240
+return Ct(Cg(Cp(), "pos") * Cg(Cc(tag), "tag") * patt) -- ./lepton/lpt-parser/parser.lua:241
+end -- ./lepton/lpt-parser/parser.lua:241
+local function unaryOp(op, e) -- ./lepton/lpt-parser/parser.lua:244
+return { -- ./lepton/lpt-parser/parser.lua:245
+["tag"] = "Op", -- ./lepton/lpt-parser/parser.lua:245
+["pos"] = e["pos"], -- ./lepton/lpt-parser/parser.lua:245
+[1] = op, -- ./lepton/lpt-parser/parser.lua:245
+[2] = e -- ./lepton/lpt-parser/parser.lua:245
+} -- ./lepton/lpt-parser/parser.lua:245
+end -- ./lepton/lpt-parser/parser.lua:245
+local function binaryOp(e1, op, e2) -- ./lepton/lpt-parser/parser.lua:248
+if not op then -- ./lepton/lpt-parser/parser.lua:249
+return e1 -- ./lepton/lpt-parser/parser.lua:250
+else -- ./lepton/lpt-parser/parser.lua:250
+return { -- ./lepton/lpt-parser/parser.lua:252
+["tag"] = "Op", -- ./lepton/lpt-parser/parser.lua:252
+["pos"] = e1["pos"], -- ./lepton/lpt-parser/parser.lua:252
+[1] = op, -- ./lepton/lpt-parser/parser.lua:252
+[2] = e1, -- ./lepton/lpt-parser/parser.lua:252
+[3] = e2 -- ./lepton/lpt-parser/parser.lua:252
+} -- ./lepton/lpt-parser/parser.lua:252
+end -- ./lepton/lpt-parser/parser.lua:252
+end -- ./lepton/lpt-parser/parser.lua:252
+local function sepBy(patt, sep, label) -- ./lepton/lpt-parser/parser.lua:256
+if label then -- ./lepton/lpt-parser/parser.lua:257
+return patt * Cg(sep * e(patt, label)) ^ 0 -- ./lepton/lpt-parser/parser.lua:258
+else -- ./lepton/lpt-parser/parser.lua:258
+return patt * Cg(sep * patt) ^ 0 -- ./lepton/lpt-parser/parser.lua:260
+end -- ./lepton/lpt-parser/parser.lua:260
+end -- ./lepton/lpt-parser/parser.lua:260
+local function chainOp(patt, sep, label) -- ./lepton/lpt-parser/parser.lua:264
+return Cf(sepBy(patt, sep, label), binaryOp) -- ./lepton/lpt-parser/parser.lua:265
+end -- ./lepton/lpt-parser/parser.lua:265
+local function commaSep(patt, label) -- ./lepton/lpt-parser/parser.lua:268
+return sepBy(patt, sym(","), label) -- ./lepton/lpt-parser/parser.lua:269
+end -- ./lepton/lpt-parser/parser.lua:269
+local function tagDo(block) -- ./lepton/lpt-parser/parser.lua:272
+block["tag"] = "Do" -- ./lepton/lpt-parser/parser.lua:273
+return block -- ./lepton/lpt-parser/parser.lua:274
+end -- ./lepton/lpt-parser/parser.lua:274
+local function fixFuncStat(func) -- ./lepton/lpt-parser/parser.lua:277
+if func[1]["is_method"] then -- ./lepton/lpt-parser/parser.lua:278
+table["insert"](func[2][1], 1, { -- ./lepton/lpt-parser/parser.lua:278
+["tag"] = "Id", -- ./lepton/lpt-parser/parser.lua:278
+[1] = "self" -- ./lepton/lpt-parser/parser.lua:278
+}) -- ./lepton/lpt-parser/parser.lua:278
+end -- ./lepton/lpt-parser/parser.lua:278
+func[1] = { func[1] } -- ./lepton/lpt-parser/parser.lua:279
+func[2] = { func[2] } -- ./lepton/lpt-parser/parser.lua:280
+return func -- ./lepton/lpt-parser/parser.lua:281
+end -- ./lepton/lpt-parser/parser.lua:281
+local function addDots(params, dots) -- ./lepton/lpt-parser/parser.lua:284
+if dots then -- ./lepton/lpt-parser/parser.lua:285
+table["insert"](params, dots) -- ./lepton/lpt-parser/parser.lua:285
 end -- ./lepton/lpt-parser/parser.lua:285
-local function insertIndex(t, index) -- ./lepton/lpt-parser/parser.lua:288
-return { -- ./lepton/lpt-parser/parser.lua:289
-["tag"] = "Index", -- ./lepton/lpt-parser/parser.lua:289
-["pos"] = t["pos"], -- ./lepton/lpt-parser/parser.lua:289
-[1] = t, -- ./lepton/lpt-parser/parser.lua:289
-[2] = index -- ./lepton/lpt-parser/parser.lua:289
-} -- ./lepton/lpt-parser/parser.lua:289
-end -- ./lepton/lpt-parser/parser.lua:289
-local function markMethod(t, method) -- ./lepton/lpt-parser/parser.lua:292
-if method then -- ./lepton/lpt-parser/parser.lua:293
-return { -- ./lepton/lpt-parser/parser.lua:294
-["tag"] = "Index", -- ./lepton/lpt-parser/parser.lua:294
-["pos"] = t["pos"], -- ./lepton/lpt-parser/parser.lua:294
-["is_method"] = true, -- ./lepton/lpt-parser/parser.lua:294
-[1] = t, -- ./lepton/lpt-parser/parser.lua:294
-[2] = method -- ./lepton/lpt-parser/parser.lua:294
-} -- ./lepton/lpt-parser/parser.lua:294
-end -- ./lepton/lpt-parser/parser.lua:294
-return t -- ./lepton/lpt-parser/parser.lua:296
-end -- ./lepton/lpt-parser/parser.lua:296
-local function fixLuaKeywords(t) -- ./lepton/lpt-parser/parser.lua:300
-local keywords = { -- ./lepton/lpt-parser/parser.lua:301
-"and", -- ./lepton/lpt-parser/parser.lua:301
-"do", -- ./lepton/lpt-parser/parser.lua:301
-"elseif", -- ./lepton/lpt-parser/parser.lua:301
-"end", -- ./lepton/lpt-parser/parser.lua:301
-"function", -- ./lepton/lpt-parser/parser.lua:301
-"in", -- ./lepton/lpt-parser/parser.lua:301
-"not", -- ./lepton/lpt-parser/parser.lua:301
-"or", -- ./lepton/lpt-parser/parser.lua:301
-"then" -- ./lepton/lpt-parser/parser.lua:301
-} -- ./lepton/lpt-parser/parser.lua:301
-if t["tag"] == "Pair" then -- ./lepton/lpt-parser/parser.lua:302
-for _, v in pairs(keywords) do -- ./lepton/lpt-parser/parser.lua:303
-if t[1][1] == v then -- ./lepton/lpt-parser/parser.lua:304
-t[1][1] = "_" .. t[1][1] -- ./lepton/lpt-parser/parser.lua:305
-break -- ./lepton/lpt-parser/parser.lua:306
-end -- ./lepton/lpt-parser/parser.lua:306
-end -- ./lepton/lpt-parser/parser.lua:306
-else -- ./lepton/lpt-parser/parser.lua:306
-for _, v in pairs(keywords) do -- ./lepton/lpt-parser/parser.lua:310
-if t[1] == v then -- ./lepton/lpt-parser/parser.lua:311
-t[1] = "_" .. t[1] -- ./lepton/lpt-parser/parser.lua:312
-break -- ./lepton/lpt-parser/parser.lua:313
-end -- ./lepton/lpt-parser/parser.lua:313
-end -- ./lepton/lpt-parser/parser.lua:313
-end -- ./lepton/lpt-parser/parser.lua:313
-return t -- ./lepton/lpt-parser/parser.lua:317
-end -- ./lepton/lpt-parser/parser.lua:317
-local function makeSuffixedExpr(t1, t2) -- ./lepton/lpt-parser/parser.lua:320
-if t2["tag"] == "Call" or t2["tag"] == "SafeCall" then -- ./lepton/lpt-parser/parser.lua:321
-local t = { -- ./lepton/lpt-parser/parser.lua:322
-["tag"] = t2["tag"], -- ./lepton/lpt-parser/parser.lua:322
-["pos"] = t1["pos"], -- ./lepton/lpt-parser/parser.lua:322
-[1] = t1 -- ./lepton/lpt-parser/parser.lua:322
-} -- ./lepton/lpt-parser/parser.lua:322
-for k, v in ipairs(t2) do -- ./lepton/lpt-parser/parser.lua:323
-table["insert"](t, v) -- ./lepton/lpt-parser/parser.lua:324
-end -- ./lepton/lpt-parser/parser.lua:324
-return t -- ./lepton/lpt-parser/parser.lua:326
-elseif t2["tag"] == "MethodStub" or t2["tag"] == "SafeMethodStub" then -- ./lepton/lpt-parser/parser.lua:327
-return { -- ./lepton/lpt-parser/parser.lua:328
-["tag"] = t2["tag"], -- ./lepton/lpt-parser/parser.lua:328
-["pos"] = t1["pos"], -- ./lepton/lpt-parser/parser.lua:328
-[1] = t1, -- ./lepton/lpt-parser/parser.lua:328
-[2] = fixLuaKeywords(t2[1]) -- ./lepton/lpt-parser/parser.lua:328
-} -- ./lepton/lpt-parser/parser.lua:328
-elseif t2["tag"] == "SafeDotIndex" or t2["tag"] == "SafeArrayIndex" then -- ./lepton/lpt-parser/parser.lua:329
-return { -- ./lepton/lpt-parser/parser.lua:330
-["tag"] = "SafeIndex", -- ./lepton/lpt-parser/parser.lua:330
-["pos"] = t1["pos"], -- ./lepton/lpt-parser/parser.lua:330
-[1] = t1, -- ./lepton/lpt-parser/parser.lua:330
-[2] = fixLuaKeywords(t2[1]) -- ./lepton/lpt-parser/parser.lua:330
-} -- ./lepton/lpt-parser/parser.lua:330
-elseif t2["tag"] == "DotIndex" or t2["tag"] == "ArrayIndex" then -- ./lepton/lpt-parser/parser.lua:331
-return { -- ./lepton/lpt-parser/parser.lua:332
-["tag"] = "Index", -- ./lepton/lpt-parser/parser.lua:332
-["pos"] = t1["pos"], -- ./lepton/lpt-parser/parser.lua:332
-[1] = t1, -- ./lepton/lpt-parser/parser.lua:332
-[2] = fixLuaKeywords(t2[1]) -- ./lepton/lpt-parser/parser.lua:332
-} -- ./lepton/lpt-parser/parser.lua:332
-else -- ./lepton/lpt-parser/parser.lua:332
-error("unexpected tag in suffixed expression") -- ./lepton/lpt-parser/parser.lua:334
-end -- ./lepton/lpt-parser/parser.lua:334
-end -- ./lepton/lpt-parser/parser.lua:334
-local function fixArrowFunc(t) -- ./lepton/lpt-parser/parser.lua:338
-if t[1] == ":" then -- ./lepton/lpt-parser/parser.lua:339
-table["insert"](t[2], 1, { -- ./lepton/lpt-parser/parser.lua:340
-["tag"] = "Id", -- ./lepton/lpt-parser/parser.lua:340
-"self" -- ./lepton/lpt-parser/parser.lua:340
-}) -- ./lepton/lpt-parser/parser.lua:340
-table["remove"](t, 1) -- ./lepton/lpt-parser/parser.lua:341
-t["is_method"] = true -- ./lepton/lpt-parser/parser.lua:342
-end -- ./lepton/lpt-parser/parser.lua:342
-t["is_short"] = true -- ./lepton/lpt-parser/parser.lua:344
-return t -- ./lepton/lpt-parser/parser.lua:345
-end -- ./lepton/lpt-parser/parser.lua:345
-local function markImplicit(t) -- ./lepton/lpt-parser/parser.lua:348
-t["implicit"] = true -- ./lepton/lpt-parser/parser.lua:349
-return t -- ./lepton/lpt-parser/parser.lua:350
-end -- ./lepton/lpt-parser/parser.lua:350
-local function statToExpr(t) -- ./lepton/lpt-parser/parser.lua:353
-t["tag"] = t["tag"] .. "Expr" -- ./lepton/lpt-parser/parser.lua:354
-return t -- ./lepton/lpt-parser/parser.lua:355
-end -- ./lepton/lpt-parser/parser.lua:355
-local function fixStructure(t) -- ./lepton/lpt-parser/parser.lua:358
-local i = 1 -- ./lepton/lpt-parser/parser.lua:359
-while i <= # t do -- ./lepton/lpt-parser/parser.lua:360
-if type(t[i]) == "table" then -- ./lepton/lpt-parser/parser.lua:361
-fixStructure(t[i]) -- ./lepton/lpt-parser/parser.lua:362
-for j = # t[i], 1, - 1 do -- ./lepton/lpt-parser/parser.lua:363
-local stat = t[i][j] -- ./lepton/lpt-parser/parser.lua:364
-if type(stat) == "table" and stat["move_up_block"] and stat["move_up_block"] > 0 then -- ./lepton/lpt-parser/parser.lua:365
-table["remove"](t[i], j) -- ./lepton/lpt-parser/parser.lua:366
-table["insert"](t, i + 1, stat) -- ./lepton/lpt-parser/parser.lua:367
-if t["tag"] == "Block" or t["tag"] == "Do" then -- ./lepton/lpt-parser/parser.lua:368
-stat["move_up_block"] = stat["move_up_block"] - 1 -- ./lepton/lpt-parser/parser.lua:369
-end -- ./lepton/lpt-parser/parser.lua:369
-end -- ./lepton/lpt-parser/parser.lua:369
-end -- ./lepton/lpt-parser/parser.lua:369
-end -- ./lepton/lpt-parser/parser.lua:369
-i = i + 1 -- ./lepton/lpt-parser/parser.lua:374
-end -- ./lepton/lpt-parser/parser.lua:374
-return t -- ./lepton/lpt-parser/parser.lua:376
-end -- ./lepton/lpt-parser/parser.lua:376
-local function eStart(label) -- ./lepton/lpt-parser/parser.lua:379
-return e(sym("{"), label) -- ./lepton/lpt-parser/parser.lua:380
-end -- ./lepton/lpt-parser/parser.lua:380
-local function eEnd(label) -- ./lepton/lpt-parser/parser.lua:383
-return e(sym("}"), label) -- ./lepton/lpt-parser/parser.lua:384
-end -- ./lepton/lpt-parser/parser.lua:384
-local function eBlkStartEnd(startLabel, endLabel, canFollow) -- ./lepton/lpt-parser/parser.lua:387
-if canFollow then -- ./lepton/lpt-parser/parser.lua:388
-return eStart(startLabel) * V("Block") * eEnd(endLabel) * canFollow ^ - 1 -- ./lepton/lpt-parser/parser.lua:389
-else -- ./lepton/lpt-parser/parser.lua:389
-return eStart(startLabel) * V("Block") * eEnd(endLabel) -- ./lepton/lpt-parser/parser.lua:391
-end -- ./lepton/lpt-parser/parser.lua:391
-end -- ./lepton/lpt-parser/parser.lua:391
-local function eBlkStartEndOrSingleStat(startLabel, endLabel, canFollow) -- ./lepton/lpt-parser/parser.lua:395
-local start = sym("{") -- ./lepton/lpt-parser/parser.lua:396
-if canFollow then -- ./lepton/lpt-parser/parser.lua:397
-return (- start * V("SingleStatBlock") * canFollow ^ - 1) + (eStart(startLabel) * V("Block") * (eEnd(endLabel) * canFollow + eEnd(endLabel))) -- ./lepton/lpt-parser/parser.lua:399
-else -- ./lepton/lpt-parser/parser.lua:399
-return (- start * V("SingleStatBlock")) + (eStart(startLabel) * V("Block") * eEnd(endLabel)) -- ./lepton/lpt-parser/parser.lua:402
-end -- ./lepton/lpt-parser/parser.lua:402
-end -- ./lepton/lpt-parser/parser.lua:402
-local function mb(patt) -- ./lepton/lpt-parser/parser.lua:406
-return # patt / 0 * patt -- ./lepton/lpt-parser/parser.lua:407
-end -- ./lepton/lpt-parser/parser.lua:407
-local function setAttribute(attribute) -- ./lepton/lpt-parser/parser.lua:410
-return function(assign) -- ./lepton/lpt-parser/parser.lua:411
-assign[1]["tag"] = "AttributeNameList" -- ./lepton/lpt-parser/parser.lua:412
-for _, id in ipairs(assign[1]) do -- ./lepton/lpt-parser/parser.lua:413
-if id["tag"] == "Id" then -- ./lepton/lpt-parser/parser.lua:414
-id["tag"] = "AttributeId" -- ./lepton/lpt-parser/parser.lua:415
-id[2] = attribute -- ./lepton/lpt-parser/parser.lua:416
-elseif id["tag"] == "DestructuringId" then -- ./lepton/lpt-parser/parser.lua:417
-for _, did in ipairs(id) do -- ./lepton/lpt-parser/parser.lua:418
-did["tag"] = "AttributeId" -- ./lepton/lpt-parser/parser.lua:419
-did[2] = attribute -- ./lepton/lpt-parser/parser.lua:420
-end -- ./lepton/lpt-parser/parser.lua:420
-end -- ./lepton/lpt-parser/parser.lua:420
-end -- ./lepton/lpt-parser/parser.lua:420
-return assign -- ./lepton/lpt-parser/parser.lua:424
-end -- ./lepton/lpt-parser/parser.lua:424
-end -- ./lepton/lpt-parser/parser.lua:424
-local stacks = { ["lexpr"] = {} } -- ./lepton/lpt-parser/parser.lua:429
-local function push(f) -- ./lepton/lpt-parser/parser.lua:431
-return Cmt(P(""), function() -- ./lepton/lpt-parser/parser.lua:432
-table["insert"](stacks[f], true) -- ./lepton/lpt-parser/parser.lua:433
-return true -- ./lepton/lpt-parser/parser.lua:434
-end) -- ./lepton/lpt-parser/parser.lua:434
-end -- ./lepton/lpt-parser/parser.lua:434
-local function pop(f) -- ./lepton/lpt-parser/parser.lua:437
-return Cmt(P(""), function() -- ./lepton/lpt-parser/parser.lua:438
-table["remove"](stacks[f]) -- ./lepton/lpt-parser/parser.lua:439
-return true -- ./lepton/lpt-parser/parser.lua:440
-end) -- ./lepton/lpt-parser/parser.lua:440
-end -- ./lepton/lpt-parser/parser.lua:440
-local function when(f) -- ./lepton/lpt-parser/parser.lua:443
-return Cmt(P(""), function() -- ./lepton/lpt-parser/parser.lua:444
-return # stacks[f] > 0 -- ./lepton/lpt-parser/parser.lua:445
-end) -- ./lepton/lpt-parser/parser.lua:445
-end -- ./lepton/lpt-parser/parser.lua:445
-local function set(f, patt) -- ./lepton/lpt-parser/parser.lua:448
-return push(f) * patt * pop(f) -- ./lepton/lpt-parser/parser.lua:449
-end -- ./lepton/lpt-parser/parser.lua:449
-local G = { -- ./lepton/lpt-parser/parser.lua:454
-V("Lua"), -- ./lepton/lpt-parser/parser.lua:454
-["Lua"] = (V("Shebang") ^ - 1 * V("Skip") * V("Block") * e(P(- 1), "Extra")) / fixStructure, -- ./lepton/lpt-parser/parser.lua:455
+return params -- ./lepton/lpt-parser/parser.lua:286
+end -- ./lepton/lpt-parser/parser.lua:286
+local function insertIndex(t, index) -- ./lepton/lpt-parser/parser.lua:289
+return { -- ./lepton/lpt-parser/parser.lua:290
+["tag"] = "Index", -- ./lepton/lpt-parser/parser.lua:290
+["pos"] = t["pos"], -- ./lepton/lpt-parser/parser.lua:290
+[1] = t, -- ./lepton/lpt-parser/parser.lua:290
+[2] = index -- ./lepton/lpt-parser/parser.lua:290
+} -- ./lepton/lpt-parser/parser.lua:290
+end -- ./lepton/lpt-parser/parser.lua:290
+local function markMethod(t, method) -- ./lepton/lpt-parser/parser.lua:293
+if method then -- ./lepton/lpt-parser/parser.lua:294
+return { -- ./lepton/lpt-parser/parser.lua:295
+["tag"] = "Index", -- ./lepton/lpt-parser/parser.lua:295
+["pos"] = t["pos"], -- ./lepton/lpt-parser/parser.lua:295
+["is_method"] = true, -- ./lepton/lpt-parser/parser.lua:295
+[1] = t, -- ./lepton/lpt-parser/parser.lua:295
+[2] = method -- ./lepton/lpt-parser/parser.lua:295
+} -- ./lepton/lpt-parser/parser.lua:295
+end -- ./lepton/lpt-parser/parser.lua:295
+return t -- ./lepton/lpt-parser/parser.lua:297
+end -- ./lepton/lpt-parser/parser.lua:297
+local function fixLuaKeywords(t) -- ./lepton/lpt-parser/parser.lua:301
+local keywords = { -- ./lepton/lpt-parser/parser.lua:302
+"and", -- ./lepton/lpt-parser/parser.lua:302
+"do", -- ./lepton/lpt-parser/parser.lua:302
+"elseif", -- ./lepton/lpt-parser/parser.lua:302
+"end", -- ./lepton/lpt-parser/parser.lua:302
+"function", -- ./lepton/lpt-parser/parser.lua:302
+"in", -- ./lepton/lpt-parser/parser.lua:302
+"not", -- ./lepton/lpt-parser/parser.lua:302
+"or", -- ./lepton/lpt-parser/parser.lua:302
+"then" -- ./lepton/lpt-parser/parser.lua:302
+} -- ./lepton/lpt-parser/parser.lua:302
+if t["tag"] == "Pair" then -- ./lepton/lpt-parser/parser.lua:303
+for _, v in pairs(keywords) do -- ./lepton/lpt-parser/parser.lua:304
+if t[1][1] == v then -- ./lepton/lpt-parser/parser.lua:305
+t[1][1] = "_" .. t[1][1] -- ./lepton/lpt-parser/parser.lua:306
+break -- ./lepton/lpt-parser/parser.lua:307
+end -- ./lepton/lpt-parser/parser.lua:307
+end -- ./lepton/lpt-parser/parser.lua:307
+else -- ./lepton/lpt-parser/parser.lua:307
+for _, v in pairs(keywords) do -- ./lepton/lpt-parser/parser.lua:311
+if t[1] == v then -- ./lepton/lpt-parser/parser.lua:312
+t[1] = "_" .. t[1] -- ./lepton/lpt-parser/parser.lua:313
+break -- ./lepton/lpt-parser/parser.lua:314
+end -- ./lepton/lpt-parser/parser.lua:314
+end -- ./lepton/lpt-parser/parser.lua:314
+end -- ./lepton/lpt-parser/parser.lua:314
+return t -- ./lepton/lpt-parser/parser.lua:318
+end -- ./lepton/lpt-parser/parser.lua:318
+local function makeSuffixedExpr(t1, t2) -- ./lepton/lpt-parser/parser.lua:321
+if t2["tag"] == "Call" or t2["tag"] == "SafeCall" then -- ./lepton/lpt-parser/parser.lua:322
+local t = { -- ./lepton/lpt-parser/parser.lua:323
+["tag"] = t2["tag"], -- ./lepton/lpt-parser/parser.lua:323
+["pos"] = t1["pos"], -- ./lepton/lpt-parser/parser.lua:323
+[1] = t1 -- ./lepton/lpt-parser/parser.lua:323
+} -- ./lepton/lpt-parser/parser.lua:323
+for k, v in ipairs(t2) do -- ./lepton/lpt-parser/parser.lua:324
+table["insert"](t, v) -- ./lepton/lpt-parser/parser.lua:325
+end -- ./lepton/lpt-parser/parser.lua:325
+return t -- ./lepton/lpt-parser/parser.lua:327
+elseif t2["tag"] == "MethodStub" or t2["tag"] == "SafeMethodStub" then -- ./lepton/lpt-parser/parser.lua:328
+return { -- ./lepton/lpt-parser/parser.lua:329
+["tag"] = t2["tag"], -- ./lepton/lpt-parser/parser.lua:329
+["pos"] = t1["pos"], -- ./lepton/lpt-parser/parser.lua:329
+[1] = t1, -- ./lepton/lpt-parser/parser.lua:329
+[2] = fixLuaKeywords(t2[1]) -- ./lepton/lpt-parser/parser.lua:329
+} -- ./lepton/lpt-parser/parser.lua:329
+elseif t2["tag"] == "SafeDotIndex" or t2["tag"] == "SafeArrayIndex" then -- ./lepton/lpt-parser/parser.lua:330
+return { -- ./lepton/lpt-parser/parser.lua:331
+["tag"] = "SafeIndex", -- ./lepton/lpt-parser/parser.lua:331
+["pos"] = t1["pos"], -- ./lepton/lpt-parser/parser.lua:331
+[1] = t1, -- ./lepton/lpt-parser/parser.lua:331
+[2] = fixLuaKeywords(t2[1]) -- ./lepton/lpt-parser/parser.lua:331
+} -- ./lepton/lpt-parser/parser.lua:331
+elseif t2["tag"] == "DotIndex" or t2["tag"] == "ArrayIndex" then -- ./lepton/lpt-parser/parser.lua:332
+return { -- ./lepton/lpt-parser/parser.lua:333
+["tag"] = "Index", -- ./lepton/lpt-parser/parser.lua:333
+["pos"] = t1["pos"], -- ./lepton/lpt-parser/parser.lua:333
+[1] = t1, -- ./lepton/lpt-parser/parser.lua:333
+[2] = fixLuaKeywords(t2[1]) -- ./lepton/lpt-parser/parser.lua:333
+} -- ./lepton/lpt-parser/parser.lua:333
+else -- ./lepton/lpt-parser/parser.lua:333
+error("unexpected tag in suffixed expression") -- ./lepton/lpt-parser/parser.lua:335
+end -- ./lepton/lpt-parser/parser.lua:335
+end -- ./lepton/lpt-parser/parser.lua:335
+local function fixArrowFunc(t) -- ./lepton/lpt-parser/parser.lua:339
+if t[1] == ":" then -- ./lepton/lpt-parser/parser.lua:340
+table["insert"](t[2], 1, { -- ./lepton/lpt-parser/parser.lua:341
+["tag"] = "Id", -- ./lepton/lpt-parser/parser.lua:341
+"self" -- ./lepton/lpt-parser/parser.lua:341
+}) -- ./lepton/lpt-parser/parser.lua:341
+table["remove"](t, 1) -- ./lepton/lpt-parser/parser.lua:342
+t["is_method"] = true -- ./lepton/lpt-parser/parser.lua:343
+end -- ./lepton/lpt-parser/parser.lua:343
+t["is_short"] = true -- ./lepton/lpt-parser/parser.lua:345
+return t -- ./lepton/lpt-parser/parser.lua:346
+end -- ./lepton/lpt-parser/parser.lua:346
+local function markImplicit(t) -- ./lepton/lpt-parser/parser.lua:349
+t["implicit"] = true -- ./lepton/lpt-parser/parser.lua:350
+return t -- ./lepton/lpt-parser/parser.lua:351
+end -- ./lepton/lpt-parser/parser.lua:351
+local function statToExpr(t) -- ./lepton/lpt-parser/parser.lua:354
+t["tag"] = t["tag"] .. "Expr" -- ./lepton/lpt-parser/parser.lua:355
+return t -- ./lepton/lpt-parser/parser.lua:356
+end -- ./lepton/lpt-parser/parser.lua:356
+local function fixStructure(t) -- ./lepton/lpt-parser/parser.lua:359
+local i = 1 -- ./lepton/lpt-parser/parser.lua:360
+while i <= # t do -- ./lepton/lpt-parser/parser.lua:361
+if type(t[i]) == "table" then -- ./lepton/lpt-parser/parser.lua:362
+fixStructure(t[i]) -- ./lepton/lpt-parser/parser.lua:363
+for j = # t[i], 1, - 1 do -- ./lepton/lpt-parser/parser.lua:364
+local stat = t[i][j] -- ./lepton/lpt-parser/parser.lua:365
+if type(stat) == "table" and stat["move_up_block"] and stat["move_up_block"] > 0 then -- ./lepton/lpt-parser/parser.lua:366
+table["remove"](t[i], j) -- ./lepton/lpt-parser/parser.lua:367
+table["insert"](t, i + 1, stat) -- ./lepton/lpt-parser/parser.lua:368
+if t["tag"] == "Block" or t["tag"] == "Do" then -- ./lepton/lpt-parser/parser.lua:369
+stat["move_up_block"] = stat["move_up_block"] - 1 -- ./lepton/lpt-parser/parser.lua:370
+end -- ./lepton/lpt-parser/parser.lua:370
+end -- ./lepton/lpt-parser/parser.lua:370
+end -- ./lepton/lpt-parser/parser.lua:370
+end -- ./lepton/lpt-parser/parser.lua:370
+i = i + 1 -- ./lepton/lpt-parser/parser.lua:375
+end -- ./lepton/lpt-parser/parser.lua:375
+return t -- ./lepton/lpt-parser/parser.lua:377
+end -- ./lepton/lpt-parser/parser.lua:377
+local function eStart(label) -- ./lepton/lpt-parser/parser.lua:380
+return e(sym("{"), label) -- ./lepton/lpt-parser/parser.lua:381
+end -- ./lepton/lpt-parser/parser.lua:381
+local function eEnd(label) -- ./lepton/lpt-parser/parser.lua:384
+return e(sym("}"), label) -- ./lepton/lpt-parser/parser.lua:385
+end -- ./lepton/lpt-parser/parser.lua:385
+local function eBlkStartEnd(startLabel, endLabel, canFollow) -- ./lepton/lpt-parser/parser.lua:388
+if canFollow then -- ./lepton/lpt-parser/parser.lua:389
+return eStart(startLabel) * V("Block") * eEnd(endLabel) * canFollow ^ - 1 -- ./lepton/lpt-parser/parser.lua:390
+else -- ./lepton/lpt-parser/parser.lua:390
+return eStart(startLabel) * V("Block") * eEnd(endLabel) -- ./lepton/lpt-parser/parser.lua:392
+end -- ./lepton/lpt-parser/parser.lua:392
+end -- ./lepton/lpt-parser/parser.lua:392
+local function eBlkStartEndOrSingleStat(startLabel, endLabel, canFollow) -- ./lepton/lpt-parser/parser.lua:396
+local start = sym("{") -- ./lepton/lpt-parser/parser.lua:397
+if canFollow then -- ./lepton/lpt-parser/parser.lua:398
+return (- start * V("SingleStatBlock") * canFollow ^ - 1) + (eStart(startLabel) * V("Block") * (eEnd(endLabel) * canFollow + eEnd(endLabel))) -- ./lepton/lpt-parser/parser.lua:400
+else -- ./lepton/lpt-parser/parser.lua:400
+return (- start * V("SingleStatBlock")) + (eStart(startLabel) * V("Block") * eEnd(endLabel)) -- ./lepton/lpt-parser/parser.lua:403
+end -- ./lepton/lpt-parser/parser.lua:403
+end -- ./lepton/lpt-parser/parser.lua:403
+local function mb(patt) -- ./lepton/lpt-parser/parser.lua:407
+return # patt / 0 * patt -- ./lepton/lpt-parser/parser.lua:408
+end -- ./lepton/lpt-parser/parser.lua:408
+local function setAttribute(attribute) -- ./lepton/lpt-parser/parser.lua:411
+return function(assign) -- ./lepton/lpt-parser/parser.lua:412
+assign[1]["tag"] = "AttributeNameList" -- ./lepton/lpt-parser/parser.lua:413
+for _, id in ipairs(assign[1]) do -- ./lepton/lpt-parser/parser.lua:414
+if id["tag"] == "Id" then -- ./lepton/lpt-parser/parser.lua:415
+id["tag"] = "AttributeId" -- ./lepton/lpt-parser/parser.lua:416
+id[2] = attribute -- ./lepton/lpt-parser/parser.lua:417
+elseif id["tag"] == "DestructuringId" then -- ./lepton/lpt-parser/parser.lua:418
+for _, did in ipairs(id) do -- ./lepton/lpt-parser/parser.lua:419
+did["tag"] = "AttributeId" -- ./lepton/lpt-parser/parser.lua:420
+did[2] = attribute -- ./lepton/lpt-parser/parser.lua:421
+end -- ./lepton/lpt-parser/parser.lua:421
+end -- ./lepton/lpt-parser/parser.lua:421
+end -- ./lepton/lpt-parser/parser.lua:421
+return assign -- ./lepton/lpt-parser/parser.lua:425
+end -- ./lepton/lpt-parser/parser.lua:425
+end -- ./lepton/lpt-parser/parser.lua:425
+local stacks = { ["lexpr"] = {} } -- ./lepton/lpt-parser/parser.lua:430
+local function push(f) -- ./lepton/lpt-parser/parser.lua:432
+return Cmt(P(""), function() -- ./lepton/lpt-parser/parser.lua:433
+table["insert"](stacks[f], true) -- ./lepton/lpt-parser/parser.lua:434
+return true -- ./lepton/lpt-parser/parser.lua:435
+end) -- ./lepton/lpt-parser/parser.lua:435
+end -- ./lepton/lpt-parser/parser.lua:435
+local function pop(f) -- ./lepton/lpt-parser/parser.lua:438
+return Cmt(P(""), function() -- ./lepton/lpt-parser/parser.lua:439
+table["remove"](stacks[f]) -- ./lepton/lpt-parser/parser.lua:440
+return true -- ./lepton/lpt-parser/parser.lua:441
+end) -- ./lepton/lpt-parser/parser.lua:441
+end -- ./lepton/lpt-parser/parser.lua:441
+local function when(f) -- ./lepton/lpt-parser/parser.lua:444
+return Cmt(P(""), function() -- ./lepton/lpt-parser/parser.lua:445
+return # stacks[f] > 0 -- ./lepton/lpt-parser/parser.lua:446
+end) -- ./lepton/lpt-parser/parser.lua:446
+end -- ./lepton/lpt-parser/parser.lua:446
+local function set(f, patt) -- ./lepton/lpt-parser/parser.lua:449
+return push(f) * patt * pop(f) -- ./lepton/lpt-parser/parser.lua:450
+end -- ./lepton/lpt-parser/parser.lua:450
+local G = { -- ./lepton/lpt-parser/parser.lua:455
+V("Lua"), -- ./lepton/lpt-parser/parser.lua:455
+["Lua"] = (V("Shebang") ^ - 1 * V("Skip") * V("Block") * e(P(- 1), "Extra")) / fixStructure, -- ./lepton/lpt-parser/parser.lua:456
 ["Shebang"] = P("#!") * (P(1) - P("\
-")) ^ 0, -- ./lepton/lpt-parser/parser.lua:456
-["Block"] = tagC("Block", (V("Stat") + - V("BlockEnd") * throw("InvalidStat")) ^ 0 * ((V("RetStat") + V("ImplicitPushStat")) * sym(";") ^ - 1) ^ - 1), -- ./lepton/lpt-parser/parser.lua:458
-["Stat"] = V("IfStat") + V("DoStat") + V("WhileStat") + V("RepeatStat") + V("ForStat") + V("LocalStat") + V("FuncStat") + V("BreakStat") + V("LabelStat") + V("GoToStat") + V("LetStat") + V("ConstStat") + V("CloseStat") + V("FuncCall") + V("Assignment") + V("ContinueStat") + V("PushStat") + sym(";"), -- ./lepton/lpt-parser/parser.lua:464
-["BlockEnd"] = P("return") + sym("}") + "]" + - 1 + V("ImplicitPushStat") + V("Assignment"), -- ./lepton/lpt-parser/parser.lua:465
-["SingleStatBlock"] = tagC("Block", V("Stat") + V("RetStat") + V("ImplicitPushStat")), -- ./lepton/lpt-parser/parser.lua:467
-["BlockNoErr"] = tagC("Block", V("Stat") ^ 0 * ((V("RetStat") + V("ImplicitPushStat")) * sym(";") ^ - 1) ^ - 1), -- ./lepton/lpt-parser/parser.lua:468
-["IfStat"] = tagC("If", V("IfPart")), -- ./lepton/lpt-parser/parser.lua:470
-["IfPart"] = kw("if") * set("lexpr", e(parenAround(V("Expr")), "ExprIf")) * eBlkStartEndOrSingleStat("OIf", "CIf", V("ElseIfPart") + V("ElsePart")), -- ./lepton/lpt-parser/parser.lua:471
-["ElseIfPart"] = kw("else") * V("IfPart"), -- ./lepton/lpt-parser/parser.lua:472
-["ElsePart"] = kw("else") * eBlkStartEndOrSingleStat("OElse", "CIf"), -- ./lepton/lpt-parser/parser.lua:473
-["DoStat"] = kw("do") * eBlkStartEndOrSingleStat("ODo", "CDo") / tagDo, -- ./lepton/lpt-parser/parser.lua:475
-["WhileStat"] = tagC("While", kw("while") * set("lexpr", e(parenAround(V("Expr")), "ExprWhile")) * V("WhileBody")), -- ./lepton/lpt-parser/parser.lua:476
-["WhileBody"] = eBlkStartEndOrSingleStat("DoWhile", "EndWhile"), -- ./lepton/lpt-parser/parser.lua:477
-["RepeatStat"] = tagC("Repeat", kw("repeat") * eBlkStartEndOrSingleStat("ORep", "CRep") * e(kw("until"), "UntilRep") * e(parenAround(V("Expr")), "ExprRep")), -- ./lepton/lpt-parser/parser.lua:478
-["ForStat"] = kw("for") * e(V("ForNum") + V("ForIn"), "ForRange"), -- ./lepton/lpt-parser/parser.lua:480
-["ForNum"] = tagC("Fornum", parenAround(V("Id") * sym(":") * V("NumRange")) * V("ForBody")), -- ./lepton/lpt-parser/parser.lua:481
-["NumRange"] = e(V("Expr"), "ForRangeStart") * e(sym(","), "ForRangeComma") * e(V("Expr"), "ForRangeEnd") * (sym(":") * e(V("Expr"), "ForRangeStep")) ^ - 1, -- ./lepton/lpt-parser/parser.lua:483
-["ForIn"] = tagC("Forin", parenAround(V("DestructuringNameList") * e(sym(":"), "InFor") * e(V("ExprList"), "EListFor")) * V("ForBody")), -- ./lepton/lpt-parser/parser.lua:484
-["ForBody"] = eBlkStartEndOrSingleStat("OFor", "CFor"), -- ./lepton/lpt-parser/parser.lua:485
-["LocalStat"] = kw("local") * e(V("LocalFunc") + V("LocalAssign"), "DefLocal"), -- ./lepton/lpt-parser/parser.lua:487
-["LocalFunc"] = tagC("Localrec", kw("fn") * e(V("Id"), "NameLFunc") * V("FuncBody")) / fixFuncStat, -- ./lepton/lpt-parser/parser.lua:488
-["LocalAssign"] = tagC("Local", V("AttributeNameList") * (sym("=") * e(V("ExprList"), "EListLAssign") + Ct(Cc()))) + tagC("Local", V("DestructuringNameList") * sym("=") * e(V("ExprList"), "EListLAssign")), -- ./lepton/lpt-parser/parser.lua:490
-["LetStat"] = kw("let") * e(V("LetAssign"), "DefLet"), -- ./lepton/lpt-parser/parser.lua:492
-["LetAssign"] = tagC("Let", V("NameList") * (sym("=") * e(V("ExprList"), "EListLAssign") + Ct(Cc()))) + tagC("Let", V("DestructuringNameList") * sym("=") * e(V("ExprList"), "EListLAssign")), -- ./lepton/lpt-parser/parser.lua:494
-["ConstStat"] = kw("const") * e(V("AttributeAssign") / setAttribute("const"), "DefConst"), -- ./lepton/lpt-parser/parser.lua:496
-["CloseStat"] = kw("close") * e(V("AttributeAssign") / setAttribute("close"), "DefClose"), -- ./lepton/lpt-parser/parser.lua:497
-["AttributeAssign"] = tagC("Local", V("NameList") * (sym("=") * e(V("ExprList"), "EListLAssign") + Ct(Cc()))) + tagC("Local", V("DestructuringNameList") * sym("=") * e(V("ExprList"), "EListLAssign")), -- ./lepton/lpt-parser/parser.lua:499
-["Assignment"] = tagC("Set", (V("VarList") + V("DestructuringNameList")) * V("BinOp") ^ - 1 * ((P("=") - "==") / "=") * ((V("BinOp") - P("-")) + # (P("-") * V("Space")) * V("BinOp")) ^ - 1 * V("Skip") * e(V("ExprList"), "EListAssign")), -- ./lepton/lpt-parser/parser.lua:502
-["FuncStat"] = tagC("Set", kw("fn") * e(V("FuncName"), "FuncName") * V("FuncBody")) / fixFuncStat, -- ./lepton/lpt-parser/parser.lua:504
-["FuncName"] = Cf(V("Id") * (sym(".") * e(V("StrId"), "NameFunc1")) ^ 0, insertIndex) * (sym(":") * e(V("StrId"), "NameFunc2")) ^ - 1 / markMethod, -- ./lepton/lpt-parser/parser.lua:506
-["FuncBody"] = tagC("Function", V("FuncParams") * eBlkStartEndOrSingleStat("OFunc", "CFunc")), -- ./lepton/lpt-parser/parser.lua:507
-["FuncParams"] = e(sym("("), "OParenPList") * V("ParList") * e(sym(")"), "CParenPList"), -- ./lepton/lpt-parser/parser.lua:508
-["ParList"] = V("NamedParList") * (sym(",") * e(tagC("Dots", sym("...")), "ParList")) ^ - 1 / addDots + Ct(tagC("Dots", sym("..."))) + Ct(Cc()), -- ./lepton/lpt-parser/parser.lua:511
-["ArrowFuncDef"] = tagC("Function", V("ArrowFuncParams") * sym("->") * V("ArrowFuncBody")) / fixArrowFunc, -- ./lepton/lpt-parser/parser.lua:513
-["ArrowFuncParams"] = (sym(":") / ":") ^ - 1 * (parenAround(V("ParList")) + tagC("NamedPar", V("NamedPar"))), -- ./lepton/lpt-parser/parser.lua:514
-["ArrowFuncBody"] = (- sym("{") * tagC("Block", tagC("Push", V("Expr"))) * - sym("}")) + eBlkStartEnd("OArrowFunc", "CArrowFunc"), -- ./lepton/lpt-parser/parser.lua:515
-["NamedParList"] = tagC("NamedParList", commaSep(V("NamedPar"))), -- ./lepton/lpt-parser/parser.lua:517
-["NamedPar"] = tagC("ParPair", V("ParKey") * e(sym("="), "EqField") * e(V("Expr"), "ExprField")) + V("Id"), -- ./lepton/lpt-parser/parser.lua:518
-["ParKey"] = V("Id") * # ("=" * - P("=")), -- ./lepton/lpt-parser/parser.lua:519
-["LabelStat"] = tagC("Label", sym("::") * e(V("Name"), "Label") * e(sym("::"), "CloseLabel")), -- ./lepton/lpt-parser/parser.lua:521
-["GoToStat"] = tagC("Goto", kw("goto") * e(V("Name"), "Goto")), -- ./lepton/lpt-parser/parser.lua:522
-["BreakStat"] = tagC("Break", kw("break")), -- ./lepton/lpt-parser/parser.lua:523
-["ContinueStat"] = tagC("Continue", kw("continue")), -- ./lepton/lpt-parser/parser.lua:524
-["RetStat"] = tagC("Return", kw("return") * commaSep(V("Expr"), "RetList") ^ - 1), -- ./lepton/lpt-parser/parser.lua:525
-["PushStat"] = tagC("Push", kw("push") * commaSep(V("Expr"), "RetList") ^ - 1), -- ./lepton/lpt-parser/parser.lua:527
-["ImplicitPushStat"] = tagC("Push", commaSep(V("Expr"), "RetList")) / markImplicit, -- ./lepton/lpt-parser/parser.lua:528
-["NameList"] = tagC("NameList", commaSep(V("Id"))), -- ./lepton/lpt-parser/parser.lua:530
-["DestructuringNameList"] = tagC("NameList", commaSep(V("DestructuringId"))), -- ./lepton/lpt-parser/parser.lua:531
-["AttributeNameList"] = tagC("AttributeNameList", commaSep(V("AttributeId"))), -- ./lepton/lpt-parser/parser.lua:532
-["VarList"] = tagC("VarList", commaSep(V("VarExpr"))), -- ./lepton/lpt-parser/parser.lua:533
-["ExprList"] = tagC("ExpList", commaSep(V("Expr"), "ExprList")), -- ./lepton/lpt-parser/parser.lua:534
-["DestructuringId"] = tagC("DestructuringId", sym("{") * V("DestructuringIdFieldList") * e(sym("}"), "CBraceDestructuring")) + V("Id"), -- ./lepton/lpt-parser/parser.lua:536
-["DestructuringIdFieldList"] = sepBy(V("DestructuringIdField"), V("FieldSep")) * V("FieldSep") ^ - 1, -- ./lepton/lpt-parser/parser.lua:537
-["DestructuringIdField"] = tagC("Pair", V("FieldKey") * e(sym("="), "DestructuringEqField") * e(V("Id"), "DestructuringExprField")) + V("Id"), -- ./lepton/lpt-parser/parser.lua:538
-["Expr"] = V("OrExpr"), -- ./lepton/lpt-parser/parser.lua:540
-["OrExpr"] = chainOp(V("AndExpr"), V("OrOp"), "OrExpr"), -- ./lepton/lpt-parser/parser.lua:541
-["AndExpr"] = chainOp(V("RelExpr"), V("AndOp"), "AndExpr"), -- ./lepton/lpt-parser/parser.lua:542
-["RelExpr"] = chainOp(V("BOrExpr"), V("RelOp"), "RelExpr"), -- ./lepton/lpt-parser/parser.lua:543
-["BOrExpr"] = chainOp(V("BXorExpr"), V("BOrOp"), "BOrExpr"), -- ./lepton/lpt-parser/parser.lua:544
-["BXorExpr"] = chainOp(V("BAndExpr"), V("BXorOp"), "BXorExpr"), -- ./lepton/lpt-parser/parser.lua:545
-["BAndExpr"] = chainOp(V("ShiftExpr"), V("BAndOp"), "BAndExpr"), -- ./lepton/lpt-parser/parser.lua:546
-["ShiftExpr"] = chainOp(V("ConcatExpr"), V("ShiftOp"), "ShiftExpr"), -- ./lepton/lpt-parser/parser.lua:547
-["ConcatExpr"] = V("AddExpr") * (V("ConcatOp") * e(V("ConcatExpr"), "ConcatExpr")) ^ - 1 / binaryOp, -- ./lepton/lpt-parser/parser.lua:548
-["AddExpr"] = chainOp(V("MulExpr"), V("AddOp"), "AddExpr"), -- ./lepton/lpt-parser/parser.lua:549
-["MulExpr"] = chainOp(V("UnaryExpr"), V("MulOp"), "MulExpr"), -- ./lepton/lpt-parser/parser.lua:550
-["UnaryExpr"] = V("UnaryOp") * e(V("UnaryExpr"), "UnaryExpr") / unaryOp + V("PowExpr"), -- ./lepton/lpt-parser/parser.lua:552
-["PowExpr"] = V("SimpleExpr") * (V("PowOp") * e(V("UnaryExpr"), "PowExpr")) ^ - 1 / binaryOp, -- ./lepton/lpt-parser/parser.lua:553
-["SimpleExpr"] = tagC("Number", V("Number")) + tagC("Nil", kw("nil")) + tagC("Boolean", kw("false") * Cc(false)) + tagC("Boolean", kw("true") * Cc(true)) + tagC("Dots", sym("...")) + V("FuncDef") + V("ArrowFuncDef") + (when("lexpr") * tagC("LetExpr", mb(V("DestructuringNameList")) * sym("=") * - sym("=") * e(V("ExprList"), "EListLAssign"))) + V("SuffixedExpr") + V("StatExpr"), -- ./lepton/lpt-parser/parser.lua:563
-["StatExpr"] = (V("IfStat") + V("DoStat") + V("WhileStat") + V("RepeatStat") + V("ForStat")) / statToExpr, -- ./lepton/lpt-parser/parser.lua:565
-["FuncCall"] = Cmt(V("SuffixedExpr"), function(s, i, exp) -- ./lepton/lpt-parser/parser.lua:567
-return exp["tag"] == "Call" or exp["tag"] == "SafeCall", exp -- ./lepton/lpt-parser/parser.lua:567
-end), -- ./lepton/lpt-parser/parser.lua:567
-["VarExpr"] = Cmt(V("SuffixedExpr"), function(s, i, exp) -- ./lepton/lpt-parser/parser.lua:568
-return exp["tag"] == "Id" or exp["tag"] == "Index", exp -- ./lepton/lpt-parser/parser.lua:568
-end), -- ./lepton/lpt-parser/parser.lua:568
-["SuffixedExpr"] = Cf(V("PrimaryExpr") * (V("Index") + V("MethodStub") + V("Call")) ^ 0 + V("NoCallPrimaryExpr") * - V("Call") * (V("Index") + V("MethodStub") + V("Call")) ^ 0 + V("NoCallPrimaryExpr"), makeSuffixedExpr), -- ./lepton/lpt-parser/parser.lua:572
-["PrimaryExpr"] = V("SelfId") * (V("SelfCall") + V("SelfIndex")) + V("Id") + tagC("Paren", sym("(") * e(V("Expr"), "ExprParen") * e(sym(")"), "CParenExpr")), -- ./lepton/lpt-parser/parser.lua:575
-["NoCallPrimaryExpr"] = tagC("String", V("String")) + V("Table") + V("TableCompr"), -- ./lepton/lpt-parser/parser.lua:576
-["Index"] = tagC("DotIndex", sym("." * - P(".")) * e(V("StrId"), "NameIndex")) + tagC("ArrayIndex", sym("[" * - P(S("=["))) * e(V("Expr"), "ExprIndex") * e(sym("]"), "CBracketIndex")) + tagC("SafeDotIndex", sym("?." * - P(".")) * e(V("StrId"), "NameIndex")) + tagC("SafeArrayIndex", sym("?[" * - P(S("=["))) * e(V("Expr"), "ExprIndex") * e(sym("]"), "CBracketIndex")), -- ./lepton/lpt-parser/parser.lua:580
-["MethodStub"] = tagC("MethodStub", sym(":" * - P(":")) * e(V("StrId"), "NameMeth")) + tagC("SafeMethodStub", sym("?:" * - P(":")) * e(V("StrId"), "NameMeth")), -- ./lepton/lpt-parser/parser.lua:582
-["Call"] = tagC("Call", V("FuncArgs")) + tagC("SafeCall", P("?") * V("FuncArgs")), -- ./lepton/lpt-parser/parser.lua:584
-["SelfCall"] = tagC("MethodStub", V("StrId")) * V("Call"), -- ./lepton/lpt-parser/parser.lua:585
-["SelfIndex"] = tagC("DotIndex", V("StrId")), -- ./lepton/lpt-parser/parser.lua:586
-["FuncDef"] = (kw("fn") * V("FuncBody")), -- ./lepton/lpt-parser/parser.lua:588
-["FuncArgs"] = sym("(") * commaSep(V("Expr"), "ArgList") ^ - 1 * e(sym(")"), "CParenArgs"), -- ./lepton/lpt-parser/parser.lua:589
-["Table"] = tagC("Table", sym("{") * V("FieldList") ^ - 1 * e(sym("}"), "CBraceTable")), -- ./lepton/lpt-parser/parser.lua:591
-["FieldList"] = sepBy(V("Field"), V("FieldSep")) * V("FieldSep") ^ - 1, -- ./lepton/lpt-parser/parser.lua:592
-["Field"] = tagC("Pair", V("FieldKey") * e(sym("="), "EqField") * e(V("Expr"), "ExprField")) / fixLuaKeywords + V("Expr"), -- ./lepton/lpt-parser/parser.lua:594
-["FieldKey"] = sym("[" * - P(S("=["))) * e(V("Expr"), "ExprFKey") * e(sym("]"), "CBracketFKey") + V("StrId") * # ("=" * - P("=")), -- ./lepton/lpt-parser/parser.lua:596
-["FieldSep"] = sym(",") + sym(";"), -- ./lepton/lpt-parser/parser.lua:597
-["TableCompr"] = tagC("TableCompr", sym("[") * V("Block") * e(sym("]"), "CBracketTableCompr")), -- ./lepton/lpt-parser/parser.lua:599
-["SelfId"] = tagC("Id", sym("@") / "self"), -- ./lepton/lpt-parser/parser.lua:601
-["Id"] = (tagC("Id", V("Name")) / fixLuaKeywords) + V("SelfId"), -- ./lepton/lpt-parser/parser.lua:602
-["AttributeSelfId"] = tagC("AttributeId", sym("@") / "self" * V("Attribute") ^ - 1), -- ./lepton/lpt-parser/parser.lua:603
-["AttributeId"] = tagC("AttributeId", V("Name") * V("Attribute") ^ - 1) / fixLuaKeywords + V("AttributeSelfId"), -- ./lepton/lpt-parser/parser.lua:604
-["StrId"] = tagC("String", V("Name")), -- ./lepton/lpt-parser/parser.lua:605
-["Attribute"] = sym("<") * e(kw("const") / "const" + kw("close") / "close", "UnknownAttribute") * e(sym(">"), "CBracketAttribute"), -- ./lepton/lpt-parser/parser.lua:607
-["Skip"] = (V("Space") + V("Comment")) ^ 0, -- ./lepton/lpt-parser/parser.lua:610
-["Space"] = space ^ 1, -- ./lepton/lpt-parser/parser.lua:611
+")) ^ 0, -- ./lepton/lpt-parser/parser.lua:457
+["Block"] = tagC("Block", (V("Stat") + - V("BlockEnd") * throw("InvalidStat")) ^ 0 * ((V("RetStat") + V("ImplicitPushStat")) * sym(";") ^ - 1) ^ - 1), -- ./lepton/lpt-parser/parser.lua:459
+["Stat"] = V("IfStat") + V("DoStat") + V("WhileStat") + V("RepeatStat") + V("ForStat") + V("LocalStat") + V("FuncStat") + V("BreakStat") + V("LabelStat") + V("GoToStat") + V("LetStat") + V("ConstStat") + V("CloseStat") + V("FuncCall") + V("Assignment") + V("ContinueStat") + V("PushStat") + sym(";"), -- ./lepton/lpt-parser/parser.lua:465
+["BlockEnd"] = P("return") + sym("}") + "]" + - 1 + V("ImplicitPushStat") + V("Assignment"), -- ./lepton/lpt-parser/parser.lua:466
+["SingleStatBlock"] = tagC("Block", V("Stat") + V("RetStat") + V("ImplicitPushStat")), -- ./lepton/lpt-parser/parser.lua:468
+["BlockNoErr"] = tagC("Block", V("Stat") ^ 0 * ((V("RetStat") + V("ImplicitPushStat")) * sym(";") ^ - 1) ^ - 1), -- ./lepton/lpt-parser/parser.lua:469
+["IfStat"] = tagC("If", V("IfPart")), -- ./lepton/lpt-parser/parser.lua:471
+["IfPart"] = kw("if") * set("lexpr", e(parenAround(V("Expr")), "ExprIf")) * eBlkStartEndOrSingleStat("OIf", "CIf", V("ElseIfPart") + V("ElsePart")), -- ./lepton/lpt-parser/parser.lua:472
+["ElseIfPart"] = kw("else") * V("IfPart"), -- ./lepton/lpt-parser/parser.lua:473
+["ElsePart"] = kw("else") * eBlkStartEndOrSingleStat("OElse", "CIf"), -- ./lepton/lpt-parser/parser.lua:474
+["DoStat"] = kw("do") * eBlkStartEndOrSingleStat("ODo", "CDo") / tagDo, -- ./lepton/lpt-parser/parser.lua:476
+["WhileStat"] = tagC("While", kw("while") * set("lexpr", e(parenAround(V("Expr")), "ExprWhile")) * V("WhileBody")), -- ./lepton/lpt-parser/parser.lua:477
+["WhileBody"] = eBlkStartEndOrSingleStat("DoWhile", "EndWhile"), -- ./lepton/lpt-parser/parser.lua:478
+["RepeatStat"] = tagC("Repeat", kw("repeat") * eBlkStartEndOrSingleStat("ORep", "CRep") * e(kw("until"), "UntilRep") * e(parenAround(V("Expr")), "ExprRep")), -- ./lepton/lpt-parser/parser.lua:479
+["ForStat"] = kw("for") * e(V("ForNum") + V("ForIn"), "ForRange"), -- ./lepton/lpt-parser/parser.lua:481
+["ForNum"] = tagC("Fornum", parenAround(V("Id") * sym(":") * V("NumRange")) * V("ForBody")), -- ./lepton/lpt-parser/parser.lua:482
+["NumRange"] = e(V("Expr"), "ForRangeStart") * e(sym(","), "ForRangeComma") * e(V("Expr"), "ForRangeEnd") * (sym(":") * e(V("Expr"), "ForRangeStep")) ^ - 1, -- ./lepton/lpt-parser/parser.lua:484
+["ForIn"] = tagC("Forin", parenAround(V("DestructuringNameList") * e(sym(":"), "InFor") * e(V("ExprList"), "EListFor")) * V("ForBody")), -- ./lepton/lpt-parser/parser.lua:485
+["ForBody"] = eBlkStartEndOrSingleStat("OFor", "CFor"), -- ./lepton/lpt-parser/parser.lua:486
+["LocalStat"] = kw("local") * e(V("LocalFunc") + V("LocalAssign"), "DefLocal"), -- ./lepton/lpt-parser/parser.lua:488
+["LocalFunc"] = tagC("Localrec", kw("fn") * e(V("Id"), "NameLFunc") * V("FuncBody")) / fixFuncStat, -- ./lepton/lpt-parser/parser.lua:489
+["LocalAssign"] = tagC("Local", V("AttributeNameList") * (sym("=") * e(V("ExprList"), "EListLAssign") + Ct(Cc()))) + tagC("Local", V("DestructuringNameList") * sym("=") * e(V("ExprList"), "EListLAssign")), -- ./lepton/lpt-parser/parser.lua:491
+["LetStat"] = kw("let") * e(V("LetAssign"), "DefLet"), -- ./lepton/lpt-parser/parser.lua:493
+["LetAssign"] = tagC("Let", V("NameList") * (sym("=") * e(V("ExprList"), "EListLAssign") + Ct(Cc()))) + tagC("Let", V("DestructuringNameList") * sym("=") * e(V("ExprList"), "EListLAssign")), -- ./lepton/lpt-parser/parser.lua:495
+["ConstStat"] = kw("const") * e(V("AttributeAssign") / setAttribute("const"), "DefConst"), -- ./lepton/lpt-parser/parser.lua:497
+["CloseStat"] = kw("close") * e(V("AttributeAssign") / setAttribute("close"), "DefClose"), -- ./lepton/lpt-parser/parser.lua:498
+["AttributeAssign"] = tagC("Local", V("NameList") * (sym("=") * e(V("ExprList"), "EListLAssign") + Ct(Cc()))) + tagC("Local", V("DestructuringNameList") * sym("=") * e(V("ExprList"), "EListLAssign")), -- ./lepton/lpt-parser/parser.lua:500
+["Assignment"] = tagC("Set", (V("VarList") + V("DestructuringNameList")) * V("BinOp") ^ - 1 * ((P("=") - "==") / "=") * ((V("BinOp") - P("-")) + # (P("-") * V("Space")) * V("BinOp")) ^ - 1 * V("Skip") * e(V("ExprList"), "EListAssign")), -- ./lepton/lpt-parser/parser.lua:503
+["FuncStat"] = tagC("Set", kw("fn") * e(V("FuncName"), "FuncName") * V("FuncBody")) / fixFuncStat, -- ./lepton/lpt-parser/parser.lua:505
+["FuncName"] = Cf(V("Id") * (sym(".") * e(V("StrId"), "NameFunc1")) ^ 0, insertIndex) * (sym(":") * e(V("StrId"), "NameFunc2")) ^ - 1 / markMethod, -- ./lepton/lpt-parser/parser.lua:507
+["FuncBody"] = tagC("Function", V("FuncParams") * eBlkStartEndOrSingleStat("OFunc", "CFunc")), -- ./lepton/lpt-parser/parser.lua:508
+["FuncParams"] = e(sym("("), "OParenPList") * V("ParList") * e(sym(")"), "CParenPList"), -- ./lepton/lpt-parser/parser.lua:509
+["ParList"] = V("NamedParList") * (sym(",") * e(tagC("Dots", sym("...")), "ParList")) ^ - 1 / addDots + Ct(tagC("Dots", sym("..."))) + Ct(Cc()), -- ./lepton/lpt-parser/parser.lua:512
+["ArrowFuncDef"] = tagC("Function", V("ArrowFuncParams") * sym("->") * V("ArrowFuncBody")) / fixArrowFunc, -- ./lepton/lpt-parser/parser.lua:514
+["ArrowFuncParams"] = (sym(":") / ":") ^ - 1 * (parenAround(V("ParList")) + tagC("NamedPar", V("NamedPar"))), -- ./lepton/lpt-parser/parser.lua:515
+["ArrowFuncBody"] = (- sym("{") * tagC("Block", tagC("Push", V("Expr"))) * - sym("}")) + eBlkStartEnd("OArrowFunc", "CArrowFunc"), -- ./lepton/lpt-parser/parser.lua:516
+["NamedParList"] = tagC("NamedParList", commaSep(V("NamedPar"))), -- ./lepton/lpt-parser/parser.lua:518
+["NamedPar"] = tagC("ParPair", V("ParKey") * e(sym("="), "EqField") * e(V("Expr"), "ExprField")) + V("Id"), -- ./lepton/lpt-parser/parser.lua:519
+["ParKey"] = V("Id") * # ("=" * - P("=")), -- ./lepton/lpt-parser/parser.lua:520
+["LabelStat"] = tagC("Label", sym("::") * e(V("Name"), "Label") * e(sym("::"), "CloseLabel")), -- ./lepton/lpt-parser/parser.lua:522
+["GoToStat"] = tagC("Goto", kw("goto") * e(V("Name"), "Goto")), -- ./lepton/lpt-parser/parser.lua:523
+["BreakStat"] = tagC("Break", kw("break")), -- ./lepton/lpt-parser/parser.lua:524
+["ContinueStat"] = tagC("Continue", kw("continue")), -- ./lepton/lpt-parser/parser.lua:525
+["RetStat"] = tagC("Return", kw("return") * commaSep(V("Expr"), "RetList") ^ - 1), -- ./lepton/lpt-parser/parser.lua:526
+["PushStat"] = tagC("Push", kw("push") * commaSep(V("Expr"), "RetList") ^ - 1), -- ./lepton/lpt-parser/parser.lua:528
+["ImplicitPushStat"] = tagC("Push", commaSep(V("Expr"), "RetList")) / markImplicit, -- ./lepton/lpt-parser/parser.lua:529
+["NameList"] = tagC("NameList", commaSep(V("Id"))), -- ./lepton/lpt-parser/parser.lua:531
+["DestructuringNameList"] = tagC("NameList", commaSep(V("DestructuringId"))), -- ./lepton/lpt-parser/parser.lua:532
+["AttributeNameList"] = tagC("AttributeNameList", commaSep(V("AttributeId"))), -- ./lepton/lpt-parser/parser.lua:533
+["VarList"] = tagC("VarList", commaSep(V("VarExpr"))), -- ./lepton/lpt-parser/parser.lua:534
+["ExprList"] = tagC("ExpList", commaSep(V("Expr"), "ExprList")), -- ./lepton/lpt-parser/parser.lua:535
+["DestructuringId"] = tagC("DestructuringId", sym("{") * V("DestructuringIdFieldList") * e(sym("}"), "CBraceDestructuring")) + V("Id"), -- ./lepton/lpt-parser/parser.lua:537
+["DestructuringIdFieldList"] = sepBy(V("DestructuringIdField"), V("FieldSep")) * V("FieldSep") ^ - 1, -- ./lepton/lpt-parser/parser.lua:538
+["DestructuringIdField"] = tagC("Pair", V("FieldKey") * e(sym("="), "DestructuringEqField") * e(V("Id"), "DestructuringExprField")) + V("Id"), -- ./lepton/lpt-parser/parser.lua:539
+["Expr"] = V("OrExpr"), -- ./lepton/lpt-parser/parser.lua:541
+["OrExpr"] = chainOp(V("AndExpr"), V("OrOp"), "OrExpr"), -- ./lepton/lpt-parser/parser.lua:542
+["AndExpr"] = chainOp(V("RelExpr"), V("AndOp"), "AndExpr"), -- ./lepton/lpt-parser/parser.lua:543
+["RelExpr"] = chainOp(V("BOrExpr"), V("RelOp"), "RelExpr"), -- ./lepton/lpt-parser/parser.lua:544
+["BOrExpr"] = chainOp(V("BXorExpr"), V("BOrOp"), "BOrExpr"), -- ./lepton/lpt-parser/parser.lua:545
+["BXorExpr"] = chainOp(V("BAndExpr"), V("BXorOp"), "BXorExpr"), -- ./lepton/lpt-parser/parser.lua:546
+["BAndExpr"] = chainOp(V("ShiftExpr"), V("BAndOp"), "BAndExpr"), -- ./lepton/lpt-parser/parser.lua:547
+["ShiftExpr"] = chainOp(V("ConcatExpr"), V("ShiftOp"), "ShiftExpr"), -- ./lepton/lpt-parser/parser.lua:548
+["ConcatExpr"] = V("TConcatExpr") * (V("ConcatOp") * e(V("ConcatExpr"), "ConcatExpr")) ^ - 1 / binaryOp, -- ./lepton/lpt-parser/parser.lua:549
+["TConcatExpr"] = V("AddExpr") * (V("TConcatOp") * e(V("TConcatExpr"), "TConcatExpr")) ^ - 1 / binaryOp, -- ./lepton/lpt-parser/parser.lua:550
+["AddExpr"] = chainOp(V("MulExpr"), V("AddOp"), "AddExpr"), -- ./lepton/lpt-parser/parser.lua:551
+["MulExpr"] = chainOp(V("UnaryExpr"), V("MulOp"), "MulExpr"), -- ./lepton/lpt-parser/parser.lua:552
+["UnaryExpr"] = V("UnaryOp") * e(V("UnaryExpr"), "UnaryExpr") / unaryOp + V("PowExpr"), -- ./lepton/lpt-parser/parser.lua:554
+["PowExpr"] = V("SimpleExpr") * (V("PowOp") * e(V("UnaryExpr"), "PowExpr")) ^ - 1 / binaryOp, -- ./lepton/lpt-parser/parser.lua:555
+["SimpleExpr"] = tagC("Number", V("Number")) + tagC("Nil", kw("nil")) + tagC("Boolean", kw("false") * Cc(false)) + tagC("Boolean", kw("true") * Cc(true)) + tagC("Dots", sym("...")) + V("FuncDef") + V("ArrowFuncDef") + (when("lexpr") * tagC("LetExpr", mb(V("DestructuringNameList")) * sym("=") * - sym("=") * e(V("ExprList"), "EListLAssign"))) + V("SuffixedExpr") + V("StatExpr"), -- ./lepton/lpt-parser/parser.lua:565
+["StatExpr"] = (V("IfStat") + V("DoStat") + V("WhileStat") + V("RepeatStat") + V("ForStat")) / statToExpr, -- ./lepton/lpt-parser/parser.lua:567
+["FuncCall"] = Cmt(V("SuffixedExpr"), function(s, i, exp) -- ./lepton/lpt-parser/parser.lua:569
+return exp["tag"] == "Call" or exp["tag"] == "SafeCall", exp -- ./lepton/lpt-parser/parser.lua:569
+end), -- ./lepton/lpt-parser/parser.lua:569
+["VarExpr"] = Cmt(V("SuffixedExpr"), function(s, i, exp) -- ./lepton/lpt-parser/parser.lua:570
+return exp["tag"] == "Id" or exp["tag"] == "Index", exp -- ./lepton/lpt-parser/parser.lua:570
+end), -- ./lepton/lpt-parser/parser.lua:570
+["SuffixedExpr"] = Cf(V("PrimaryExpr") * (V("Index") + V("MethodStub") + V("Call")) ^ 0 + V("NoCallPrimaryExpr") * - V("Call") * (V("Index") + V("MethodStub") + V("Call")) ^ 0 + V("NoCallPrimaryExpr"), makeSuffixedExpr), -- ./lepton/lpt-parser/parser.lua:574
+["PrimaryExpr"] = V("SelfId") * (V("SelfCall") + V("SelfIndex")) + V("Id") + tagC("Paren", sym("(") * e(V("Expr"), "ExprParen") * e(sym(")"), "CParenExpr")), -- ./lepton/lpt-parser/parser.lua:577
+["NoCallPrimaryExpr"] = tagC("String", V("String")) + V("Table") + V("TableCompr"), -- ./lepton/lpt-parser/parser.lua:578
+["Index"] = tagC("DotIndex", sym("." * - P(".")) * e(V("StrId"), "NameIndex")) + tagC("ArrayIndex", sym("[" * - P(S("=["))) * e(V("Expr"), "ExprIndex") * e(sym("]"), "CBracketIndex")) + tagC("SafeDotIndex", sym("?." * - P(".")) * e(V("StrId"), "NameIndex")) + tagC("SafeArrayIndex", sym("?[" * - P(S("=["))) * e(V("Expr"), "ExprIndex") * e(sym("]"), "CBracketIndex")), -- ./lepton/lpt-parser/parser.lua:582
+["MethodStub"] = tagC("MethodStub", sym(":" * - P(":")) * e(V("StrId"), "NameMeth")) + tagC("SafeMethodStub", sym("?:" * - P(":")) * e(V("StrId"), "NameMeth")), -- ./lepton/lpt-parser/parser.lua:584
+["Call"] = tagC("Call", V("FuncArgs")) + tagC("SafeCall", P("?") * V("FuncArgs")), -- ./lepton/lpt-parser/parser.lua:586
+["SelfCall"] = tagC("MethodStub", V("StrId")) * V("Call"), -- ./lepton/lpt-parser/parser.lua:587
+["SelfIndex"] = tagC("DotIndex", V("StrId")), -- ./lepton/lpt-parser/parser.lua:588
+["FuncDef"] = (kw("fn") * V("FuncBody")), -- ./lepton/lpt-parser/parser.lua:590
+["FuncArgs"] = sym("(") * commaSep(V("Expr"), "ArgList") ^ - 1 * e(sym(")"), "CParenArgs"), -- ./lepton/lpt-parser/parser.lua:591
+["Table"] = tagC("Table", sym("{") * V("FieldList") ^ - 1 * e(sym("}"), "CBraceTable")), -- ./lepton/lpt-parser/parser.lua:593
+["FieldList"] = sepBy(V("Field"), V("FieldSep")) * V("FieldSep") ^ - 1, -- ./lepton/lpt-parser/parser.lua:594
+["Field"] = tagC("Pair", V("FieldKey") * e(sym("="), "EqField") * e(V("Expr"), "ExprField")) / fixLuaKeywords + V("Expr"), -- ./lepton/lpt-parser/parser.lua:596
+["FieldKey"] = sym("[" * - P(S("=["))) * e(V("Expr"), "ExprFKey") * e(sym("]"), "CBracketFKey") + V("StrId") * # ("=" * - P("=")), -- ./lepton/lpt-parser/parser.lua:598
+["FieldSep"] = sym(",") + sym(";"), -- ./lepton/lpt-parser/parser.lua:599
+["TableCompr"] = tagC("TableCompr", sym("[") * V("Block") * e(sym("]"), "CBracketTableCompr")), -- ./lepton/lpt-parser/parser.lua:601
+["SelfId"] = tagC("Id", sym("@") / "self"), -- ./lepton/lpt-parser/parser.lua:603
+["Id"] = (tagC("Id", V("Name")) / fixLuaKeywords) + V("SelfId"), -- ./lepton/lpt-parser/parser.lua:604
+["AttributeSelfId"] = tagC("AttributeId", sym("@") / "self" * V("Attribute") ^ - 1), -- ./lepton/lpt-parser/parser.lua:605
+["AttributeId"] = tagC("AttributeId", V("Name") * V("Attribute") ^ - 1) / fixLuaKeywords + V("AttributeSelfId"), -- ./lepton/lpt-parser/parser.lua:606
+["StrId"] = tagC("String", V("Name")), -- ./lepton/lpt-parser/parser.lua:607
+["Attribute"] = sym("<") * e(kw("const") / "const" + kw("close") / "close", "UnknownAttribute") * e(sym(">"), "CBracketAttribute"), -- ./lepton/lpt-parser/parser.lua:609
+["Skip"] = (V("Space") + V("Comment")) ^ 0, -- ./lepton/lpt-parser/parser.lua:612
+["Space"] = space ^ 1, -- ./lepton/lpt-parser/parser.lua:613
 ["Comment"] = P("--") * V("LongStr") / 0 + P("--") * (P(1) - P("\
-")) ^ 0, -- ./lepton/lpt-parser/parser.lua:613
-["Name"] = token(- V("Reserved") * C(V("Ident"))), -- ./lepton/lpt-parser/parser.lua:615
-["Reserved"] = V("Keywords") * - V("IdRest"), -- ./lepton/lpt-parser/parser.lua:616
-["Keywords"] = P("close") + "const" + "fn" + "global" + "let" + "push" + "break" + "else" + "false" + "for" + "goto" + "if" + "local" + "nil" + "repeat" + "return" + "true" + "until" + "while", -- ./lepton/lpt-parser/parser.lua:621
-["Ident"] = V("IdStart") * V("IdRest") ^ 0, -- ./lepton/lpt-parser/parser.lua:622
-["IdStart"] = alpha + P("_"), -- ./lepton/lpt-parser/parser.lua:623
-["IdRest"] = alnum + P("_"), -- ./lepton/lpt-parser/parser.lua:624
-["Number"] = token(C(V("Hex") + V("Float") + V("Int"))), -- ./lepton/lpt-parser/parser.lua:626
-["Hex"] = (P("0x") + "0X") * ((xdigit ^ 0 * V("DeciHex")) + (e(xdigit ^ 1, "DigitHex") * V("DeciHex") ^ - 1)) * V("ExpoHex") ^ - 1, -- ./lepton/lpt-parser/parser.lua:627
-["Float"] = V("Decimal") * V("Expo") ^ - 1 + V("Int") * V("Expo"), -- ./lepton/lpt-parser/parser.lua:629
-["Decimal"] = digit ^ 1 * "." * digit ^ 0 + P(".") * - P(".") * e(digit ^ 1, "DigitDeci"), -- ./lepton/lpt-parser/parser.lua:631
-["DeciHex"] = P(".") * xdigit ^ 0, -- ./lepton/lpt-parser/parser.lua:632
-["Expo"] = S("eE") * S("+-") ^ - 1 * e(digit ^ 1, "DigitExpo"), -- ./lepton/lpt-parser/parser.lua:633
-["ExpoHex"] = S("pP") * S("+-") ^ - 1 * e(xdigit ^ 1, "DigitExpo"), -- ./lepton/lpt-parser/parser.lua:634
-["Int"] = digit ^ 1, -- ./lepton/lpt-parser/parser.lua:635
-["String"] = token(V("ShortStr") + V("LongStr")), -- ./lepton/lpt-parser/parser.lua:637
+")) ^ 0, -- ./lepton/lpt-parser/parser.lua:615
+["Name"] = token(- V("Reserved") * C(V("Ident"))), -- ./lepton/lpt-parser/parser.lua:617
+["Reserved"] = V("Keywords") * - V("IdRest"), -- ./lepton/lpt-parser/parser.lua:618
+["Keywords"] = P("close") + "const" + "fn" + "global" + "let" + "push" + "break" + "else" + "false" + "for" + "goto" + "if" + "local" + "nil" + "repeat" + "return" + "true" + "until" + "while", -- ./lepton/lpt-parser/parser.lua:623
+["Ident"] = V("IdStart") * V("IdRest") ^ 0, -- ./lepton/lpt-parser/parser.lua:624
+["IdStart"] = alpha + P("_"), -- ./lepton/lpt-parser/parser.lua:625
+["IdRest"] = alnum + P("_"), -- ./lepton/lpt-parser/parser.lua:626
+["Number"] = token(C(V("Hex") + V("Float") + V("Int"))), -- ./lepton/lpt-parser/parser.lua:628
+["Hex"] = (P("0x") + "0X") * ((xdigit ^ 0 * V("DeciHex")) + (e(xdigit ^ 1, "DigitHex") * V("DeciHex") ^ - 1)) * V("ExpoHex") ^ - 1, -- ./lepton/lpt-parser/parser.lua:629
+["Float"] = V("Decimal") * V("Expo") ^ - 1 + V("Int") * V("Expo"), -- ./lepton/lpt-parser/parser.lua:631
+["Decimal"] = digit ^ 1 * "." * digit ^ 0 + P(".") * - P(".") * e(digit ^ 1, "DigitDeci"), -- ./lepton/lpt-parser/parser.lua:633
+["DeciHex"] = P(".") * xdigit ^ 0, -- ./lepton/lpt-parser/parser.lua:634
+["Expo"] = S("eE") * S("+-") ^ - 1 * e(digit ^ 1, "DigitExpo"), -- ./lepton/lpt-parser/parser.lua:635
+["ExpoHex"] = S("pP") * S("+-") ^ - 1 * e(xdigit ^ 1, "DigitExpo"), -- ./lepton/lpt-parser/parser.lua:636
+["Int"] = digit ^ 1, -- ./lepton/lpt-parser/parser.lua:637
+["String"] = token(V("ShortStr") + V("LongStr")), -- ./lepton/lpt-parser/parser.lua:639
 ["ShortStr"] = P("\"") * Cs((V("EscSeq") + (P(1) - S("\"\
 "))) ^ 0) * e(P("\""), "Quote") + P("'") * Cs((V("EscSeq") + (P(1) - S("'\
-"))) ^ 0) * e(P("'"), "Quote"), -- ./lepton/lpt-parser/parser.lua:639
+"))) ^ 0) * e(P("'"), "Quote"), -- ./lepton/lpt-parser/parser.lua:641
 ["EscSeq"] = P("\\") / "" * (P("a") / "\7" + P("b") / "\8" + P("f") / "\12" + P("n") / "\
 " + P("r") / "\13" + P("t") / "\9" + P("v") / "\11" + P("\
 ") / "\
 " + P("\13") / "\
-" + P("\\") / "\\" + P("\"") / "\"" + P("'") / "'" + P("z") * space ^ 0 / "" + digit * digit ^ - 2 / tonumber / string["char"] + P("x") * e(C(xdigit * xdigit), "HexEsc") * Cc(16) / tonumber / string["char"] + P("u") * e("{", "OBraceUEsc") * e(C(xdigit ^ 1), "DigitUEsc") * Cc(16) * e("}", "CBraceUEsc") / tonumber / (utf8 and utf8["char"] or string["char"]) + throw("EscSeq")), -- ./lepton/lpt-parser/parser.lua:669
-["LongStr"] = V("Open") * C((P(1) - V("CloseEq")) ^ 0) * e(V("Close"), "CloseLStr") / function(s, eqs) -- ./lepton/lpt-parser/parser.lua:672
-return s -- ./lepton/lpt-parser/parser.lua:672
-end, -- ./lepton/lpt-parser/parser.lua:672
+" + P("\\") / "\\" + P("\"") / "\"" + P("'") / "'" + P("z") * space ^ 0 / "" + digit * digit ^ - 2 / tonumber / string["char"] + P("x") * e(C(xdigit * xdigit), "HexEsc") * Cc(16) / tonumber / string["char"] + P("u") * e("{", "OBraceUEsc") * e(C(xdigit ^ 1), "DigitUEsc") * Cc(16) * e("}", "CBraceUEsc") / tonumber / (utf8 and utf8["char"] or string["char"]) + throw("EscSeq")), -- ./lepton/lpt-parser/parser.lua:671
+["LongStr"] = V("Open") * C((P(1) - V("CloseEq")) ^ 0) * e(V("Close"), "CloseLStr") / function(s, eqs) -- ./lepton/lpt-parser/parser.lua:674
+return s -- ./lepton/lpt-parser/parser.lua:674
+end, -- ./lepton/lpt-parser/parser.lua:674
 ["Open"] = "[" * Cg(V("Equals"), "openEq") * "[" * P("\
-") ^ - 1, -- ./lepton/lpt-parser/parser.lua:673
-["Close"] = "]" * C(V("Equals")) * "]", -- ./lepton/lpt-parser/parser.lua:674
-["Equals"] = P("=") ^ 0, -- ./lepton/lpt-parser/parser.lua:675
-["CloseEq"] = Cmt(V("Close") * Cb("openEq"), function(s, i, closeEq, openEq) -- ./lepton/lpt-parser/parser.lua:676
-return # openEq == # closeEq -- ./lepton/lpt-parser/parser.lua:676
-end), -- ./lepton/lpt-parser/parser.lua:676
-["OrOp"] = sym("||") / "or", -- ./lepton/lpt-parser/parser.lua:678
-["AndOp"] = sym("&&") / "and", -- ./lepton/lpt-parser/parser.lua:679
-["RelOp"] = sym("!=") / "ne" + sym("==") / "eq" + sym("<=") / "le" + sym(">=") / "ge" + sym("<") / "lt" + sym(">") / "gt" + sym("%%") / "divb", -- ./lepton/lpt-parser/parser.lua:686
-["BOrOp"] = sym("|" - P("||")) / "bor", -- ./lepton/lpt-parser/parser.lua:687
-["BXorOp"] = sym("~") / "bxor", -- ./lepton/lpt-parser/parser.lua:688
-["BAndOp"] = sym("&" - P("&&")) / "band", -- ./lepton/lpt-parser/parser.lua:689
-["ShiftOp"] = sym("<<") / "shl" + sym(">>") / "shr", -- ./lepton/lpt-parser/parser.lua:691
-["ConcatOp"] = sym("++") / "concat", -- ./lepton/lpt-parser/parser.lua:692
-["AddOp"] = sym("+" - P("++")) / "add" + sym("-" - P("->")) / "sub", -- ./lepton/lpt-parser/parser.lua:694
-["MulOp"] = sym("*") / "mul" + sym("//") / "idiv" + sym("/") / "div" + sym("%" - P("%%")) / "mod", -- ./lepton/lpt-parser/parser.lua:698
-["UnaryOp"] = sym("!") / "not" + sym("-") / "unm" + sym("#") / "len" + sym("~") / "bnot", -- ./lepton/lpt-parser/parser.lua:702
-["PowOp"] = sym("^") / "pow", -- ./lepton/lpt-parser/parser.lua:703
-["BinOp"] = V("OrOp") + V("AndOp") + V("BOrOp") + V("BXorOp") + V("BAndOp") + V("ShiftOp") + V("ConcatOp") + V("AddOp") + V("MulOp") + V("PowOp") -- ./lepton/lpt-parser/parser.lua:704
-} -- ./lepton/lpt-parser/parser.lua:704
-local macroidentifier = { -- ./lepton/lpt-parser/parser.lua:709
-e(V("MacroIdentifier"), "InvalidStat") * e(P(- 1), "Extra"), -- ./lepton/lpt-parser/parser.lua:710
-["MacroIdentifier"] = tagC("MacroFunction", V("Id") * sym("(") * V("MacroFunctionArgs") * e(sym(")"), "CParenPList")) + V("Id"), -- ./lepton/lpt-parser/parser.lua:713
-["MacroFunctionArgs"] = V("NameList") * (sym(",") * e(tagC("Dots", sym("...")), "ParList")) ^ - 1 / addDots + Ct(tagC("Dots", sym("..."))) + Ct(Cc()) -- ./lepton/lpt-parser/parser.lua:717
-} -- ./lepton/lpt-parser/parser.lua:717
-for k, v in pairs(G) do -- ./lepton/lpt-parser/parser.lua:721
-if macroidentifier[k] == nil then -- ./lepton/lpt-parser/parser.lua:722
-macroidentifier[k] = v -- ./lepton/lpt-parser/parser.lua:723
-end -- ./lepton/lpt-parser/parser.lua:723
-end -- ./lepton/lpt-parser/parser.lua:723
-local parser = {} -- ./lepton/lpt-parser/parser.lua:729
-local validator = require("lepton.lpt-parser.validator") -- ./lepton/lpt-parser/parser.lua:731
-local validate = validator["validate"] -- ./lepton/lpt-parser/parser.lua:732
-local syntaxerror = validator["syntaxerror"] -- ./lepton/lpt-parser/parser.lua:733
-parser["parse"] = function(subject, filename) -- ./lepton/lpt-parser/parser.lua:735
-local errorinfo = { -- ./lepton/lpt-parser/parser.lua:736
-["subject"] = subject, -- ./lepton/lpt-parser/parser.lua:736
-["filename"] = filename -- ./lepton/lpt-parser/parser.lua:736
-} -- ./lepton/lpt-parser/parser.lua:736
-lpeg["setmaxstack"](1000) -- ./lepton/lpt-parser/parser.lua:737
-local ast, label, errpos = lpeg["match"](G, subject, nil, errorinfo) -- ./lepton/lpt-parser/parser.lua:738
-if not ast then -- ./lepton/lpt-parser/parser.lua:739
-local errmsg = labels[label][2] -- ./lepton/lpt-parser/parser.lua:740
-return ast, syntaxerror(errorinfo, errpos, errmsg) -- ./lepton/lpt-parser/parser.lua:741
-end -- ./lepton/lpt-parser/parser.lua:741
-return validate(ast, errorinfo) -- ./lepton/lpt-parser/parser.lua:743
-end -- ./lepton/lpt-parser/parser.lua:743
-parser["parsemacroidentifier"] = function(subject, filename) -- ./lepton/lpt-parser/parser.lua:746
-local errorinfo = { -- ./lepton/lpt-parser/parser.lua:747
-["subject"] = subject, -- ./lepton/lpt-parser/parser.lua:747
-["filename"] = filename -- ./lepton/lpt-parser/parser.lua:747
-} -- ./lepton/lpt-parser/parser.lua:747
-lpeg["setmaxstack"](1000) -- ./lepton/lpt-parser/parser.lua:748
-local ast, label, errpos = lpeg["match"](macroidentifier, subject, nil, errorinfo) -- ./lepton/lpt-parser/parser.lua:749
-if not ast then -- ./lepton/lpt-parser/parser.lua:750
-local errmsg = labels[label][2] -- ./lepton/lpt-parser/parser.lua:751
-return ast, syntaxerror(errorinfo, errpos, errmsg) -- ./lepton/lpt-parser/parser.lua:752
-end -- ./lepton/lpt-parser/parser.lua:752
-return ast -- ./lepton/lpt-parser/parser.lua:754
-end -- ./lepton/lpt-parser/parser.lua:754
-return parser -- ./lepton/lpt-parser/parser.lua:757
-end -- ./lepton/lpt-parser/parser.lua:757
-local parser = _() or parser -- ./lepton/lpt-parser/parser.lua:762
-package["loaded"]["lepton.lpt-parser.parser"] = parser or true -- ./lepton/lpt-parser/parser.lua:763
+") ^ - 1, -- ./lepton/lpt-parser/parser.lua:675
+["Close"] = "]" * C(V("Equals")) * "]", -- ./lepton/lpt-parser/parser.lua:676
+["Equals"] = P("=") ^ 0, -- ./lepton/lpt-parser/parser.lua:677
+["CloseEq"] = Cmt(V("Close") * Cb("openEq"), function(s, i, closeEq, openEq) -- ./lepton/lpt-parser/parser.lua:678
+return # openEq == # closeEq -- ./lepton/lpt-parser/parser.lua:678
+end), -- ./lepton/lpt-parser/parser.lua:678
+["OrOp"] = sym("||") / "or", -- ./lepton/lpt-parser/parser.lua:680
+["AndOp"] = sym("&&") / "and", -- ./lepton/lpt-parser/parser.lua:681
+["RelOp"] = sym("!=") / "ne" + sym("==") / "eq" + sym("<=") / "le" + sym(">=") / "ge" + sym("<") / "lt" + sym(">") / "gt" + sym("%%") / "divb", -- ./lepton/lpt-parser/parser.lua:688
+["BOrOp"] = sym("|" - P("||")) / "bor", -- ./lepton/lpt-parser/parser.lua:689
+["BXorOp"] = sym("~") / "bxor", -- ./lepton/lpt-parser/parser.lua:690
+["BAndOp"] = sym("&" - P("&&")) / "band", -- ./lepton/lpt-parser/parser.lua:691
+["ShiftOp"] = sym("<<") / "shl" + sym(">>") / "shr", -- ./lepton/lpt-parser/parser.lua:693
+["ConcatOp"] = sym("++") / "concat", -- ./lepton/lpt-parser/parser.lua:694
+["TConcatOp"] = sym("+++") / "tconcat", -- ./lepton/lpt-parser/parser.lua:695
+["AddOp"] = sym("+" - P("++")) / "add" + sym("-" - P("->")) / "sub", -- ./lepton/lpt-parser/parser.lua:697
+["AppendOp"] = sym("#=") / "tappend", -- ./lepton/lpt-parser/parser.lua:698
+["MulOp"] = sym("*") / "mul" + sym("//") / "idiv" + sym("/") / "div" + sym("%" - P("%%")) / "mod", -- ./lepton/lpt-parser/parser.lua:702
+["UnaryOp"] = sym("!") / "not" + sym("-") / "unm" + sym("#" - P("#=")) / "len" + sym("~") / "bnot", -- ./lepton/lpt-parser/parser.lua:706
+["PowOp"] = sym("^") / "pow", -- ./lepton/lpt-parser/parser.lua:707
+["BinOp"] = V("OrOp") + V("AndOp") + V("BOrOp") + V("BXorOp") + V("BAndOp") + V("ShiftOp") + V("ConcatOp") + V("TConcatOp") + V("AddOp") + V("MulOp") + V("PowOp") -- ./lepton/lpt-parser/parser.lua:708
+} -- ./lepton/lpt-parser/parser.lua:708
+local macroidentifier = { -- ./lepton/lpt-parser/parser.lua:713
+e(V("MacroIdentifier"), "InvalidStat") * e(P(- 1), "Extra"), -- ./lepton/lpt-parser/parser.lua:714
+["MacroIdentifier"] = tagC("MacroFunction", V("Id") * sym("(") * V("MacroFunctionArgs") * e(sym(")"), "CParenPList")) + V("Id"), -- ./lepton/lpt-parser/parser.lua:717
+["MacroFunctionArgs"] = V("NameList") * (sym(",") * e(tagC("Dots", sym("...")), "ParList")) ^ - 1 / addDots + Ct(tagC("Dots", sym("..."))) + Ct(Cc()) -- ./lepton/lpt-parser/parser.lua:721
+} -- ./lepton/lpt-parser/parser.lua:721
+for k, v in pairs(G) do -- ./lepton/lpt-parser/parser.lua:725
+if macroidentifier[k] == nil then -- ./lepton/lpt-parser/parser.lua:726
+macroidentifier[k] = v -- ./lepton/lpt-parser/parser.lua:727
+end -- ./lepton/lpt-parser/parser.lua:727
+end -- ./lepton/lpt-parser/parser.lua:727
+local parser = {} -- ./lepton/lpt-parser/parser.lua:733
+local validator = require("lepton.lpt-parser.validator") -- ./lepton/lpt-parser/parser.lua:735
+local validate = validator["validate"] -- ./lepton/lpt-parser/parser.lua:736
+local syntaxerror = validator["syntaxerror"] -- ./lepton/lpt-parser/parser.lua:737
+parser["parse"] = function(subject, filename) -- ./lepton/lpt-parser/parser.lua:739
+local errorinfo = { -- ./lepton/lpt-parser/parser.lua:740
+["subject"] = subject, -- ./lepton/lpt-parser/parser.lua:740
+["filename"] = filename -- ./lepton/lpt-parser/parser.lua:740
+} -- ./lepton/lpt-parser/parser.lua:740
+lpeg["setmaxstack"](1000) -- ./lepton/lpt-parser/parser.lua:741
+local ast, label, errpos = lpeg["match"](G, subject, nil, errorinfo) -- ./lepton/lpt-parser/parser.lua:742
+if not ast then -- ./lepton/lpt-parser/parser.lua:743
+local errmsg = labels[label][2] -- ./lepton/lpt-parser/parser.lua:744
+return ast, syntaxerror(errorinfo, errpos, errmsg) -- ./lepton/lpt-parser/parser.lua:745
+end -- ./lepton/lpt-parser/parser.lua:745
+return validate(ast, errorinfo) -- ./lepton/lpt-parser/parser.lua:747
+end -- ./lepton/lpt-parser/parser.lua:747
+parser["parsemacroidentifier"] = function(subject, filename) -- ./lepton/lpt-parser/parser.lua:750
+local errorinfo = { -- ./lepton/lpt-parser/parser.lua:751
+["subject"] = subject, -- ./lepton/lpt-parser/parser.lua:751
+["filename"] = filename -- ./lepton/lpt-parser/parser.lua:751
+} -- ./lepton/lpt-parser/parser.lua:751
+lpeg["setmaxstack"](1000) -- ./lepton/lpt-parser/parser.lua:752
+local ast, label, errpos = lpeg["match"](macroidentifier, subject, nil, errorinfo) -- ./lepton/lpt-parser/parser.lua:753
+if not ast then -- ./lepton/lpt-parser/parser.lua:754
+local errmsg = labels[label][2] -- ./lepton/lpt-parser/parser.lua:755
+return ast, syntaxerror(errorinfo, errpos, errmsg) -- ./lepton/lpt-parser/parser.lua:756
+end -- ./lepton/lpt-parser/parser.lua:756
+return ast -- ./lepton/lpt-parser/parser.lua:758
+end -- ./lepton/lpt-parser/parser.lua:758
+return parser -- ./lepton/lpt-parser/parser.lua:761
+end -- ./lepton/lpt-parser/parser.lua:761
+local parser = _() or parser -- ./lepton/lpt-parser/parser.lua:766
+package["loaded"]["lepton.lpt-parser.parser"] = parser or true -- ./lepton/lpt-parser/parser.lua:767
 local unpack = unpack or table["unpack"] -- lepton.lpt:20
 lepton["default"] = { -- lepton.lpt:23
 ["target"] = "lua54", -- lepton.lpt:24
