@@ -79,6 +79,8 @@ lpeg.locale(lpeg)
 local P, S, V = lpeg.P, lpeg.S, lpeg.V
 local C, Carg, Cb, Cc = lpeg.C, lpeg.Carg, lpeg.Cb, lpeg.Cc
 local Cf, Cg, Cmt, Cp, Cs, Ct = lpeg.Cf, lpeg.Cg, lpeg.Cmt, lpeg.Cp, lpeg.Cs, lpeg.Ct
+
+-- lpeglabel
 local Rec, T = lpeg.Rec, lpeg.T
 
 local alpha, digit, alnum = lpeg.alpha, lpeg.digit, lpeg.alnum
@@ -93,10 +95,8 @@ local labels = {
 
     { 'ErrExprIf', [[expected a condition after 'if']] },
     { 'ErrOIf', [[expected '{' after the condition]] },
-    { 'ErrExprEIf', [[expected a condition after 'elseif']] },
-    { 'ErrOEIf', [[expected '{' after the condition]] },
-    { 'ErrOElse', [[expected '{' after 'else']] },
     { 'ErrCIf', [[expected '}' to close the if statement]] },
+    { 'ErrOElse', [[expected '{' after 'else']] },
 
     { 'ErrODo', [[expected '{' after 'do']] },
     { 'ErrCDo', [[expected '}' to close the do block]] },
@@ -116,17 +116,17 @@ local labels = {
     { 'ErrForRangeStep', [[expected a step expression for the numeric range after ',']] },
     { 'ErrInFor', [[expected ':' after the variable(s)]] },
     { 'ErrEListFor', [[expected one or more expressions after ':']] },
-    { 'ErrCFor', [[expected 'end' to close the for loop]] },
+    { 'ErrCFor', [[expected '}' to close the for loop]] },
 
-    { 'ErrDefLocal', [[expected a function definition or assignment after local]] },
-    { 'ErrDefLet', [[expected an assignment after let]] },
-    { 'ErrDefClose', [[expected an assignment after close]] },
-    { 'ErrDefConst', [[expected an assignment after const]] },
-    { 'ErrNameLFunc', [[expected a function name after 'function']] },
+    { 'ErrDefLocal', [[expected a function definition or assignment after 'local']] },
+    { 'ErrDefLet', [[expected an assignment after 'let']] },
+    { 'ErrDefClose', [[expected an assignment after 'close']] },
+    { 'ErrDefConst', [[expected an assignment after 'const']] },
+    { 'ErrNameLFunc', [[expected a function name after 'local fn']] },
     { 'ErrEListLAssign', [[expected one or more expressions after '=']] },
     { 'ErrEListAssign', [[expected one or more expressions after '=']] },
 
-    { 'ErrFuncName', [[expected a function name after 'function']] },
+    { 'ErrFuncName', [[expected a function name after 'fn']] },
     { 'ErrNameFunc1', [[expected a function name after '.']] },
     { 'ErrNameFunc2', [[expected a method name after ':']] },
     { 'ErrOParenPList', [[expected '(' before the parameter list]] },
@@ -296,6 +296,27 @@ local function markMethod(t, method)
     return t
 end
 
+-- lets you name variables with names that are keywords in Lua but not Lepton
+local function fixLuaKeywords(t)
+    local keywords = { 'and', 'do', 'elseif', 'end', 'function', 'in', 'not', 'or', 'then' }
+    if t.tag == 'Pair' then
+        for _, v in pairs(keywords) do
+            if t[1][1] == v then
+                t[1][1] = '_' .. t[1][1]
+                break
+            end
+        end
+    else
+        for _, v in pairs(keywords) do
+            if t[1] == v then
+                t[1] = '_' .. t[1]
+                break
+            end
+        end
+    end
+    return t
+end
+
 local function makeSuffixedExpr(t1, t2)
     if t2.tag == 'Call' or t2.tag == 'SafeCall' then
         local t = { tag = t2.tag, pos = t1.pos, [1] = t1 }
@@ -304,11 +325,11 @@ local function makeSuffixedExpr(t1, t2)
         end
         return t
     elseif t2.tag == 'MethodStub' or t2.tag == 'SafeMethodStub' then
-        return { tag = t2.tag, pos = t1.pos, [1] = t1, [2] = t2[1] }
+        return { tag = t2.tag, pos = t1.pos, [1] = t1, [2] = fixLuaKeywords(t2[1]) }
     elseif t2.tag == 'SafeDotIndex' or t2.tag == 'SafeArrayIndex' then
-        return { tag = 'SafeIndex', pos = t1.pos, [1] = t1, [2] = t2[1] }
+        return { tag = 'SafeIndex', pos = t1.pos, [1] = t1, [2] = fixLuaKeywords(t2[1]) }
     elseif t2.tag == 'DotIndex' or t2.tag == 'ArrayIndex' then
-        return { tag = 'Index', pos = t1.pos, [1] = t1, [2] = t2[1] }
+        return { tag = 'Index', pos = t1.pos, [1] = t1, [2] = fixLuaKeywords(t2[1]) }
     else
         error('unexpected tag in suffixed expression')
     end
@@ -323,19 +344,6 @@ local function fixArrowFunc(t)
     t.is_short = true
     return t
 end
-
--- TODO: version for => self methods
--- local function fixArrowFunc(t)
---     require('lepton.lpt-parser.pp').dump(t)
---     if t[2].tag == 'SelfArrow' then -- self method
---         table.insert(t[1], 1, { tag = 'Id', 'self' })
---         table.remove(t, 2)
---         t.is_method = true
---     end
---     t.is_short = true
---     require('lepton.lpt-parser.pp').dump(t)
---     return t
--- end
 
 local function markImplicit(t)
     t.implicit = true
@@ -454,14 +462,14 @@ local G = { V'Lua',
                 + V'FuncCall' + V'Assignment'
                 + V'ContinueStat' + V'PushStat'
                 + sym(';');
-    BlockEnd    = P'return' + sym('}') + (sym('}') * 'elseif') + (sym('}') * 'else') + (sym('}') * 'until') + ']' + -1 + V'ImplicitPushStat' + V'Assignment';
+    BlockEnd    = P'return' + sym('}') + ']' + -1 + V'ImplicitPushStat' + V'Assignment';
 
     SingleStatBlock = tagC('Block', V'Stat' + V'RetStat' + V'ImplicitPushStat');
     BlockNoErr      = tagC('Block', V'Stat'^0 * ((V'RetStat' + V'ImplicitPushStat') * sym(';')^-1)^-1); -- used to check if something a valid block without throwing an error
 
     IfStat      = tagC('If', V'IfPart');
     IfPart      = kw('if') * set('lexpr', e(parenAround(V'Expr'), 'ExprIf')) * eBlkStartEndOrSingleStat('OIf', 'CIf', V'ElseIfPart' + V'ElsePart');
-    ElseIfPart  = kw('elseif') * set('lexpr', e(parenAround(V'Expr'), 'ExprEIf')) * eBlkStartEndOrSingleStat('OEIf', 'CIf', V'ElseIfPart' + V'ElsePart');
+    ElseIfPart  = kw('else') * V'IfPart';
     ElsePart    = kw('else') * eBlkStartEndOrSingleStat('OElse', 'CIf');
 
     DoStat      = kw('do') * eBlkStartEndOrSingleStat('ODo', 'CDo') / tagDo;
@@ -477,7 +485,7 @@ local G = { V'Lua',
     ForBody   = eBlkStartEndOrSingleStat('OFor', 'CFor');
 
     LocalStat    = kw('local') * e(V'LocalFunc' + V'LocalAssign', 'DefLocal');
-    LocalFunc    = tagC('Localrec', kw('function') * e(V'Id', 'NameLFunc') * V'FuncBody') / fixFuncStat;
+    LocalFunc    = tagC('Localrec', kw('fn') * e(V'Id', 'NameLFunc') * V'FuncBody') / fixFuncStat;
     LocalAssign  = tagC('Local', V'AttributeNameList' * (sym('=') * e(V'ExprList', 'EListLAssign') + Ct(Cc())))
                  + tagC('Local', V'DestructuringNameList' * sym('=') * e(V'ExprList', 'EListLAssign'));
 
@@ -493,7 +501,7 @@ local G = { V'Lua',
     Assignment  = tagC('Set', (V'VarList' + V'DestructuringNameList') * V'BinOp'^-1 * ((P'=' - '==') / '=')
                 * ((V'BinOp' - P'-') + #(P'-' * V'Space') * V'BinOp')^-1 * V'Skip' * e(V'ExprList', 'EListAssign'));
 
-    FuncStat    = tagC('Set', kw('function') * e(V'FuncName', 'FuncName') * V'FuncBody') / fixFuncStat;
+    FuncStat    = tagC('Set', kw('fn') * e(V'FuncName', 'FuncName') * V'FuncBody') / fixFuncStat;
     FuncName    = Cf(V'Id' * (sym('.') * e(V'StrId', 'NameFunc1'))^0, insertIndex)
                 * (sym(':') * e(V'StrId', 'NameFunc2'))^-1 / markMethod;
     FuncBody    = tagC('Function', V'FuncParams' * eBlkStartEndOrSingleStat('OFunc', 'CFunc'));
@@ -522,8 +530,8 @@ local G = { V'Lua',
     NameList              = tagC('NameList', commaSep(V'Id'));
     DestructuringNameList = tagC('NameList', commaSep(V'DestructuringId')),
     AttributeNameList     = tagC('AttributeNameList', commaSep(V'AttributeId'));
-    VarList   = tagC('VarList', commaSep(V'VarExpr'));
-    ExprList  = tagC('ExpList', commaSep(V'Expr', 'ExprList'));
+    VarList               = tagC('VarList', commaSep(V'VarExpr'));
+    ExprList              = tagC('ExpList', commaSep(V'Expr', 'ExprList'));
 
     DestructuringId          = tagC('DestructuringId', sym('{') * V'DestructuringIdFieldList' * e(sym('}'), 'CBraceDestructuring')) + V'Id',
     DestructuringIdFieldList = sepBy(V'DestructuringIdField', V'FieldSep') * V'FieldSep'^-1;
@@ -577,12 +585,12 @@ local G = { V'Lua',
     SelfCall          = tagC('MethodStub', V'StrId') * V'Call';
     SelfIndex         = tagC('DotIndex', V'StrId');
 
-    FuncDef   = (kw('function') * V'FuncBody');
+    FuncDef   = (kw('fn') * V'FuncBody');
     FuncArgs  = sym('(') * commaSep(V'Expr', 'ArgList')^-1 * e(sym(')'), 'CParenArgs');
 
     Table      = tagC('Table', sym('{') * V'FieldList'^-1 * e(sym('}'), 'CBraceTable'));
     FieldList  = sepBy(V'Field', V'FieldSep') * V'FieldSep'^-1;
-    Field      = tagC('Pair', V'FieldKey' * e(sym('='), 'EqField') * e(V'Expr', 'ExprField'))
+    Field      = tagC('Pair', V'FieldKey' * e(sym('='), 'EqField') * e(V'Expr', 'ExprField')) / fixLuaKeywords
                + V'Expr';
     FieldKey   = sym('[' * -P(S'=[')) * e(V'Expr', 'ExprFKey') * e(sym(']'), 'CBracketFKey')
                + V'StrId' * #('=' * -P'=');
@@ -591,9 +599,9 @@ local G = { V'Lua',
     TableCompr = tagC('TableCompr', sym('[') * V'Block' * e(sym(']'), 'CBracketTableCompr'));
 
     SelfId = tagC('Id', sym('@') / 'self');
-    Id     = tagC('Id', V'Name') + V'SelfId';
+    Id     = (tagC('Id', V'Name') / fixLuaKeywords) + V'SelfId';
     AttributeSelfId = tagC('AttributeId', sym'@' / 'self' * V'Attribute'^-1);
-    AttributeId     = tagC('AttributeId', V'Name' * V'Attribute'^-1) + V'AttributeSelfId';
+    AttributeId     = tagC('AttributeId', V'Name' * V'Attribute'^-1) / fixLuaKeywords + V'AttributeSelfId';
     StrId  = tagC('String', V'Name');
 
     Attribute = sym('<') * e(kw'const' / 'const' + kw'close' / 'close', 'UnknownAttribute') * e(sym('>'), 'CBracketAttribute');
@@ -604,15 +612,16 @@ local G = { V'Lua',
     Comment  = P'--' * V'LongStr' / 0
              + P'--' * (P(1) - P'\n')^0;
 
-    Name      = token(-V'Reserved' * C(V'Ident'));
-    Reserved  = V'Keywords' * -V'IdRest';
-    Keywords  = P'break' + 'elseif' + 'else'
-              + 'false' + 'for' + 'function' + 'goto'
-              + 'if' + 'local' + 'nil' + 'repeat'
-              + 'return' + 'true' + 'until' + 'while';
-    Ident     = V'IdStart' * V'IdRest'^0;
-    IdStart   = alpha + P'_';
-    IdRest    = alnum + P'_';
+    Name        = token(-V'Reserved' * C(V'Ident'));
+    Reserved    = V'Keywords' * -V'IdRest';
+    Keywords    = P'close' + 'const' + 'fn' + 'global'
+                + 'let' + 'push' + 'break' + 'else'
+                + 'false' + 'for' + 'goto' + 'if'
+                + 'local' + 'nil' + 'repeat'
+                + 'return' + 'true' + 'until' + 'while';
+    Ident       = V'IdStart' * V'IdRest'^0;
+    IdStart     = alpha + P'_';
+    IdRest      = alnum + P'_';
 
     Number   = token(C(V'Hex' + V'Float' + V'Int'));
     Hex      = (P'0x' + '0X') * ((xdigit^0 * V'DeciHex') + (e(xdigit^1, 'DigitHex') * V'DeciHex'^-1)) * V'ExpoHex'^-1;

@@ -209,7 +209,7 @@ return a
 ]], 42)
 
 test('preprocessor macro replace function with function', [[
-#define('test(x)', function(x) { return ('%s = 42'):format(x) })
+#define('test(x)', x -> ('%s = 42'):format(x))
 test(hello)
 return hello
 ]], 42)
@@ -342,7 +342,7 @@ test('left+right assignment operators priority', [[
 
 -- {{{ default function parameters
 test('default parameters', [[
-    local function test(hey, def='re', no, foo=('bar'):gsub('bar', 'batru')) {
+    local fn test(hey, def='re', no, foo=('bar'):gsub('bar', 'batru')) {
         return def ++ foo
     }
     return test(78, 'SANDWICH', true)
@@ -352,7 +352,7 @@ test('default parameters', [[
 -- {{{ @ as self alias
 test('@ as self alias', [[
     local a = {}
-    function a:hey() {
+    fn a:hey() {
         return @ == self
     }
     return a:hey()
@@ -366,7 +366,7 @@ test('@ as self alias and indexation', [[
     local a = {
         foo = 'Hoi'
     }
-    function a:hey() {
+    fn a:hey() {
         return @.foo
     }
     return a:hey()
@@ -382,7 +382,7 @@ test('@name indexation', [[
     local a = {
         foo = 'Hoi'
     }
-    function a:hey() {
+    fn a:hey() {
         return @foo
     }
     return a:hey()
@@ -397,11 +397,11 @@ test('@name indexation with arrow method', [[
 test('@name method call', [[
     local a = {
         foo = 'Hoi',
-        bar = function(self) {
+        bar = fn(self) {
             return self.foo
         }
     }
-    function a:hey() {
+    fn a:hey() {
         return @bar()
     }
     return a:hey()
@@ -420,7 +420,7 @@ test('@[expt] indexation', [[
     local a = {
         foo = 'Hoi'
     }
-    function a:hey() {
+    fn a:hey() {
         return @['foo']
     }
     return a:hey()
@@ -514,7 +514,7 @@ test('arrow method with multiple parameters and implicit return', [[
 test('arrow function parsing edge cases', [[
     -- Taken from the file I used when solving this horror, too tired to make separate tests.
     x = ''
-    function a(s) {
+    fn a(s) {
         x = x ++ tostring(s || '+')
     }
     k=true
@@ -568,7 +568,7 @@ test('arrow function parsing edge cases', [[
         a()]
     }
     if (a()) { h() }
-    local function f(...) {
+    local fn f(...) {
       if (select('#', ...) == 1) {
         return (...)
       } else {
@@ -583,7 +583,7 @@ test('arrow function parsing edge cases', [[
 -- {{{ let variable declaration
 test('let variable declaration', [[
     let a = {
-        foo = function() {
+        foo = fn() {
             return type(a)
         }
     }
@@ -698,7 +698,7 @@ test('continue keyword in for, used with break', [[
 
 -- {{{ push keyword
 test('push keyword', [[
-    function a() {
+    fn a() {
         for (i : 1, 5) {
             push i, 'next'
         }
@@ -707,13 +707,13 @@ test('push keyword', [[
     return table.concat({a()})
 ]], '1next2next3next4next5nextdone')
 test('push keyword variable length', [[
-    function v() {
+    fn v() {
         return 'hey', 'hop'
     }
-    function w() {
+    fn w() {
         return 'foo', 'bar'
     }
-    function a() {
+    fn a() {
         push 5, v(), w()
         return
     }
@@ -777,13 +777,13 @@ test("one line if", [[
 		a = 0
 	return a
 ]], 5)
-test("one line if-elseif", [[
+test("one line if-else if", [[
 	a = 3
 	if (false)
 		a = 0
-	elseif (true)
+	else if (true)
 		a = 5
-	elseif (false)
+	else if (false)
 		a = -1
 	return a
 ]], 5)
@@ -801,7 +801,7 @@ test("one line while", [[
 ]], 5)
 test("one line function", [[
     a = 3
-    b = function(x)
+    b = fn(x)
         a = x
     a = 0
     b(5)
@@ -826,7 +826,7 @@ test('suffixable string literal array index', [[
 
 -- {{{ table literals
 test('suffixable table literal method', [[
-    return {a=3,len=function(t) { return t.a }}:len()
+    return {a=3,len=fn(t) { return t.a }}:len()
 ]], 3)
 test('suffixable table literal dot index', [[
     return {len=3}.len
@@ -838,7 +838,7 @@ test('suffixable table literal array index', [[
 
 -- {{{ table comprehension
 test('suffixable table comprehension method', [[
-    return [@len = function() { return 3 }]:len()
+    return [@len = fn() { return 3 }]:len()
 ]], 3)
 test('suffixable table comprehension dot index', [[
     return [@len = 3].len
@@ -897,11 +897,11 @@ test('several let in while condition, only test the first', [[
 test('let in if condition', [[
     if (a = false) {
         error('condition was false')
-    } elseif (b = nil) {
+    } else if (b = nil) {
         error('condition was nil')
-    } elseif (c = true) {
+    } else if (c = true) {
         return 'ok'
-    } elseif (d = true) {
+    } else if (d = true) {
         error('should not be reachable')
     }
 ]], 'ok')
@@ -909,13 +909,13 @@ test('let in if condition, scope', [[
     local r
     if (a = false) {
         error('condition was false')
-    } elseif (b = nil) {
+    } else if (b = nil) {
         error('condition was nil')
-    } elseif (c = true) {
+    } else if (c = true) {
         assert(a == false)
         assert(d == nil)
         r = 'ok'
-    } elseif (d = true) {
+    } else if (d = true) {
         error('should not be reachable')
     }
     assert(c == nil)
@@ -924,9 +924,9 @@ test('let in if condition, scope', [[
 test('several let in if condition, only test the first', [[
     if (a = false) {
         error('condition was false')
-    } elseif (b = nil) {
+    } else if (b = nil) {
         error('condition was nil')
-    } elseif (c, d = false, 'ok') {
+    } else if (c, d = false, 'ok') {
         error('should have tested against c')
     } else {
         return d
@@ -945,18 +945,18 @@ test('several let in if condition, evaluation order', [[
 
 -- {{{ method stubs
 test('method stub, basic', [[
-    local t = { s = 'ok', m = function(self) { return self.s } }
+    local t = { s = 'ok', m = fn(self) { return self.s } }
     local f = t:m
     return f()
 ]], 'ok')
 test('method stub, store method', [[
-    local t = { s = 'ok', m = function(self) { return self.s } }
+    local t = { s = 'ok', m = fn(self) { return self.s } }
     local f = t:m
-    t.m = function() { return 'not ok' }
+    t.m = fn() { return 'not ok' }
     return f()
 ]], 'ok')
 test('method stub, store object', [[
-    local t = { s = 'ok', m = function(self) { return self.s } }
+    local t = { s = 'ok', m = fn(self) { return self.s } }
     local f = t:m
     t = {}
     return f()
@@ -972,7 +972,7 @@ test('safe method stub, when nil', [[
     return t?:m
 ]], nil)
 test('safe method stub, when non-nil', [[
-    local t = { s = 'ok', m = function(self) { return self.s } }
+    local t = { s = 'ok', m = fn(self) { return self.s } }
     return t?:m()
 ]], 'ok')
 
@@ -980,7 +980,7 @@ test('safe call, when nil', [[
     return f?()
 ]], nil)
 test('safe call, when non nil', [[
-    f = function() { return 'ok' }
+    f = fn() { return 'ok' }
     return f?()
 ]], 'ok')
 
@@ -993,7 +993,7 @@ test('safe index, when non nil', [[
 ]], 'ok')
 
 test('safe prefixes, random chaining', [[
-    f = { l = { m = function(s) { return s || 'ok' } } }
+    f = { l = { m = fn(s) { return s || 'ok' } } }
     assert(f?.l?.m() == 'ok')
     assert(f?.l?.o == nil)
     assert(f?.l?.o?() == nil)
@@ -1061,11 +1061,11 @@ test('destructuring assignment with if with assignment', [[
         return x + y
     }
 ]], 6)
-test('destructuring assignment with if-elseif with assignment', [[
+test('destructuring assignment with if-else if with assignment', [[
     t = { x = 5, y = 1 }
     if (({u} = t) && u) {
         return 0
-    } elseif ({x, y} = t) {
+    } else if ({x, y} = t) {
         return x + y
     }
 ]], 6)
@@ -1121,11 +1121,11 @@ test('destructuring assignment with if with assignment with custom name', [[
         return x + y
     }
 ]], 6)
-test('destructuring assignment with if-elseif with assignment with custom name', [[
+test('destructuring assignment with if-else if with assignment with custom name', [[
     t = { o = 5, y = 1 }
     if (({x} = t) && x) {
         return 0
-    } elseif ({o = x, y} = t) {
+    } else if ({o = x, y} = t) {
         return x + y
     }
 ]], 6)
@@ -1181,11 +1181,11 @@ test('destructuring assignment with if with assignment with expression as key', 
         return x + y
     }
 ]], 6)
-test('destructuring assignment with if-elseif with assignment with expression as key', [[
+test('destructuring assignment with if-else if with assignment with expression as key', [[
     t = { 5, y = 1 }
     if (({x} = t) && x) {
         return 0
-    } elseif ({[1] = x, y} = t) {
+    } else if ({[1] = x, y} = t) {
         return x + y
     }
 ]], 6)
