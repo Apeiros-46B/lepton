@@ -883,7 +883,11 @@ return function(code, ast, options, macros={functions={}, variables={}})
 			idiv = '//', mod = '%', pow = '^', concat = '..',
 			band = '&', bor = '|', bxor = '~', shl = '<<', shr = '>>',
 			eq = '==', ne = '~=', lt = '<', gt = '>', le = '<=', ge = '>=',
-			['and'] = 'and', ['or'] = 'or', unm = '-', len = '#', bnot = '~', ['not'] = 'not'
+			['and'] = 'and', ['or'] = 'or', unm = '-', len = '#', bnot = '~', ['not'] = 'not',
+
+            divb = (left, right) -- divisibility operator
+                return '((' .. lua(left) .. ') % (' .. lua(right) .. ') == 0)'
+            end,
 		}
 	}, {
 		__index = (self, key)

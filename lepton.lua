@@ -1280,19 +1280,22 @@ end, -- ./compiler/lua54.lpt:876
 ["unm"] = "-", -- ./compiler/lua54.lpt:886
 ["len"] = "#", -- ./compiler/lua54.lpt:886
 ["bnot"] = "~", -- ./compiler/lua54.lpt:886
-["not"] = "not" -- ./compiler/lua54.lpt:886
-} -- ./compiler/lua54.lpt:886
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:889
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:890
-end }) -- ./compiler/lua54.lpt:890
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:896
-return requireStr .. code -- ./compiler/lua54.lpt:897
-end -- ./compiler/lua54.lpt:897
-end -- ./compiler/lua54.lpt:897
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:902
-package["loaded"]["compiler.lua54"] = lua54 or true -- ./compiler/lua54.lpt:903
-local function _() -- ./compiler/lua54.lpt:906
-local function _() -- ./compiler/lua54.lpt:908
+["not"] = "not", -- ./compiler/lua54.lpt:886
+["divb"] = function(left, right) -- ./compiler/lua54.lpt:888
+return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:889
+end -- ./compiler/lua54.lpt:889
+} -- ./compiler/lua54.lpt:889
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:893
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:894
+end }) -- ./compiler/lua54.lpt:894
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:900
+return requireStr .. code -- ./compiler/lua54.lpt:901
+end -- ./compiler/lua54.lpt:901
+end -- ./compiler/lua54.lpt:901
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:906
+package["loaded"]["compiler.lua54"] = lua54 or true -- ./compiler/lua54.lpt:907
+local function _() -- ./compiler/lua54.lpt:910
+local function _() -- ./compiler/lua54.lpt:912
 local util = require("lepton.util") -- ./compiler/lua54.lpt:1
 local targetName = "Lua 5.4" -- ./compiler/lua54.lpt:3
 local unpack = unpack or table["unpack"] -- ./compiler/lua54.lpt:5
@@ -2215,11 +2218,14 @@ end, -- ./compiler/lua54.lpt:876
 ["unm"] = "-", -- ./compiler/lua54.lpt:886
 ["len"] = "#", -- ./compiler/lua54.lpt:886
 ["bnot"] = "~", -- ./compiler/lua54.lpt:886
-["not"] = "not" -- ./compiler/lua54.lpt:886
-} -- ./compiler/lua54.lpt:886
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:889
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:890
-end }) -- ./compiler/lua54.lpt:890
+["not"] = "not", -- ./compiler/lua54.lpt:886
+["divb"] = function(left, right) -- ./compiler/lua54.lpt:888
+return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:889
+end -- ./compiler/lua54.lpt:889
+} -- ./compiler/lua54.lpt:889
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:893
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:894
+end }) -- ./compiler/lua54.lpt:894
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -2228,11 +2234,11 @@ else -- ./compiler/lua53.lpt:6
 return t[1] -- ./compiler/lua53.lpt:8
 end -- ./compiler/lua53.lpt:8
 end -- ./compiler/lua53.lpt:8
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:896
-return requireStr .. code -- ./compiler/lua54.lpt:897
-end -- ./compiler/lua54.lpt:897
-end -- ./compiler/lua54.lpt:897
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:902
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:900
+return requireStr .. code -- ./compiler/lua54.lpt:901
+end -- ./compiler/lua54.lpt:901
+end -- ./compiler/lua54.lpt:901
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:906
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22
@@ -3162,11 +3168,14 @@ end, -- ./compiler/lua54.lpt:876
 ["unm"] = "-", -- ./compiler/lua54.lpt:886
 ["len"] = "#", -- ./compiler/lua54.lpt:886
 ["bnot"] = "~", -- ./compiler/lua54.lpt:886
-["not"] = "not" -- ./compiler/lua54.lpt:886
-} -- ./compiler/lua54.lpt:886
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:889
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:890
-end }) -- ./compiler/lua54.lpt:890
+["not"] = "not", -- ./compiler/lua54.lpt:886
+["divb"] = function(left, right) -- ./compiler/lua54.lpt:888
+return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:889
+end -- ./compiler/lua54.lpt:889
+} -- ./compiler/lua54.lpt:889
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:893
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:894
+end }) -- ./compiler/lua54.lpt:894
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -3200,11 +3209,11 @@ end -- ./compiler/lua52.lpt:23
 tags["_opid"]["bnot"] = function(right) -- ./compiler/lua52.lpt:25
 return "bit32.bnot(" .. lua(right) .. ")" -- ./compiler/lua52.lpt:26
 end -- ./compiler/lua52.lpt:26
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:896
-return requireStr .. code -- ./compiler/lua54.lpt:897
-end -- ./compiler/lua54.lpt:897
-end -- ./compiler/lua54.lpt:897
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:902
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:900
+return requireStr .. code -- ./compiler/lua54.lpt:901
+end -- ./compiler/lua54.lpt:901
+end -- ./compiler/lua54.lpt:901
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:906
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22
@@ -4138,11 +4147,14 @@ end, -- ./compiler/lua54.lpt:876
 ["unm"] = "-", -- ./compiler/lua54.lpt:886
 ["len"] = "#", -- ./compiler/lua54.lpt:886
 ["bnot"] = "~", -- ./compiler/lua54.lpt:886
-["not"] = "not" -- ./compiler/lua54.lpt:886
-} -- ./compiler/lua54.lpt:886
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:889
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:890
-end }) -- ./compiler/lua54.lpt:890
+["not"] = "not", -- ./compiler/lua54.lpt:886
+["divb"] = function(left, right) -- ./compiler/lua54.lpt:888
+return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:889
+end -- ./compiler/lua54.lpt:889
+} -- ./compiler/lua54.lpt:889
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:893
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:894
+end }) -- ./compiler/lua54.lpt:894
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -4204,11 +4216,11 @@ tags["_opid"]["bnot"] = function(right) -- ./compiler/luajit.lpt:27
 addRequire("bit", "bnot", "bnot") -- ./compiler/luajit.lpt:28
 return var("bnot") .. "(" .. lua(right) .. ")" -- ./compiler/luajit.lpt:29
 end -- ./compiler/luajit.lpt:29
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:896
-return requireStr .. code -- ./compiler/lua54.lpt:897
-end -- ./compiler/lua54.lpt:897
-end -- ./compiler/lua54.lpt:897
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:902
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:900
+return requireStr .. code -- ./compiler/lua54.lpt:901
+end -- ./compiler/lua54.lpt:901
+end -- ./compiler/lua54.lpt:901
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:906
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22
@@ -5146,11 +5158,14 @@ end, -- ./compiler/lua54.lpt:876
 ["unm"] = "-", -- ./compiler/lua54.lpt:886
 ["len"] = "#", -- ./compiler/lua54.lpt:886
 ["bnot"] = "~", -- ./compiler/lua54.lpt:886
-["not"] = "not" -- ./compiler/lua54.lpt:886
-} -- ./compiler/lua54.lpt:886
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:889
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:890
-end }) -- ./compiler/lua54.lpt:890
+["not"] = "not", -- ./compiler/lua54.lpt:886
+["divb"] = function(left, right) -- ./compiler/lua54.lpt:888
+return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:889
+end -- ./compiler/lua54.lpt:889
+} -- ./compiler/lua54.lpt:889
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:893
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:894
+end }) -- ./compiler/lua54.lpt:894
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -5237,11 +5252,11 @@ end -- ./compiler/lua51.lpt:26
 tags["Label"] = function() -- ./compiler/lua51.lpt:28
 error("target " .. targetName .. " does not support goto labels") -- ./compiler/lua51.lpt:29
 end -- ./compiler/lua51.lpt:29
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:896
-return requireStr .. code -- ./compiler/lua54.lpt:897
-end -- ./compiler/lua54.lpt:897
-end -- ./compiler/lua54.lpt:897
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:902
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:900
+return requireStr .. code -- ./compiler/lua54.lpt:901
+end -- ./compiler/lua54.lpt:901
+end -- ./compiler/lua54.lpt:901
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:906
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22
@@ -6954,55 +6969,55 @@ end), -- ./lepton/lpt-parser/parser.lua:676
 ["ShiftOp"] = sym("<<") / "shl" + sym(">>") / "shr", -- ./lepton/lpt-parser/parser.lua:690
 ["ConcatOp"] = sym("++") / "concat", -- ./lepton/lpt-parser/parser.lua:691
 ["AddOp"] = sym("+" - P("++")) / "add" + sym("-" - P("->")) / "sub", -- ./lepton/lpt-parser/parser.lua:693
-["MulOp"] = sym("*") / "mul" + sym("//") / "idiv" + sym("/") / "div" + sym("%") / "mod", -- ./lepton/lpt-parser/parser.lua:697
-["UnaryOp"] = sym("!") / "not" + sym("-") / "unm" + sym("#") / "len" + sym("~") / "bnot", -- ./lepton/lpt-parser/parser.lua:701
-["PowOp"] = sym("^") / "pow", -- ./lepton/lpt-parser/parser.lua:702
-["BinOp"] = V("OrOp") + V("AndOp") + V("BOrOp") + V("BXorOp") + V("BAndOp") + V("ShiftOp") + V("ConcatOp") + V("AddOp") + V("MulOp") + V("PowOp") -- ./lepton/lpt-parser/parser.lua:703
-} -- ./lepton/lpt-parser/parser.lua:703
-local macroidentifier = { -- ./lepton/lpt-parser/parser.lua:708
-e(V("MacroIdentifier"), "InvalidStat") * e(P(- 1), "Extra"), -- ./lepton/lpt-parser/parser.lua:709
-["MacroIdentifier"] = tagC("MacroFunction", V("Id") * sym("(") * V("MacroFunctionArgs") * e(sym(")"), "CParenPList")) + V("Id"), -- ./lepton/lpt-parser/parser.lua:712
-["MacroFunctionArgs"] = V("NameList") * (sym(",") * e(tagC("Dots", sym("...")), "ParList")) ^ - 1 / addDots + Ct(tagC("Dots", sym("..."))) + Ct(Cc()) -- ./lepton/lpt-parser/parser.lua:716
-} -- ./lepton/lpt-parser/parser.lua:716
-for k, v in pairs(G) do -- ./lepton/lpt-parser/parser.lua:720
-if macroidentifier[k] == nil then -- ./lepton/lpt-parser/parser.lua:721
-macroidentifier[k] = v -- ./lepton/lpt-parser/parser.lua:722
-end -- ./lepton/lpt-parser/parser.lua:722
-end -- ./lepton/lpt-parser/parser.lua:722
-local parser = {} -- ./lepton/lpt-parser/parser.lua:728
-local validator = require("lepton.lpt-parser.validator") -- ./lepton/lpt-parser/parser.lua:730
-local validate = validator["validate"] -- ./lepton/lpt-parser/parser.lua:731
-local syntaxerror = validator["syntaxerror"] -- ./lepton/lpt-parser/parser.lua:732
-parser["parse"] = function(subject, filename) -- ./lepton/lpt-parser/parser.lua:734
-local errorinfo = { -- ./lepton/lpt-parser/parser.lua:735
-["subject"] = subject, -- ./lepton/lpt-parser/parser.lua:735
-["filename"] = filename -- ./lepton/lpt-parser/parser.lua:735
-} -- ./lepton/lpt-parser/parser.lua:735
-lpeg["setmaxstack"](1000) -- ./lepton/lpt-parser/parser.lua:736
-local ast, label, errpos = lpeg["match"](G, subject, nil, errorinfo) -- ./lepton/lpt-parser/parser.lua:737
-if not ast then -- ./lepton/lpt-parser/parser.lua:738
-local errmsg = labels[label][2] -- ./lepton/lpt-parser/parser.lua:739
-return ast, syntaxerror(errorinfo, errpos, errmsg) -- ./lepton/lpt-parser/parser.lua:740
-end -- ./lepton/lpt-parser/parser.lua:740
-return validate(ast, errorinfo) -- ./lepton/lpt-parser/parser.lua:742
-end -- ./lepton/lpt-parser/parser.lua:742
-parser["parsemacroidentifier"] = function(subject, filename) -- ./lepton/lpt-parser/parser.lua:745
-local errorinfo = { -- ./lepton/lpt-parser/parser.lua:746
-["subject"] = subject, -- ./lepton/lpt-parser/parser.lua:746
-["filename"] = filename -- ./lepton/lpt-parser/parser.lua:746
-} -- ./lepton/lpt-parser/parser.lua:746
-lpeg["setmaxstack"](1000) -- ./lepton/lpt-parser/parser.lua:747
-local ast, label, errpos = lpeg["match"](macroidentifier, subject, nil, errorinfo) -- ./lepton/lpt-parser/parser.lua:748
-if not ast then -- ./lepton/lpt-parser/parser.lua:749
-local errmsg = labels[label][2] -- ./lepton/lpt-parser/parser.lua:750
-return ast, syntaxerror(errorinfo, errpos, errmsg) -- ./lepton/lpt-parser/parser.lua:751
-end -- ./lepton/lpt-parser/parser.lua:751
-return ast -- ./lepton/lpt-parser/parser.lua:753
-end -- ./lepton/lpt-parser/parser.lua:753
-return parser -- ./lepton/lpt-parser/parser.lua:756
-end -- ./lepton/lpt-parser/parser.lua:756
-local parser = _() or parser -- ./lepton/lpt-parser/parser.lua:761
-package["loaded"]["lepton.lpt-parser.parser"] = parser or true -- ./lepton/lpt-parser/parser.lua:762
+["MulOp"] = sym("*") / "mul" + sym("//") / "idiv" + sym("/") / "div" + sym("%" - P("%%")) / "mod" + sym("%%") / "divb", -- ./lepton/lpt-parser/parser.lua:698
+["UnaryOp"] = sym("!") / "not" + sym("-") / "unm" + sym("#") / "len" + sym("~") / "bnot", -- ./lepton/lpt-parser/parser.lua:702
+["PowOp"] = sym("^") / "pow", -- ./lepton/lpt-parser/parser.lua:703
+["BinOp"] = V("OrOp") + V("AndOp") + V("BOrOp") + V("BXorOp") + V("BAndOp") + V("ShiftOp") + V("ConcatOp") + V("AddOp") + V("MulOp") + V("PowOp") -- ./lepton/lpt-parser/parser.lua:704
+} -- ./lepton/lpt-parser/parser.lua:704
+local macroidentifier = { -- ./lepton/lpt-parser/parser.lua:709
+e(V("MacroIdentifier"), "InvalidStat") * e(P(- 1), "Extra"), -- ./lepton/lpt-parser/parser.lua:710
+["MacroIdentifier"] = tagC("MacroFunction", V("Id") * sym("(") * V("MacroFunctionArgs") * e(sym(")"), "CParenPList")) + V("Id"), -- ./lepton/lpt-parser/parser.lua:713
+["MacroFunctionArgs"] = V("NameList") * (sym(",") * e(tagC("Dots", sym("...")), "ParList")) ^ - 1 / addDots + Ct(tagC("Dots", sym("..."))) + Ct(Cc()) -- ./lepton/lpt-parser/parser.lua:717
+} -- ./lepton/lpt-parser/parser.lua:717
+for k, v in pairs(G) do -- ./lepton/lpt-parser/parser.lua:721
+if macroidentifier[k] == nil then -- ./lepton/lpt-parser/parser.lua:722
+macroidentifier[k] = v -- ./lepton/lpt-parser/parser.lua:723
+end -- ./lepton/lpt-parser/parser.lua:723
+end -- ./lepton/lpt-parser/parser.lua:723
+local parser = {} -- ./lepton/lpt-parser/parser.lua:729
+local validator = require("lepton.lpt-parser.validator") -- ./lepton/lpt-parser/parser.lua:731
+local validate = validator["validate"] -- ./lepton/lpt-parser/parser.lua:732
+local syntaxerror = validator["syntaxerror"] -- ./lepton/lpt-parser/parser.lua:733
+parser["parse"] = function(subject, filename) -- ./lepton/lpt-parser/parser.lua:735
+local errorinfo = { -- ./lepton/lpt-parser/parser.lua:736
+["subject"] = subject, -- ./lepton/lpt-parser/parser.lua:736
+["filename"] = filename -- ./lepton/lpt-parser/parser.lua:736
+} -- ./lepton/lpt-parser/parser.lua:736
+lpeg["setmaxstack"](1000) -- ./lepton/lpt-parser/parser.lua:737
+local ast, label, errpos = lpeg["match"](G, subject, nil, errorinfo) -- ./lepton/lpt-parser/parser.lua:738
+if not ast then -- ./lepton/lpt-parser/parser.lua:739
+local errmsg = labels[label][2] -- ./lepton/lpt-parser/parser.lua:740
+return ast, syntaxerror(errorinfo, errpos, errmsg) -- ./lepton/lpt-parser/parser.lua:741
+end -- ./lepton/lpt-parser/parser.lua:741
+return validate(ast, errorinfo) -- ./lepton/lpt-parser/parser.lua:743
+end -- ./lepton/lpt-parser/parser.lua:743
+parser["parsemacroidentifier"] = function(subject, filename) -- ./lepton/lpt-parser/parser.lua:746
+local errorinfo = { -- ./lepton/lpt-parser/parser.lua:747
+["subject"] = subject, -- ./lepton/lpt-parser/parser.lua:747
+["filename"] = filename -- ./lepton/lpt-parser/parser.lua:747
+} -- ./lepton/lpt-parser/parser.lua:747
+lpeg["setmaxstack"](1000) -- ./lepton/lpt-parser/parser.lua:748
+local ast, label, errpos = lpeg["match"](macroidentifier, subject, nil, errorinfo) -- ./lepton/lpt-parser/parser.lua:749
+if not ast then -- ./lepton/lpt-parser/parser.lua:750
+local errmsg = labels[label][2] -- ./lepton/lpt-parser/parser.lua:751
+return ast, syntaxerror(errorinfo, errpos, errmsg) -- ./lepton/lpt-parser/parser.lua:752
+end -- ./lepton/lpt-parser/parser.lua:752
+return ast -- ./lepton/lpt-parser/parser.lua:754
+end -- ./lepton/lpt-parser/parser.lua:754
+return parser -- ./lepton/lpt-parser/parser.lua:757
+end -- ./lepton/lpt-parser/parser.lua:757
+local parser = _() or parser -- ./lepton/lpt-parser/parser.lua:762
+package["loaded"]["lepton.lpt-parser.parser"] = parser or true -- ./lepton/lpt-parser/parser.lua:763
 local unpack = unpack or table["unpack"] -- lepton.lpt:20
 lepton["default"] = { -- lepton.lpt:23
 ["target"] = "lua54", -- lepton.lpt:24

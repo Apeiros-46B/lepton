@@ -694,7 +694,8 @@ local G = { V'Lua',
     MulOp     = sym('*')          / 'mul'
               + sym('//')         / 'idiv'
               + sym('/')          / 'div'
-              + sym('%')          / 'mod';
+              + sym('%' - P'%%')  / 'mod'
+              + sym('%%')         / 'divb'; -- divisibility operator
     UnaryOp   = sym('!')          / 'not'
               + sym('-')          / 'unm'
               + sym('#')          / 'len'
