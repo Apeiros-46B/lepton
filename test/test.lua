@@ -1191,6 +1191,15 @@ test('destructuring assignment with if-else if with assignment with expression a
 ]], 6)
 -- }}}
 -- }}}
+
+-- {{{ table concat
+test('table.concat operator', [[
+    return { 'Hello', 'world!' } +++ ' '
+]], 'Hello world!')
+test('table.concat operator priority over concat', [[
+    return { 'Hello', 'world' } +++ ' ' ++ '!'
+]], 'Hello world!')
+-- }}}
 -- }}}
 -- }}}
 
