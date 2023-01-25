@@ -1406,23 +1406,59 @@ end, -- ./compiler/lua54.lpt:989
 ["bnot"] = "~", -- ./compiler/lua54.lpt:1000
 ["not"] = "not", -- ./compiler/lua54.lpt:1000
 ["divb"] = function(left, right) -- ./compiler/lua54.lpt:1003
-return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:1004
+return table["concat"]({ -- ./compiler/lua54.lpt:1004
+"((", -- ./compiler/lua54.lpt:1004
+lua(left), -- ./compiler/lua54.lpt:1004
+") % (", -- ./compiler/lua54.lpt:1004
+lua(right), -- ./compiler/lua54.lpt:1004
+") == 0)" -- ./compiler/lua54.lpt:1004
+}) -- ./compiler/lua54.lpt:1004
 end, -- ./compiler/lua54.lpt:1004
 ["tconcat"] = function(left, right) -- ./compiler/lua54.lpt:1008
-return "table.concat(" .. lua(left) .. ", " .. lua(right) .. ")" -- ./compiler/lua54.lpt:1009
-end -- ./compiler/lua54.lpt:1009
-} -- ./compiler/lua54.lpt:1009
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:1014
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:1015
-end }) -- ./compiler/lua54.lpt:1015
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:1022
-return requireStr .. luaHeader .. code -- ./compiler/lua54.lpt:1023
+if right["tag"] == "Table" then -- ./compiler/lua54.lpt:1009
+local sep = right[1] -- ./compiler/lua54.lpt:1010
+local i = right[2] -- ./compiler/lua54.lpt:1011
+local j = right[3] -- ./compiler/lua54.lpt:1012
+local r = { -- ./compiler/lua54.lpt:1014
+"table.concat(", -- ./compiler/lua54.lpt:1014
+lua(left) -- ./compiler/lua54.lpt:1014
+} -- ./compiler/lua54.lpt:1014
+if sep ~= nil then -- ./compiler/lua54.lpt:1016
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1017
+r[# r + 1] = lua(sep) -- ./compiler/lua54.lpt:1018
+end -- ./compiler/lua54.lpt:1018
+if i ~= nil then -- ./compiler/lua54.lpt:1021
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1022
+r[# r + 1] = lua(i) -- ./compiler/lua54.lpt:1023
 end -- ./compiler/lua54.lpt:1023
-end -- ./compiler/lua54.lpt:1023
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:1028
-package["loaded"]["compiler.lua54"] = lua54 or true -- ./compiler/lua54.lpt:1029
-local function _() -- ./compiler/lua54.lpt:1032
-local function _() -- ./compiler/lua54.lpt:1034
+if j ~= nil then -- ./compiler/lua54.lpt:1026
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1027
+r[# r + 1] = lua(j) -- ./compiler/lua54.lpt:1028
+end -- ./compiler/lua54.lpt:1028
+r[# r + 1] = ")" -- ./compiler/lua54.lpt:1031
+return table["concat"](r) -- ./compiler/lua54.lpt:1033
+else -- ./compiler/lua54.lpt:1033
+return table["concat"]({ -- ./compiler/lua54.lpt:1035
+"table.concat(", -- ./compiler/lua54.lpt:1035
+lua(left), -- ./compiler/lua54.lpt:1035
+", ", -- ./compiler/lua54.lpt:1035
+lua(right), -- ./compiler/lua54.lpt:1035
+")" -- ./compiler/lua54.lpt:1035
+}) -- ./compiler/lua54.lpt:1035
+end -- ./compiler/lua54.lpt:1035
+end -- ./compiler/lua54.lpt:1035
+} -- ./compiler/lua54.lpt:1035
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:1041
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:1042
+end }) -- ./compiler/lua54.lpt:1042
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:1049
+return requireStr .. luaHeader .. code -- ./compiler/lua54.lpt:1050
+end -- ./compiler/lua54.lpt:1050
+end -- ./compiler/lua54.lpt:1050
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:1055
+package["loaded"]["compiler.lua54"] = lua54 or true -- ./compiler/lua54.lpt:1056
+local function _() -- ./compiler/lua54.lpt:1059
+local function _() -- ./compiler/lua54.lpt:1061
 local util = require("lepton.util") -- ./compiler/lua54.lpt:1
 local targetName = "Lua 5.4" -- ./compiler/lua54.lpt:3
 local unpack = unpack or table["unpack"] -- ./compiler/lua54.lpt:5
@@ -2471,15 +2507,51 @@ end, -- ./compiler/lua54.lpt:989
 ["bnot"] = "~", -- ./compiler/lua54.lpt:1000
 ["not"] = "not", -- ./compiler/lua54.lpt:1000
 ["divb"] = function(left, right) -- ./compiler/lua54.lpt:1003
-return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:1004
+return table["concat"]({ -- ./compiler/lua54.lpt:1004
+"((", -- ./compiler/lua54.lpt:1004
+lua(left), -- ./compiler/lua54.lpt:1004
+") % (", -- ./compiler/lua54.lpt:1004
+lua(right), -- ./compiler/lua54.lpt:1004
+") == 0)" -- ./compiler/lua54.lpt:1004
+}) -- ./compiler/lua54.lpt:1004
 end, -- ./compiler/lua54.lpt:1004
 ["tconcat"] = function(left, right) -- ./compiler/lua54.lpt:1008
-return "table.concat(" .. lua(left) .. ", " .. lua(right) .. ")" -- ./compiler/lua54.lpt:1009
-end -- ./compiler/lua54.lpt:1009
-} -- ./compiler/lua54.lpt:1009
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:1014
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:1015
-end }) -- ./compiler/lua54.lpt:1015
+if right["tag"] == "Table" then -- ./compiler/lua54.lpt:1009
+local sep = right[1] -- ./compiler/lua54.lpt:1010
+local i = right[2] -- ./compiler/lua54.lpt:1011
+local j = right[3] -- ./compiler/lua54.lpt:1012
+local r = { -- ./compiler/lua54.lpt:1014
+"table.concat(", -- ./compiler/lua54.lpt:1014
+lua(left) -- ./compiler/lua54.lpt:1014
+} -- ./compiler/lua54.lpt:1014
+if sep ~= nil then -- ./compiler/lua54.lpt:1016
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1017
+r[# r + 1] = lua(sep) -- ./compiler/lua54.lpt:1018
+end -- ./compiler/lua54.lpt:1018
+if i ~= nil then -- ./compiler/lua54.lpt:1021
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1022
+r[# r + 1] = lua(i) -- ./compiler/lua54.lpt:1023
+end -- ./compiler/lua54.lpt:1023
+if j ~= nil then -- ./compiler/lua54.lpt:1026
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1027
+r[# r + 1] = lua(j) -- ./compiler/lua54.lpt:1028
+end -- ./compiler/lua54.lpt:1028
+r[# r + 1] = ")" -- ./compiler/lua54.lpt:1031
+return table["concat"](r) -- ./compiler/lua54.lpt:1033
+else -- ./compiler/lua54.lpt:1033
+return table["concat"]({ -- ./compiler/lua54.lpt:1035
+"table.concat(", -- ./compiler/lua54.lpt:1035
+lua(left), -- ./compiler/lua54.lpt:1035
+", ", -- ./compiler/lua54.lpt:1035
+lua(right), -- ./compiler/lua54.lpt:1035
+")" -- ./compiler/lua54.lpt:1035
+}) -- ./compiler/lua54.lpt:1035
+end -- ./compiler/lua54.lpt:1035
+end -- ./compiler/lua54.lpt:1035
+} -- ./compiler/lua54.lpt:1035
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:1041
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:1042
+end }) -- ./compiler/lua54.lpt:1042
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -2488,11 +2560,11 @@ else -- ./compiler/lua53.lpt:6
 return t[1] -- ./compiler/lua53.lpt:8
 end -- ./compiler/lua53.lpt:8
 end -- ./compiler/lua53.lpt:8
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:1022
-return requireStr .. luaHeader .. code -- ./compiler/lua54.lpt:1023
-end -- ./compiler/lua54.lpt:1023
-end -- ./compiler/lua54.lpt:1023
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:1028
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:1049
+return requireStr .. luaHeader .. code -- ./compiler/lua54.lpt:1050
+end -- ./compiler/lua54.lpt:1050
+end -- ./compiler/lua54.lpt:1050
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:1055
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22
@@ -3548,15 +3620,51 @@ end, -- ./compiler/lua54.lpt:989
 ["bnot"] = "~", -- ./compiler/lua54.lpt:1000
 ["not"] = "not", -- ./compiler/lua54.lpt:1000
 ["divb"] = function(left, right) -- ./compiler/lua54.lpt:1003
-return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:1004
+return table["concat"]({ -- ./compiler/lua54.lpt:1004
+"((", -- ./compiler/lua54.lpt:1004
+lua(left), -- ./compiler/lua54.lpt:1004
+") % (", -- ./compiler/lua54.lpt:1004
+lua(right), -- ./compiler/lua54.lpt:1004
+") == 0)" -- ./compiler/lua54.lpt:1004
+}) -- ./compiler/lua54.lpt:1004
 end, -- ./compiler/lua54.lpt:1004
 ["tconcat"] = function(left, right) -- ./compiler/lua54.lpt:1008
-return "table.concat(" .. lua(left) .. ", " .. lua(right) .. ")" -- ./compiler/lua54.lpt:1009
-end -- ./compiler/lua54.lpt:1009
-} -- ./compiler/lua54.lpt:1009
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:1014
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:1015
-end }) -- ./compiler/lua54.lpt:1015
+if right["tag"] == "Table" then -- ./compiler/lua54.lpt:1009
+local sep = right[1] -- ./compiler/lua54.lpt:1010
+local i = right[2] -- ./compiler/lua54.lpt:1011
+local j = right[3] -- ./compiler/lua54.lpt:1012
+local r = { -- ./compiler/lua54.lpt:1014
+"table.concat(", -- ./compiler/lua54.lpt:1014
+lua(left) -- ./compiler/lua54.lpt:1014
+} -- ./compiler/lua54.lpt:1014
+if sep ~= nil then -- ./compiler/lua54.lpt:1016
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1017
+r[# r + 1] = lua(sep) -- ./compiler/lua54.lpt:1018
+end -- ./compiler/lua54.lpt:1018
+if i ~= nil then -- ./compiler/lua54.lpt:1021
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1022
+r[# r + 1] = lua(i) -- ./compiler/lua54.lpt:1023
+end -- ./compiler/lua54.lpt:1023
+if j ~= nil then -- ./compiler/lua54.lpt:1026
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1027
+r[# r + 1] = lua(j) -- ./compiler/lua54.lpt:1028
+end -- ./compiler/lua54.lpt:1028
+r[# r + 1] = ")" -- ./compiler/lua54.lpt:1031
+return table["concat"](r) -- ./compiler/lua54.lpt:1033
+else -- ./compiler/lua54.lpt:1033
+return table["concat"]({ -- ./compiler/lua54.lpt:1035
+"table.concat(", -- ./compiler/lua54.lpt:1035
+lua(left), -- ./compiler/lua54.lpt:1035
+", ", -- ./compiler/lua54.lpt:1035
+lua(right), -- ./compiler/lua54.lpt:1035
+")" -- ./compiler/lua54.lpt:1035
+}) -- ./compiler/lua54.lpt:1035
+end -- ./compiler/lua54.lpt:1035
+end -- ./compiler/lua54.lpt:1035
+} -- ./compiler/lua54.lpt:1035
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:1041
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:1042
+end }) -- ./compiler/lua54.lpt:1042
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -3590,11 +3698,11 @@ end -- ./compiler/lua52.lpt:23
 tags["_opid"]["bnot"] = function(right) -- ./compiler/lua52.lpt:25
 return "bit32.bnot(" .. lua(right) .. ")" -- ./compiler/lua52.lpt:26
 end -- ./compiler/lua52.lpt:26
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:1022
-return requireStr .. luaHeader .. code -- ./compiler/lua54.lpt:1023
-end -- ./compiler/lua54.lpt:1023
-end -- ./compiler/lua54.lpt:1023
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:1028
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:1049
+return requireStr .. luaHeader .. code -- ./compiler/lua54.lpt:1050
+end -- ./compiler/lua54.lpt:1050
+end -- ./compiler/lua54.lpt:1050
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:1055
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22
@@ -4654,15 +4762,51 @@ end, -- ./compiler/lua54.lpt:989
 ["bnot"] = "~", -- ./compiler/lua54.lpt:1000
 ["not"] = "not", -- ./compiler/lua54.lpt:1000
 ["divb"] = function(left, right) -- ./compiler/lua54.lpt:1003
-return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:1004
+return table["concat"]({ -- ./compiler/lua54.lpt:1004
+"((", -- ./compiler/lua54.lpt:1004
+lua(left), -- ./compiler/lua54.lpt:1004
+") % (", -- ./compiler/lua54.lpt:1004
+lua(right), -- ./compiler/lua54.lpt:1004
+") == 0)" -- ./compiler/lua54.lpt:1004
+}) -- ./compiler/lua54.lpt:1004
 end, -- ./compiler/lua54.lpt:1004
 ["tconcat"] = function(left, right) -- ./compiler/lua54.lpt:1008
-return "table.concat(" .. lua(left) .. ", " .. lua(right) .. ")" -- ./compiler/lua54.lpt:1009
-end -- ./compiler/lua54.lpt:1009
-} -- ./compiler/lua54.lpt:1009
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:1014
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:1015
-end }) -- ./compiler/lua54.lpt:1015
+if right["tag"] == "Table" then -- ./compiler/lua54.lpt:1009
+local sep = right[1] -- ./compiler/lua54.lpt:1010
+local i = right[2] -- ./compiler/lua54.lpt:1011
+local j = right[3] -- ./compiler/lua54.lpt:1012
+local r = { -- ./compiler/lua54.lpt:1014
+"table.concat(", -- ./compiler/lua54.lpt:1014
+lua(left) -- ./compiler/lua54.lpt:1014
+} -- ./compiler/lua54.lpt:1014
+if sep ~= nil then -- ./compiler/lua54.lpt:1016
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1017
+r[# r + 1] = lua(sep) -- ./compiler/lua54.lpt:1018
+end -- ./compiler/lua54.lpt:1018
+if i ~= nil then -- ./compiler/lua54.lpt:1021
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1022
+r[# r + 1] = lua(i) -- ./compiler/lua54.lpt:1023
+end -- ./compiler/lua54.lpt:1023
+if j ~= nil then -- ./compiler/lua54.lpt:1026
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1027
+r[# r + 1] = lua(j) -- ./compiler/lua54.lpt:1028
+end -- ./compiler/lua54.lpt:1028
+r[# r + 1] = ")" -- ./compiler/lua54.lpt:1031
+return table["concat"](r) -- ./compiler/lua54.lpt:1033
+else -- ./compiler/lua54.lpt:1033
+return table["concat"]({ -- ./compiler/lua54.lpt:1035
+"table.concat(", -- ./compiler/lua54.lpt:1035
+lua(left), -- ./compiler/lua54.lpt:1035
+", ", -- ./compiler/lua54.lpt:1035
+lua(right), -- ./compiler/lua54.lpt:1035
+")" -- ./compiler/lua54.lpt:1035
+}) -- ./compiler/lua54.lpt:1035
+end -- ./compiler/lua54.lpt:1035
+end -- ./compiler/lua54.lpt:1035
+} -- ./compiler/lua54.lpt:1035
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:1041
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:1042
+end }) -- ./compiler/lua54.lpt:1042
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -4724,11 +4868,11 @@ tags["_opid"]["bnot"] = function(right) -- ./compiler/luajit.lpt:27
 addRequire("bit", "bnot", "bnot") -- ./compiler/luajit.lpt:28
 return var("bnot") .. "(" .. lua(right) .. ")" -- ./compiler/luajit.lpt:29
 end -- ./compiler/luajit.lpt:29
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:1022
-return requireStr .. luaHeader .. code -- ./compiler/lua54.lpt:1023
-end -- ./compiler/lua54.lpt:1023
-end -- ./compiler/lua54.lpt:1023
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:1028
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:1049
+return requireStr .. luaHeader .. code -- ./compiler/lua54.lpt:1050
+end -- ./compiler/lua54.lpt:1050
+end -- ./compiler/lua54.lpt:1050
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:1055
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22
@@ -5792,15 +5936,51 @@ end, -- ./compiler/lua54.lpt:989
 ["bnot"] = "~", -- ./compiler/lua54.lpt:1000
 ["not"] = "not", -- ./compiler/lua54.lpt:1000
 ["divb"] = function(left, right) -- ./compiler/lua54.lpt:1003
-return "((" .. lua(left) .. ") % (" .. lua(right) .. ") == 0)" -- ./compiler/lua54.lpt:1004
+return table["concat"]({ -- ./compiler/lua54.lpt:1004
+"((", -- ./compiler/lua54.lpt:1004
+lua(left), -- ./compiler/lua54.lpt:1004
+") % (", -- ./compiler/lua54.lpt:1004
+lua(right), -- ./compiler/lua54.lpt:1004
+") == 0)" -- ./compiler/lua54.lpt:1004
+}) -- ./compiler/lua54.lpt:1004
 end, -- ./compiler/lua54.lpt:1004
 ["tconcat"] = function(left, right) -- ./compiler/lua54.lpt:1008
-return "table.concat(" .. lua(left) .. ", " .. lua(right) .. ")" -- ./compiler/lua54.lpt:1009
-end -- ./compiler/lua54.lpt:1009
-} -- ./compiler/lua54.lpt:1009
-}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:1014
-error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:1015
-end }) -- ./compiler/lua54.lpt:1015
+if right["tag"] == "Table" then -- ./compiler/lua54.lpt:1009
+local sep = right[1] -- ./compiler/lua54.lpt:1010
+local i = right[2] -- ./compiler/lua54.lpt:1011
+local j = right[3] -- ./compiler/lua54.lpt:1012
+local r = { -- ./compiler/lua54.lpt:1014
+"table.concat(", -- ./compiler/lua54.lpt:1014
+lua(left) -- ./compiler/lua54.lpt:1014
+} -- ./compiler/lua54.lpt:1014
+if sep ~= nil then -- ./compiler/lua54.lpt:1016
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1017
+r[# r + 1] = lua(sep) -- ./compiler/lua54.lpt:1018
+end -- ./compiler/lua54.lpt:1018
+if i ~= nil then -- ./compiler/lua54.lpt:1021
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1022
+r[# r + 1] = lua(i) -- ./compiler/lua54.lpt:1023
+end -- ./compiler/lua54.lpt:1023
+if j ~= nil then -- ./compiler/lua54.lpt:1026
+r[# r + 1] = ", " -- ./compiler/lua54.lpt:1027
+r[# r + 1] = lua(j) -- ./compiler/lua54.lpt:1028
+end -- ./compiler/lua54.lpt:1028
+r[# r + 1] = ")" -- ./compiler/lua54.lpt:1031
+return table["concat"](r) -- ./compiler/lua54.lpt:1033
+else -- ./compiler/lua54.lpt:1033
+return table["concat"]({ -- ./compiler/lua54.lpt:1035
+"table.concat(", -- ./compiler/lua54.lpt:1035
+lua(left), -- ./compiler/lua54.lpt:1035
+", ", -- ./compiler/lua54.lpt:1035
+lua(right), -- ./compiler/lua54.lpt:1035
+")" -- ./compiler/lua54.lpt:1035
+}) -- ./compiler/lua54.lpt:1035
+end -- ./compiler/lua54.lpt:1035
+end -- ./compiler/lua54.lpt:1035
+} -- ./compiler/lua54.lpt:1035
+}, { ["__index"] = function(self, key) -- ./compiler/lua54.lpt:1041
+error("don't know how to compile a " .. tostring(key) .. " to " .. targetName) -- ./compiler/lua54.lpt:1042
+end }) -- ./compiler/lua54.lpt:1042
 targetName = "Lua 5.3" -- ./compiler/lua53.lpt:1
 tags["AttributeId"] = function(t) -- ./compiler/lua53.lpt:4
 if t[2] then -- ./compiler/lua53.lpt:5
@@ -5887,11 +6067,11 @@ end -- ./compiler/lua51.lpt:26
 tags["Label"] = function() -- ./compiler/lua51.lpt:28
 error("target " .. targetName .. " does not support goto labels") -- ./compiler/lua51.lpt:29
 end -- ./compiler/lua51.lpt:29
-local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:1022
-return requireStr .. luaHeader .. code -- ./compiler/lua54.lpt:1023
-end -- ./compiler/lua54.lpt:1023
-end -- ./compiler/lua54.lpt:1023
-local lua54 = _() or lua54 -- ./compiler/lua54.lpt:1028
+local code = lua(ast) .. newline() -- ./compiler/lua54.lpt:1049
+return requireStr .. luaHeader .. code -- ./compiler/lua54.lpt:1050
+end -- ./compiler/lua54.lpt:1050
+end -- ./compiler/lua54.lpt:1050
+local lua54 = _() or lua54 -- ./compiler/lua54.lpt:1055
 return lua54 -- ./compiler/lua53.lpt:18
 end -- ./compiler/lua53.lpt:18
 local lua53 = _() or lua53 -- ./compiler/lua53.lpt:22

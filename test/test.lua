@@ -1199,6 +1199,22 @@ test('table.concat operator', [[
 test('table.concat operator priority over concat', [[
     return { 'Hello', 'world' } +++ ' ' ++ '!'
 ]], 'Hello world!')
+
+test('table.concat with empty opts', [[
+    return { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } +++ {}
+]], '12345678910')
+test('table.concat with sep in opts table', [[
+    return { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } +++ { ' ' }
+]], '1 2 3 4 5 6 7 8 9 10')
+test('table.concat with i only', [[
+    return { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } +++ { ' ', 6 }
+]], '6 7 8 9 10')
+test('table.concat with j only', [[
+    return { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } +++ { ' ', nil, 5 }
+]], '1 2 3 4 5')
+test('table.concat with i and j', [[
+    return { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } +++ { ' ', 2, 8 }
+]], '2 3 4 5 6 7 8')
 -- }}}
 
 -- {{{ table append

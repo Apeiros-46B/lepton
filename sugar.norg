@@ -29,7 +29,3 @@
 
 * ( ) Quick table.unpack
   `t.{i?, j?}` becomes `table.unpack(t, i?, j?)` (or `unpack` instead of `table.unpack` depending on Lua target version)
-
-* (-) Quick table.concat
-  - `t +++ delim` becomes `table.concat(t, delim)`
-  - `t +++ {delim?, i?, j?}` becomes `table.concat(t, delim?, i?, j?)`
