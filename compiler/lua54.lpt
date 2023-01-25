@@ -128,7 +128,7 @@ end
     end
     local function addFilter()
         if not libraries.filter then
-            addLua([[
+            addLua([=[
 local function %sfilter(predicate, t, use_kv)
     local new = {}
     local i = 1
@@ -136,19 +136,26 @@ local function %sfilter(predicate, t, use_kv)
         local result
 
         if use_kv then
-            result = predicate(k, v)
+            result = { predicate(k, v) }
         else
-            result = predicate(v)
+            result = { predicate(v) }
         end
 
-        if result then
-            new[i] = v
+        if result[1] then
+            local len = #result
+            if len == 1 then
+                new[i] = v
+            elseif len == 2 then
+                new[i] = result[2]
+            elseif len == 3 then
+                new[result[2]] = result[3]
+            end
             i = i + 1
         end
     end
     return new
 end
-]]:format(options.variablePrefix))
+]=]:format(options.variablePrefix))
             libraries.filter = true
         end
     end
