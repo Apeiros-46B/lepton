@@ -154,7 +154,7 @@ end
     end
     -- }}}
 
-	-- {{{ Module management
+	-- {{{ module management
 	local required = {} -- { ['full require expression'] = true, ... }
 	local requireStr = ''
 	-- Add the module 'mod' to the list of modules to require, and load its field 'field' (or the whole module if nil) into the variable 'name'.
@@ -312,7 +312,7 @@ end
     end
     -- }}}
 
-	-- {{{ Tag constructors
+	-- {{{ tag constructors
 	tags = setmetatable({
         -- {{{ block
 		-- block: { stat* } --
@@ -993,18 +993,25 @@ end
 
 		-- {{{ ops
 		_opid = {
+            -- {{{ standard operators
 			add = '+', sub = '-', mul = '*', div = '/',
 			idiv = '//', mod = '%', pow = '^', concat = '..',
 			band = '&', bor = '|', bxor = '~', shl = '<<', shr = '>>',
 			eq = '==', ne = '~=', lt = '<', gt = '>', le = '<=', ge = '>=',
 			['and'] = 'and', ['or'] = 'or', unm = '-', len = '#', bnot = '~', ['not'] = 'not',
+            -- }}}
 
-            -- divisibility operator
+            -- {{{ divisibility (%% and !%)
             divb = (left, right)
                 return table.concat({ '((', lua(left), ') % (', lua(right), ') == 0)' })
             end,
 
-            -- table.concat sugar
+            ndivb = (left, right)
+                return table.concat({ '((', lua(left), ') % (', lua(right), ') ~= 0)' })
+            end,
+            -- }}}
+
+            -- {{{ table.concat (+++)
             tconcat = (left, right)
                 if right.tag == 'Table' then
                     local sep = right[1]
@@ -1035,6 +1042,7 @@ end
                     return table.concat({ 'table.concat(', lua(left), ', ', lua(right), ')' })
                 end
             end,
+            -- }}}
 		}
         -- }}}
 	}, {

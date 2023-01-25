@@ -711,7 +711,8 @@ local G = { V'Lua',
               + sym('>=')         / 'ge'
               + sym('<')          / 'lt'
               + sym('>')          / 'gt'
-              + sym('%%')         / 'divb'; -- divisibility operator
+              + sym('%%')         / 'divb' -- divisibility operators
+              + sym('!%')         / 'ndivb';
     BOrOp     = sym('|' - P'||')  / 'bor';
     BXorOp    = sym('~')          / 'bxor';
     BAndOp    = sym('&' - P'&&')  / 'band';
@@ -728,7 +729,7 @@ local G = { V'Lua',
               + sym('%' - P'%%')  / 'mod';
     UnaryOp   = sym('!')          / 'not'
               + sym('-')          / 'unm'
-              + sym('#' - P'#=')  / 'len'
+              + sym('#')          / 'len'
               + sym('~')          / 'bnot';
     PowOp     = sym('^')          / 'pow';
     BinOp     = V'OrOp' + V'AndOp' + V'BOrOp' + V'BXorOp' + V'BAndOp' + V'ShiftOp' + V'ConcatOp' + V'TConcatOp' + V'AddOp' + V'MulOp' + V'PowOp';
