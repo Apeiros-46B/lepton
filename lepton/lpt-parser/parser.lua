@@ -223,6 +223,19 @@ end
 -- }}}
 
 -- {{{ regular combinators and auxiliary functions
+-- for debugging
+local function dump(t)
+    require('lepton.lpt-parser.pp').dump(t)
+    return t
+end
+
+local function isAny(item, comparisons)
+    for _, v in ipairs(comparisons) do
+        if item == v then return true end
+    end
+    return false
+end
+
 local function token(patt)
     return patt * V'Skip'
 end
@@ -303,28 +316,22 @@ end
 local function fixLuaKeywords(t)
     local keywords = { 'and', 'do', 'elseif', 'end', 'function', 'in', 'not', 'or', 'then' }
     if t.tag == 'Pair' then
-        for _, v in pairs(keywords) do
-            if t[1][1] == v then
-                t[1][1] = '_' .. t[1][1]
-                break
-            end
+        if isAny(t[1][1], keywords) then
+            t[1][1] = '_' .. t[1][1]
         end
     else
-        for _, v in pairs(keywords) do
-            if t[1] == v then
-                t[1] = '_' .. t[1]
-                break
-            end
+        if isAny(t[1], keywords) then
+            t[1] = '_' .. t[1]
         end
     end
     return t
 end
 
 local function makeSuffixedExpr(t1, t2)
-    if t2.tag == 'Call' or t2.tag == 'SafeCall' then
+    if isAny(t2.tag, { 'Call', 'SafeCall', 'Broadcast', 'BroadcastKV', 'Filter', 'FilterKV' }) then
         local t = { tag = t2.tag, pos = t1.pos, [1] = t1 }
-        for k, v in ipairs(t2) do
-            table.insert(t, v)
+        for _, v in ipairs(t2) do
+            t[#t+1] = v
         end
         return t
     elseif t2.tag == 'MethodStub' or t2.tag == 'SafeMethodStub' then
@@ -570,8 +577,17 @@ local G = { V'Lua',
 
     StatExpr = (V'IfStat' + V'DoStat' + V'WhileStat' + V'RepeatStat' + V'ForStat') / statToExpr;
 
-    FuncCall  = Cmt(V'SuffixedExpr', function(s, i, exp) return exp.tag == 'Call' or exp.tag == 'SafeCall', exp end);
-    VarExpr   = Cmt(V'SuffixedExpr', function(s, i, exp) return exp.tag == 'Id' or exp.tag == 'Index', exp end);
+    FuncCall = Cmt(V'SuffixedExpr', function(s, i, exp)
+        return exp.tag == 'Call'
+            or exp.tag == 'SafeCall'
+            or exp.tag == 'Broadcast'
+            or exp.tag == 'BroadcastKV'
+            or exp.tag == 'Filter'
+            or exp.tag == 'FilterKV',
+
+            exp
+    end);
+    VarExpr = Cmt(V'SuffixedExpr', function(s, i, exp) return exp.tag == 'Id' or exp.tag == 'Index', exp end);
 
     SuffixedExpr      = Cf(V'PrimaryExpr' * (V'Index' + V'MethodStub' + V'Call')^0
                       + V'NoCallPrimaryExpr' * -V'Call' * (V'Index' + V'MethodStub' + V'Call')^0
@@ -580,14 +596,18 @@ local G = { V'Lua',
                       + V'Id'
                       + tagC('Paren', sym('(') * e(V'Expr', 'ExprParen') * e(sym(')'), 'CParenExpr'));
     NoCallPrimaryExpr = tagC('String', V'String') + V'Table' + V'TableCompr';
-    Index             = tagC('DotIndex', sym('.' * -P'.') * e(V'StrId', 'NameIndex'))
+    Index             = tagC('DotIndex', sym('.' * -P'.' * -V'Call') * e(V'StrId', 'NameIndex'))
                       + tagC('ArrayIndex', sym('[' * -P(S'=[')) * e(V'Expr', 'ExprIndex') * e(sym(']'), 'CBracketIndex'))
                       + tagC('SafeDotIndex', sym('?.' * -P'.') * e(V'StrId', 'NameIndex'))
                       + tagC('SafeArrayIndex', sym('?[' * -P(S'=[')) * e(V'Expr', 'ExprIndex') * e(sym(']'), 'CBracketIndex'));
     MethodStub        = tagC('MethodStub', sym(':' * -P':') * e(V'StrId', 'NameMeth'))
                       + tagC('SafeMethodStub', sym('?:' * -P':') * e(V'StrId', 'NameMeth'));
     Call              = tagC('Call', V'FuncArgs')
-                      + tagC('SafeCall', P'?' * V'FuncArgs');
+                      + tagC('SafeCall', sym('?') * V'FuncArgs')
+                      + tagC('Broadcast', sym('.') * V'FuncArgs')
+                      + tagC('BroadcastKV', sym('..') * V'FuncArgs')
+                      + tagC('Filter', sym('-<') * V'FuncArgs')
+                      + tagC('FilterKV', sym('-<<') * V'FuncArgs');
     SelfCall          = tagC('MethodStub', V'StrId') * V'Call';
     SelfIndex         = tagC('DotIndex', V'StrId');
 
@@ -604,11 +624,11 @@ local G = { V'Lua',
 
     TableCompr = tagC('TableCompr', sym('[') * V'Block' * e(sym(']'), 'CBracketTableCompr'));
 
-    SelfId = tagC('Id', sym('@') / 'self');
-    Id     = (tagC('Id', V'Name') / fixLuaKeywords) + V'SelfId';
+    SelfId          = tagC('Id', sym('@') / 'self');
+    Id              = (tagC('Id', V'Name') / fixLuaKeywords) + V'SelfId';
     AttributeSelfId = tagC('AttributeId', sym'@' / 'self' * V'Attribute'^-1);
     AttributeId     = tagC('AttributeId', V'Name' * V'Attribute'^-1) / fixLuaKeywords + V'AttributeSelfId';
-    StrId  = tagC('String', V'Name');
+    StrId           = tagC('String', V'Name');
 
     Attribute = sym('<') * e(kw'const' / 'const' + kw'close' / 'close', 'UnknownAttribute') * e(sym('>'), 'CBracketAttribute');
 

@@ -352,7 +352,7 @@ function traverse_exp (env, exp)
         return traverse_op(env, exp)
     elseif tag == 'Paren' then -- `Paren{ expr }
         return traverse_paren(env, exp)
-    elseif tag == 'Call' or tag == 'SafeCall' then -- `(Safe)Call{ expr expr* }
+    elseif tag == 'Call' or tag == 'SafeCall' or tag == 'Broadcast' or tag == 'BroadcastKV' or tag == 'Filter' or tag == 'FilterKV' then -- `(Safe)Call{ expr expr* }
         return traverse_call(env, exp)
     elseif tag == 'Id' or -- `Id{ <string> }
         tag == 'Index' then -- `Index{ expr expr }
@@ -415,6 +415,8 @@ function traverse_stm (env, stm)
         return traverse_continue(env, stm)
     elseif tag == 'Push' then -- `Push{ <expr>* }
         return traverse_push(env, stm)
+    elseif tag == 'Broadcast' or tag == 'BroadcastKV' or tag == 'Filter' or tag == 'FilterKV' then
+        return traverse_call(env, stm)
     else
         error('expecting a statement, but got a ' .. tag)
     end
