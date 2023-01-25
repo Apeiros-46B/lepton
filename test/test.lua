@@ -1229,6 +1229,54 @@ test('table append multiple assignment', [[
     return table.concat({ table.concat(t), table.concat(u), table.concat(v) })
 ]], '123456789')
 -- }}}
+
+-- {{{ broadcasting
+test('broadcasting', [[
+    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+    func = v -> v * v
+
+    return table.concat(func.(t), ' ')
+]], '1 4 9 16 25 36 49 64 81 100')
+test('broadcasting with key and value', [[
+    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+    func = (k, v) -> k * v
+
+    return table.concat(func..(t), ' ')
+]], '1 4 9 16 25 36 49 64 81 100')
+test('broadcasting with key replacement', [[
+    t = { 1, 2, 3 }
+    result = (v -> { v * 2, v * v }).(t)
+
+    return table.concat({ result[2], result[4], result[6] }, ' ')
+]], '1 4 9')
+-- }}}
+
+-- {{{ filtering
+test('filtering', [[
+    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+    predicate = v -> v !% 2
+
+    return table.concat(predicate-<(t), ' ')
+]], '1 3 5 7 9')
+test('filtering with key and value', [[
+    t = { 1, 4, 9, 16, 25, 36, 49, 64, 81, 100 }
+    predicate = (k, v) -> k + v %% 4
+
+    return table.concat(predicate-<<(t), ' ')
+]], '9 16 49 64')
+test('filtering with value replacement', [[
+    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+    predicate = v -> { v %% 2, v / 2 }
+
+    return table.concat(predicate-<(t), ' ')
+]], '1.0 2.0 3.0 4.0 5.0')
+test('filtering with key and value replacement', [[
+    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+    result = (v -> { v %% 2, v, v / 2 })-<(t)
+
+    return table.concat({ result[2], result[4], result[6], result[8], result[10] }, ' ')
+]], '1.0 2.0 3.0 4.0 5.0')
+-- }}}
 -- }}}
 -- }}}
 
