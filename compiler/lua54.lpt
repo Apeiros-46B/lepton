@@ -122,7 +122,7 @@ local function %sbroadcast(func, t, use_kv)
             new[pair[1]] = pair[2]
         end
     end
-    if #new > 0 then
+    if next(new) ~= nil then
         return new
     end
 end
