@@ -5,13 +5,14 @@ local targetName = 'Lua 5.4'
 local unpack = unpack or table.unpack
 
 return function(code, ast, options, macros={functions={}, variables={}})
-	--- Line mapping
+	-- {{{ line mapping
 	local lastInputPos = 1 -- last token position in the input code
 	local prevLinePos = 1 -- last token position in the previous line of code in the input code
 	local lastSource = options.chunkname or 'nil' -- last found code source name (from the original file)
 	local lastLine = 1 -- last found line number (from the original file)
+    -- }}}
 
-	--- Newline management
+	-- {{{ newline management
 	local indentLevel = 0
 	-- Returns a newline.
 	local function newline()
@@ -45,8 +46,9 @@ return function(code, ast, options, macros={functions={}, variables={}})
 		indentLevel -= 1
 		return newline()
 	end
+    -- }}}
 
-	--- State stacks
+	-- {{{ state stacks
 	-- Used for context-sensitive syntax.
 	local states = {
 		push = {}, -- push stack variable names
@@ -73,8 +75,9 @@ return function(code, ast, options, macros={functions={}, variables={}})
 	local function peek(name)
 		return states[name][#states[name]]
 	end
+    -- }}}
 
-	--- Variable management
+	-- {{{ variable management
 	-- Returns the prefixed variable name.
 	local function var(name)
 		return options.variablePrefix..name
@@ -96,6 +99,7 @@ return function(code, ast, options, macros={functions={}, variables={}})
     local function addLua(code)
         luaHeader ..= code
     end
+    -- }}}
 
     -- {{{ our libraries
     local libraries = { broadcast = false, filter = false }
@@ -106,13 +110,11 @@ local function %sbroadcast(func, t, use_kv)
     local new = {}
     for k, v in pairs(t) do
         local pair
-
         if use_kv then
             pair = { func(k, v) }
         else
             pair = { func(v) }
         end
-
         local len = #pair
         if len == 1 then
             new[k] = pair[1]
@@ -120,7 +122,9 @@ local function %sbroadcast(func, t, use_kv)
             new[pair[1]] = pair[2]
         end
     end
-    return new
+    if #new > 0 then
+        return new
+    end
 end
 ]=]:format(options.variablePrefix))
             libraries.broadcast = true
@@ -134,23 +138,18 @@ local function %sfilter(predicate, t, use_kv)
     local i = 1
     for k, v in pairs(t) do
         local result
-
         if use_kv then
-            result = { predicate(k, v) }
+            result = predicate(k, v)
         else
-            result = { predicate(v) }
+            result = predicate(v)
         end
-
-        if result[1] then
-            local len = #result
-            if len == 1 then
+        if result then
+            if type(k) == 'number' then
                 new[i] = v
-            elseif len == 2 then
-                new[i] = result[2]
-            elseif len == 3 then
-                new[result[2]] = result[3]
+                i = i + 1
+            else
+                new[k] = v
             end
-            i = i + 1
         end
     end
     return new
@@ -272,6 +271,7 @@ end
 	local CONTINUE_STOP = () -- at the start of loops using continue
 		return unindent()..'end'..newline()..'::'..var'continue'..'::'
 	end
+    -- {{{ destructuring
 	local DESTRUCTURING_ASSIGN = (destructured, newlineAfter=false, noLocal=false) -- to define values from a destructuring assignement
 		local vars = {}
 		local values = {}
@@ -309,6 +309,7 @@ end
 			return ''
 		end
 	end
+    -- }}}
     local BROADCAST = (t, use_kv)
         addBroadcast()
         return table.concat({ options.variablePrefix, 'broadcast(', lua(t[1]), ',', lua(t[2]), (use_kv and ', true') or '', ')' })
@@ -840,6 +841,7 @@ end
         -- }}}
 
 		-- {{{ apply
+        -- {{{ calls
 		-- Call{ expr expr* }
 		Call = (t)
 			if t[1].tag == 'String' or t[1].tag == 'Table' then
@@ -893,6 +895,7 @@ end
 				return '('..lua(t[1])..' ~= nil and '..lua(t[1])..'('..lua(t, '_lhs', 2)..') or nil)'
 			end
 		end,
+        -- }}}
 
         -- broadcasting & filtering
         Broadcast = (t)
@@ -952,7 +955,7 @@ end
 		end,
 		-- DestructuringId{ Id | Pair+ }
 		DestructuringId = (t)
-			if t.id then -- destructing already done before, use parent variable as id
+			if t.id then -- destructuring already done before, use parent variable as id
 				return t.id
 			else
 				local d = assert(peek('destructuring'), 'DestructuringId not in a destructurable assignement')
@@ -1049,6 +1052,24 @@ end
                     return table.concat({ 'table.concat(', lua(left), ', ', lua(right), ')' })
                 end
             end,
+            -- }}}
+
+            -- {{{ piping
+            pipe = (left, right)
+                return table.concat({ lua(right), '(', lua(left), ')' })
+            end,
+            pipebc = (left, right)
+                return table.concat({ BROADCAST({ right, left }, false) })
+            end,
+            pipebckv = (left, right)
+                return table.concat({ BROADCAST({ right, left }, true) })
+            end,
+            -- pipefilt = (left, right)
+            --     return table.concat({ FILTER({ right, left }, false) })
+            -- end,
+            -- pipefiltkv = (left, right)
+            --     return table.concat({ FILTER({ right, left }, true) })
+            -- end,
             -- }}}
 		}
         -- }}}

@@ -150,6 +150,7 @@ local labels = {
     { 'ErrOParenExpr', [[expected '(' before the expression]] },
     { 'ErrCParenExpr', [[expected ')' after the expression]] },
 
+    { 'ErrPipeExpr', [[expected an expression after the pipe operator]] },
     { 'ErrOrExpr', [[expected an expression after '||']] },
     { 'ErrAndExpr', [[expected an expression after '&&']] },
     { 'ErrRelExpr', [[expected an expression after the relational operator]] },
@@ -524,7 +525,7 @@ local G = { V'Lua',
 
     ArrowFuncDef    = tagC('Function', V'ArrowFuncParams' * sym('->') * V'ArrowFuncBody') / fixArrowFunc;
     ArrowFuncParams = (sym(':') / ':')^-1 * (parenAround(V'ParList') + tagC('NamedPar', V'NamedPar'));
-    ArrowFuncBody   = (-sym('{') * tagC('Block', tagC('Push', V'Expr')) * -sym('}')) + eBlkStartEnd('OArrowFunc', 'CArrowFunc');
+    ArrowFuncBody   = (-sym('{') * tagC('Block', tagC('Push', V'OrExpr')) * -sym('}')) + eBlkStartEnd('OArrowFunc', 'CArrowFunc');
 
     NamedParList  = tagC('NamedParList', commaSep(V'NamedPar'));
     NamedPar      = tagC('ParPair', V'ParKey' * e(sym('='), 'EqField') * e(V'Expr', 'ExprField')) + V'Id';
@@ -549,7 +550,8 @@ local G = { V'Lua',
     DestructuringIdFieldList = sepBy(V'DestructuringIdField', V'FieldSep') * V'FieldSep'^-1;
     DestructuringIdField     = tagC('Pair', V'FieldKey' * e(sym('='), 'DestructuringEqField') * e(V'Id', 'DestructuringExprField')) + V'Id';
 
-    Expr        = V'OrExpr';
+    Expr        = V'PipeExpr';
+    PipeExpr    = chainOp(V'OrExpr', V'PipeOp', 'PipeExpr');
     OrExpr      = chainOp(V'AndExpr', V'OrOp', 'OrExpr');
     AndExpr     = chainOp(V'RelExpr', V'AndOp', 'AndExpr');
     RelExpr     = chainOp(V'BOrExpr', V'RelOp', 'RelExpr');
@@ -596,7 +598,7 @@ local G = { V'Lua',
                       + V'Id'
                       + tagC('Paren', sym('(') * e(V'Expr', 'ExprParen') * e(sym(')'), 'CParenExpr'));
     NoCallPrimaryExpr = tagC('String', V'String') + V'Table' + V'TableCompr';
-    Index             = tagC('DotIndex', sym('.' * -P'.' * -V'Call') * e(V'StrId', 'NameIndex'))
+    Index             = tagC('DotIndex', sym('.' * -P'.' * -V'Call' * -V'PipeOp') * e(V'StrId', 'NameIndex'))
                       + tagC('ArrayIndex', sym('[' * -P(S'=[')) * e(V'Expr', 'ExprIndex') * e(sym(']'), 'CBracketIndex'))
                       + tagC('SafeDotIndex', sym('?.' * -P'.') * e(V'StrId', 'NameIndex'))
                       + tagC('SafeArrayIndex', sym('?[' * -P(S'=[')) * e(V'Expr', 'ExprIndex') * e(sym(']'), 'CBracketIndex'));
@@ -703,36 +705,42 @@ local G = { V'Lua',
     Equals   = P'='^0;
     CloseEq  = Cmt(V'Close' * Cb('openEq'), function (s, i, closeEq, openEq) return #openEq == #closeEq end);
 
-    OrOp      = sym('||')         / 'or';
-    AndOp     = sym('&&')         / 'and';
-    RelOp     = sym('!=')         / 'ne'
-              + sym('==')         / 'eq'
-              + sym('<=')         / 'le'
-              + sym('>=')         / 'ge'
-              + sym('<')          / 'lt'
-              + sym('>')          / 'gt'
-              + sym('%%')         / 'divb' -- divisibility operators
-              + sym('!%')         / 'ndivb';
-    BOrOp     = sym('|' - P'||')  / 'bor';
-    BXorOp    = sym('~')          / 'bxor';
-    BAndOp    = sym('&' - P'&&')  / 'band';
-    ShiftOp   = sym('<<')         / 'shl'
-              + sym('>>')         / 'shr';
-    ConcatOp  = sym('++')         / 'concat';
-    TConcatOp = sym('+++')        / 'tconcat'; -- table.concat sugar
-    AddOp     = sym('+' - P'++')  / 'add'
-              + sym('-' - P'->')  / 'sub';
-    AppendOp  = sym('#=')         / 'tappend'; -- t
-    MulOp     = sym('*')          / 'mul'
-              + sym('//')         / 'idiv'
-              + sym('/')          / 'div'
-              + sym('%' - P'%%')  / 'mod';
-    UnaryOp   = sym('!')          / 'not'
-              + sym('-')          / 'unm'
-              + sym('#')          / 'len'
-              + sym('~')          / 'bnot';
-    PowOp     = sym('^')          / 'pow';
-    BinOp     = V'OrOp' + V'AndOp' + V'BOrOp' + V'BXorOp' + V'BAndOp' + V'ShiftOp' + V'ConcatOp' + V'TConcatOp' + V'AddOp' + V'MulOp' + V'PowOp';
+    PipeOp    = sym('|>')                / 'pipe'
+              + sym('.|>')               / 'pipebc'
+              + sym('..|>')              / 'pipebckv';
+              -- + sym('..|>')              / 'pipebckv'
+              -- + sym('-<|>')              / 'pipefilt'
+              -- + sym('-<<|>')             / 'pipefiltkv';
+    OrOp      = sym('||')                / 'or';
+    AndOp     = sym('&&')                / 'and';
+    RelOp     = sym('!=')                / 'ne'
+              + sym('==')                / 'eq'
+              + sym('<=')                / 'le'
+              + sym('>=')                / 'ge'
+              + sym('<')                 / 'lt'
+              + sym('>')                 / 'gt'
+              + sym('%%')                / 'divb' -- divisibility operators
+              + sym('!%')                / 'ndivb';
+    BOrOp     = sym('|' - P'||')         / 'bor';
+    BXorOp    = sym('~')                 / 'bxor';
+    BAndOp    = sym('&' - P'&&')         / 'band';
+    ShiftOp   = sym('<<')                / 'shl'
+              + sym('>>')                / 'shr';
+    ConcatOp  = sym('++')                / 'concat';
+    TConcatOp = sym('+++')               / 'tconcat'; -- table.concat sugar
+    AddOp     = sym('+' - P'++')         / 'add'
+              + sym('-' - P'->' - P'-<') / 'sub';
+    AppendOp  = sym('#=')                / 'tappend'; -- t
+    MulOp     = sym('*')                 / 'mul'
+              + sym('//')                / 'idiv'
+              + sym('/')                 / 'div'
+              + sym('%' - P'%%')         / 'mod';
+    UnaryOp   = sym('!')                 / 'not'
+              + sym('-')                 / 'unm'
+              + sym('#')                 / 'len'
+              + sym('~')                 / 'bnot';
+    PowOp     = sym('^')                 / 'pow';
+    BinOp     = V'PipeOp' + V'OrOp' + V'AndOp' + V'BOrOp' + V'BXorOp' + V'BAndOp' + V'ShiftOp' + V'ConcatOp' + V'TConcatOp' + V'AddOp' + V'MulOp' + V'PowOp';
 }
 -- }}}
 

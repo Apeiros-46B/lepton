@@ -20,12 +20,12 @@
   - `for (i, k, v :: t)` where `t` is an identifier or table literal becomes `for k, v in pairs(t)`
     and keeps a counter of how many values have been iterated over so far in the variable `i`
 
-* ( ) Piping (inspired by Julia)
-  - `value |> func_1 |> func_2`  becomes `func_2(func_1(value))`
-  - `value .|> func_1 |> func_2`  becomes `func_2(func_1.(value))` (broadcast)
-  - `value ..|> func_1 |> func_2`  becomes `func_2(func_1..(value))` (key+value broadcast)
-  - `value -<|> func_1 |> func_2`  becomes `func_2(func_1-<(value))` (filter)
-  - `value -<<|> func_1 |> func_2`  becomes `func_2(func_1-<<(value))` (key+value filter)
+* (-) Piping (inspired by Julia)
+  - (x) `value |> func_1 |> func_2`  becomes `func_2(func_1(value))`
+  - (x) `value .|> func_1 |> func_2`  becomes `func_2(func_1.(value))` (broadcast)
+  - (x) `value ..|> func_1 |> func_2`  becomes `func_2(func_1..(value))` (key+value broadcast)
+  - ( ) `value -<|> func_1 |> func_2`  becomes `func_2(func_1-<(value))` (filter)
+  - ( ) `value -<<|> func_1 |> func_2`  becomes `func_2(func_1-<<(value))` (key+value filter)
 
 * ( ) Quick table.unpack
   `t.{i?, j?}` becomes `table.unpack(t, i?, j?)` (or `unpack` instead of `table.unpack` depending on Lua target version)
