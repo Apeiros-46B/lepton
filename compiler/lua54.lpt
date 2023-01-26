@@ -897,7 +897,7 @@ end
 		end,
         -- }}}
 
-        -- broadcasting & filtering
+        -- {{{ broadcasting & filtering
         Broadcast = (t)
             return BROADCAST(t, false)
         end,
@@ -910,6 +910,23 @@ end
         FilterKV = (t)
             return FILTER(t, true)
         end,
+        -- }}}
+
+        -- {{{ string.format shorthand (string call)
+        StringFormat = (t)
+            local args = {}
+            for _, v in ipairs(t[2]) do
+                args[#args+1] = lua(v)
+            end
+            local r = { '(', 'string.format(', '%q':format(t[1]) }
+            if #args ~= 0 then
+                r[#r+1] = ', '
+                r[#r+1] = table.concat(args, ', ')
+                r[#r+1] = '))'
+            end
+            return table.concat(r)
+        end,
+        -- }}}
         -- }}}
 
 		-- {{{ lhs

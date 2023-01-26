@@ -1316,6 +1316,15 @@ test('piping with arrow function and key replacement broadcast', [[
 ]], '2 4 6 8 10 12 14 16 18 20')
 -- }}}
 -- }}}
+
+-- {{{ string format
+test('string.format shorthand', [[
+    return 'my fav number: %d'(42)
+]], 'my fav number: 42')
+test('string.format shorthand with float', [[
+    return 'pi: %.8f'(math.pi)
+]], 'pi: 3.14159265')
+-- }}}
 -- }}}
 -- }}}
 

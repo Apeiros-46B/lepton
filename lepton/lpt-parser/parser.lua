@@ -596,7 +596,8 @@ local G = { V'Lua',
                       + V'NoCallPrimaryExpr', makeSuffixedExpr);
     PrimaryExpr       = V'SelfId' * (V'SelfCall' + V'SelfIndex')
                       + V'Id'
-                      + tagC('Paren', sym('(') * e(V'Expr', 'ExprParen') * e(sym(')'), 'CParenExpr'));
+                      + tagC('Paren', sym('(') * e(V'Expr', 'ExprParen') * e(sym(')'), 'CParenExpr'))
+                      + V'StringFormat';
     NoCallPrimaryExpr = tagC('String', V'String') + V'Table' + V'TableCompr';
     Index             = tagC('DotIndex', sym('.' * -P'.' * -V'Call' * -V'PipeOp') * e(V'StrId', 'NameIndex'))
                       + tagC('ArrayIndex', sym('[' * -P(S'=[')) * e(V'Expr', 'ExprIndex') * e(sym(']'), 'CBracketIndex'))
@@ -664,9 +665,10 @@ local G = { V'Lua',
     ExpoHex  = S'pP' * S'+-'^-1 * e(xdigit^1, 'DigitExpo');
     Int      = digit^1;
 
-    String    = token(V'ShortStr' + V'LongStr');
-    ShortStr  = P'"' * Cs((V'EscSeq' + (P(1)-S'"\n'))^0) * e(P'"', 'Quote')
-              + P"'" * Cs((V'EscSeq' + (P(1)-S"'\n"))^0) * e(P"'", 'Quote');
+    StringFormat = tagC('StringFormat', V'String' * V'Call');
+    String       = token(V'ShortStr' + V'LongStr');
+    ShortStr     = P'"' * Cs((V'EscSeq' + (P(1)-S'"\n'))^0) * e(P'"', 'Quote')
+                 + P"'" * Cs((V'EscSeq' + (P(1)-S"'\n"))^0) * e(P"'", 'Quote');
 
     EscSeq = P'\\' / ''  -- remove backslash
            * ( P'a' / '\a'

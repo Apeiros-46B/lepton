@@ -340,7 +340,8 @@ function traverse_exp (env, exp)
     if tag == 'Nil' or
         tag == 'Boolean' or -- `Boolean{ <boolean> }
         tag == 'Number' or -- `Number{ <number> }
-        tag == 'String' then -- `String{ <string> }
+        tag == 'String' or -- `String{ <string> }
+        tag == 'StringFormat' then
         return true
     elseif tag == 'Dots' then
         return traverse_vararg(env, exp)
