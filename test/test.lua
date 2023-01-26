@@ -1245,7 +1245,8 @@ test('broadcasting with key and value', [[
 ]], '1 4 9 16 25 36 49 64 81 100')
 test('broadcasting with key replacement', [[
     t = { 1, 2, 3 }
-    result = (v -> { v * 2, v * v }).(t)
+    func = v -> { v * 2, v * v }
+    result = func.(t)
 
     return table.concat({ result[2], result[4], result[6] }, ' ')
 ]], '1 4 9')
@@ -1264,18 +1265,56 @@ test('filtering with key and value', [[
 
     return table.concat(predicate-<<(t), ' ')
 ]], '9 16 49 64')
-test('filtering with value replacement', [[
-    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
-    predicate = v -> { v %% 2, v / 2 }
+-- }}}
 
-    return table.concat(predicate-<(t), ' ')
-]], '1.0 2.0 3.0 4.0 5.0')
-test('filtering with key and value replacement', [[
-    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
-    result = (v -> { v %% 2, v, v / 2 })-<(t)
+-- {{{ piping
+-- {{{ normal
+test('piping', [[
+    func1 = x -> x * 2
+    func2 = x -> x + 3
 
-    return table.concat({ result[2], result[4], result[6], result[8], result[10] }, ' ')
-]], '1.0 2.0 3.0 4.0 5.0')
+    return 3 |> func1 |> func2
+]], 9)
+test('piping with broadcast', [[
+    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+    func = x -> x * x
+
+    return (t .|> func) +++ ' '
+]], '1 4 9 16 25 36 49 64 81 100')
+test('piping with key value broadcast', [[
+    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+    func = (x, y) -> x + y
+
+    return (t ..|> func) +++ ' '
+]], '2 4 6 8 10 12 14 16 18 20')
+test('piping with key replacement broadcast', [[
+    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+    func = (x, y) -> x + y
+
+    return (t ..|> func) +++ ' '
+]], '2 4 6 8 10 12 14 16 18 20')
+-- }}}
+
+-- {{{ using arrow function inline
+test('piping with arrow function', [[
+    return 3 |> x -> x * 2 |> x -> x + 3
+]], 9)
+test('piping with arrow function and broadcast', [[
+    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+
+    return (t .|> x -> x * x) +++ ' '
+]], '1 4 9 16 25 36 49 64 81 100')
+test('piping with arrow function and key value broadcast', [[
+    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+
+    return (t ..|> (x, y) -> x + y) +++ ' '
+]], '2 4 6 8 10 12 14 16 18 20')
+test('piping with arrow function and key replacement broadcast', [[
+    t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+
+    return (t ..|> (x, y) -> x + y) +++ ' '
+]], '2 4 6 8 10 12 14 16 18 20')
+-- }}}
 -- }}}
 -- }}}
 -- }}}

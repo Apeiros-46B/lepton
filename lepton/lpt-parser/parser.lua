@@ -721,7 +721,7 @@ local G = { V'Lua',
               + sym('>')                 / 'gt'
               + sym('%%')                / 'divb' -- divisibility operators
               + sym('!%')                / 'ndivb';
-    BOrOp     = sym('|' - P'||')         / 'bor';
+    BOrOp     = sym('|' - P'||' - P'|>') / 'bor';
     BXorOp    = sym('~')                 / 'bxor';
     BAndOp    = sym('&' - P'&&')         / 'band';
     ShiftOp   = sym('<<')                / 'shl'

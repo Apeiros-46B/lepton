@@ -1056,7 +1056,7 @@ end
 
             -- {{{ piping
             pipe = (left, right)
-                return table.concat({ lua(right), '(', lua(left), ')' })
+                return table.concat({ '(', lua(right), ')', '(', lua(left), ')' })
             end,
             pipebc = (left, right)
                 return table.concat({ BROADCAST({ right, left }, false) })
