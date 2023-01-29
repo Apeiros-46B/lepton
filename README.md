@@ -1,436 +1,391 @@
-Candran
-=======
-Candran is a dialect of the [Lua 5.4](http://www.lua.org) programming language which compiles to Lua 5.4, Lua 5.3, Lua 5.2, LuaJIT and Lua 5.1 compatible code. It adds several useful syntax additions which aims to make Lua faster and easier to write, and a simple preprocessor.
+# Lepton
 
-Unlike Moonscript, Candran tries to stay close to the Lua syntax, and existing Lua code should be able to run on Candran unmodified.
+Lepton is a dialect of the [Lua 5.4](https://www.lua.org) programming language based on [Candran](https://github.com/Reuh/candran)
 
-````lua
-#import("lib.thing") -- static import
-#local DEBUG = false
+Lepton aims to add C-like syntax to Candran, inspired by [Erde](https://erde-lang.github.io).
 
-#if DEBUG then
-#	define("log(...)", "print(...)") -- macro: calls to log() will be replaced with print() in compiled code
-#else
-#	define("log(...)", "") -- remove calls to log from the compiled code when DEBUG is true
-#end
-log("example macro") -- preprocessor macros
+In addition, Lepton adds many more syntax additions on top of Candran, inspired by different languages like Julia and Unix shell scripts.
 
-local function calculate(toadd=25) -- default parameters
-	local result = thing.do()
-	result += toadd
-	#if DEBUG then -- preprocessor conditionals
-		print("Did something")
-	#end
-	return result
-end
-
-let a = {
-	hey = 5 // 2, -- Lua 5.3+ syntax, that will be translated to work with the current Lua version
+Unlike Candran, existing Lua code will *not* run on Lepton.
 
-	child = nil,
+**Current status**: Lepton is still under development and quite a few things do not work.  
+In addition, many things are planned and syntax may be changed at any moment to avoid ambiguity.
 
-	method = :(foo, thing) -- short function declaration, with self
-		@hey = thing(foo) -- @ as an alias for self
-	end,
+Lepton is also released under the MIT License (see `LICENSE` for details).
 
-	selfReference = () -- short function declaration, without self
-		return a -- no need for a prior local declaration when using let
-	end
-}
+# Syntax Additions
+After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lua. Lepton code adds the folowing syntax to Lua 5.4 syntax:
 
-const five = 5 -- shortcut for Lua 5.4 attributes 
+<details>
+  <summary>Assignment operators</summary>
 
-a:method(42, (foo)
-	return "something " .. foo
-end)
+  - `var += nb`
+  - `var -= nb`
+  - `var *= nb`
+  - `var /= nb`
+  - `var //= nb`
+  - `var ^= nb`
+  - `var %= nb`
+  - `var ++= str`
+  - `var &&= str`
+  - `var ||= str`
+  - `var &= nb`
+  - `var |= nb`
+  - `var <<= nb`
+  - `var >>= nb`
 
-local fn = a:method -- bundles an object and method in a function
-fn(42, (foo)
-	return "something" .. foo
-end)
+  For example, a `var += nb` assignment will be compiled into `var = var + nb`.
 
-a.child?:method?() -- safe navigation operator
+  All theses operators can also be put right of the assigment operator, in which case `var =+ nb` will be compiled into `var = nb + var`.
 
-local {hey, method} = a -- destructuring assignement
+  Right and left operator can be used at the same time.
 
-local odd = [ -- table comprehension
-	for i=1, 10 do
-		if i%2 == 0 then
-			continue -- continue keyword
-		end
-		i -- implicit push
-	end
-]
+  **Please note** that the code `a=-1` will be compiled into `a = -1` and not `a = a - 1`, like in pure Lua. If you want the latter, spacing is required between the `=-` and the expression: `a=- 1`. Yes, this is also valid Lua code, but as far as I'm aware, nobody write code like this; people who really like spacing would write `a= - 1` or `a = - 1`, and Lepton will read both of those as it is expected in pure Lua.
+</details>
 
-local count = [for i=1,10 i] -- single line statements
+<details>
+  <summary>Default function parameters</summary>
 
-local a = if condition then "one" else "two" end -- statement as expressions
+  ```lua
+  function foo(bar = "default", other = thing.do()) {
+      -- stuff
+  }
+  ```
+  If an argument isn't provided or set to `nil` when the function is called, it will automatically be set to its default value.
 
-print("Hello %s":format("world")) -- methods calls on strings (and tables) litterals without enclosing parentheses
-
-if f, err = io.open("data") then -- if condition with assignements
-	thing.process(f)
-else
-	error("can't open data: "..err)
-end
+  It is equivalent to doing `arg = (arg ~= nil or default) and arg` for each argument at the start of the function.
 
-````
-
-**Current status**: Candran is heavily used in several of my personal projects and works as expected.
-
-Candran is released under the MIT License (see ```LICENSE``` for details).
-
-#### Quick setup
-Install Candran automatically using LuaRocks: ```sudo luarocks install candran```.
-
-Or manually install LPegLabel and argparse (```luarocks install lpeglabel```, version 1.5 or above, and ```luarocks install argparse```, version 0.7 or above), download this repository and use Candran through the scripts in ```bin/``` or use it as a library with the self-contained ```candran.lua```.
-
-You can optionally install lua-linenoise (```luarocks install linenoise```, version 0.9 or above) for an improved REPL, and luacheck (```luarocks install luacheck```, version 0.23.0 or above) to be able to use ```cancheck```. Installing Candran using LuaRocks will install linenoise and luacheck by default.
+  The default values can be any Lua expression, which will be evaluated in the function's scope each time the default value end up being used.
+</details>
 
-You can register the Candran package searcher in your main Lua file (`require("candran").setup()`) and any subsequent `require` call in your project will automatically search for Candran modules.
+<details>
+  <summary>Short anonymous function declaration</summary>
 
-If you use LÖVE, some integration with Candran is detailled [here](https://github.com/Reuh/candran/wiki/L%C3%96VE).
+  ```lua
+  a = arg1, arg2 -> { print(arg1) }
 
-#### Editor support
-Most editors should be able to use their existing Lua support for Candran code. If you want full support for the additional syntax in your editor:
-* **Sublime Text 3**:
-	* [sublime-candran](https://github.com/Reuh/sublime-candran) support the full Candran syntax
-	* [SublimeLinter-cancheck-contrib](https://github.com/Reuh/SublimeLinter-contrib-cancheck) SublimeLinter plugin for Candran using ```cancheck```
-	* [SublimeLinter-candran-contrib](https://github.com/Reuh/SublimeLinter-contrib-candran) SublimeLinter plugin for Candran using ```canc -parse``` (only checks for syntaxic errors, no linting)
-* **Atom**: [language-candran](https://atom.io/packages/language-candran) support the full Candran syntax
+  b = :hop -> { print(self, hop) }
+  ```
 
-For linting, if your editor support [luacheck](https://github.com/luarocks/luacheck), you should be able to replace it with ```cancheck``` (in this repository ```bin/cancheck```, or installed automatically if Candran was installed using LuaRocks), which is a wrapper around luacheck that monkey-patch it to support Candran.
-
-The language
-------------
-### Syntax additions
-After the [preprocessor](#preprocessor) is run the Candran code is compiled to Lua. Candran code adds the folowing syntax to Lua 5.4 syntax:
-
-##### Assignment operators
-* ````var += nb````
-* ````var -= nb````
-* ````var *= nb````
-* ````var /= nb````
-* ````var //= nb````
-* ````var ^= nb````
-* ````var %= nb````
-* ````var ..= str````
-* ````var and= str````
-* ````var or= str````
-* ````var &= nb````
-* ````var |= nb````
-* ````var <<= nb````
-* ````var >>= nb````
-
-For example, a ````var += nb```` assignment will be compiled into ````var = var + nb````.
-
-All theses operators can also be put right of the assigment operator, in which case ```var =+ nb``` will be compiled into ```var = nb + var```.
-
-Right and left operator can be used at the same time.
-
-**Please note** that the code `a=-1` will be compiled into `a = -1` and not `a = a - 1`, like in pure Lua. If you want the latter, spacing is required between the `=-` and the expression: `a=- 1`. Yes, this is also valid Lua code, but as far as I'm aware, nobody write code like this; people who really like spacing would write `a= - 1` or `a = - 1`, and Candran will read both of those as it is expected in pure Lua. This is the only incompatibility between Candran and pure Lua.
-
-##### Default function parameters
-```lua
-function foo(bar = "default", other = thing.do())
-	-- stuff
-end
-```
-If an argument isn't provided or set to ```nil``` when the function is called, it will automatically be set to its default value.
-
-It is equivalent to doing ```if arg == nil then arg = default end``` for each argument at the start of the function.
-
-The default values can be any Lua expression, which will be evaluated in the function's scope each time the default value end up being used.
-
-##### Short anonymous function declaration
-```lua
-a = (arg1, arg2)
-	print(arg1)
-end
-
-b = :(hop)
-	print(self, hop)
-end
-```
-Anonymous function (functions values) can be created in a more concise way by omitting the ```function``` keyword.
-
-A ```:``` can prefix the parameters parenthesis to automatically add a ```self``` parameter.
-
-##### `@` self aliases
-```lua
-a = {
-	foo = "Hoi"
-}
-
-function a:hey()
-	print(@foo) -- Hoi
-	print(@["foo"]) -- also works
-	print(@ == self) -- true
-end
-```
-When a variable name is prefied with ```@```, the name will be accessed in ```self```.
-
-When used by itself, ```@``` is an alias for ```self```.
-
-##### `let` variable declaration
-```lua
-let a = {
-	foo = function()
-		print(type(a)) -- table
-	end
-}
-```
-
-Similar to ```local```, but the variable will be declared *before* the assignemnt (i.e. it will compile into ```local a; a = value```), so you can access it from functions defined in the value.
-
-This does not support Lua 5.4 attributes.
-
-Can also be used as a shorter name for ```local```.
-
-##### `const` and `close` variable declaration
-```lua
-const a = 5
-close b = {}
-
-const x, y, z = 1, 2, 3 -- every variable will be defined using <const>
-```
-
-Shortcut to Lua 5.4 variable attribute. Do not behave like `let`, as attributes require the variable to be constant and therefore can't be predeclared. Only compatibel with Lua 5.4 target.
-
-##### `continue` keyword
-```lua
-for i=1, 10 do
-	if i % 2 == 0 then
-		continue
-	end
-	print(i) -- 1, 3, 5, 7, 9
-end
-```
+  Anonymous function (functions values) can be created in a more concise way by omitting the `function` keyword.
 
-Will skip the current loop iteration.
+  A `:` can prefix the parameters parenthesis to automatically add a `self` parameter.
+</details>
 
-##### `push` keyword
-```lua
-function a()
-	for i=1, 5 do
-		push i, "next"
-	end
-	return "done"
-end
-print(a()) -- 1, next, 2, next, 3, next, 4, next, 5, next, done
+<details>
+  <summary>`@` self aliases</summary>
 
-push "hey" -- Does *not* work, because it is a valid Lua syntax for push("hey")
-```
+  ```lua
+  a = {
+      foo = "Hoi"
+  }
 
-Add one or more value to the returned value list. If you use a `return` afterwards, the pushed values will be placed *before* the `return` values, otherwise the function will only return what was pushed.
-
-In particular, this keyword is useful when used through implicit `push` with table comprehension and statement expressions.
-
-**Please note** that, in order to stay compatible with vanilla Lua syntax, any `push` immediatly followed by a `"string expression"`, `{table expression}` or `(parenthesis)` will be interpreted as a function call. It's recommended to use the implicit `push` when possible.
-
-##### Implicit `push`
-```lua
-function a()
-	for i=1, 5 do
-		i, next
-	end
-	return "done"
-end
-print(a()) -- 1, next, 2, next, 3, next, 4, next, 5, next, done
-
--- or probably more useful...
-local square = (x) x*x end -- function(x) return x*x end
-```
-
-Any list of expressions placed *at the end of a block* will be converted into a `push` automatically.
-
-**Please note** that this doesn't work with `v()` function calls, because these are already valid statements. Use `push v()` in this case.
-
-##### Table comprehension
-```lua
-a = [
-	for i=1, 10 do
-		i
-	end
-] -- { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
-
-a = [
-	for i=1, 10 do
-		if i%2 == 0 then
-			@[i] = true
-		end
-	end
-] -- { [2] = true, [4] = true, [6] = true, [8] = true, [10] = true }
-
-a = [push unpack(t1); push unpack(t2)] -- concatenate t1 and t2
-```
-
-Comprehensions provide a shorter syntax for defining and initializing tables based on a block of code.
-
-You can write *any* code you want between `[` and `]`, this code will be run as if it was a separate function which is immediadtly run.
-
-Values returned by the function will be inserted in the generated table in the order they were returned. This way, each time you `push` value(s), they will be added to the table.
-
-The table generation function also have access to the `self` variable (and its alias `@`), which is the table which is being created, so you can set any of the table's field.
-
-##### Destructuring assignement
-```lua
-t = { x = 1, y = 2, z = 3 }
-
-{x, y, z} = t -- x, y, z = t.x, t.y, t.z
-
-{x = o} = t -- o = t.x
-
-{["x"] = o} = t -- o = t["x"]
-
--- Also works with local, let, for ... in, if with assignement, +=, etc.
-local {x, y} = t
-let {x, y} = t
-for i, {x, y} in ipairs{t} do end
-if {x, y} = t then end
-{x} += t -- x = x + t.x
-
--- Works as expected with multiple assignement.
-a, {x, y, z}, b = 1, t, 2
-
-```
-
-Destruturing assignement allows to quickly extract fields from a table into a variable.
-
-This is done by replacing the variable name in any assignement with a table literal, where every item is the name of the field and assigned variable. It is possible to use a different field name than the variable name by naming the table item (`fieldName = var` or `[fieldExpression] = var`).
-
-
-##### Safe navigation operators
-```lua
-a = nil
-print(a?.b) -- nil
-
-a = {b=true}
-print(a?.b) -- true
-
--- So instead of typing
-if object and object.child and object.child.isGreen then
-	-- stuff
-end
--- you can type
-if object?.child?.isGreen then
-	-- stuff
-end
-
--- The ?. operator does not break the whole chain; make sure to use the operator on each index.
-print(a?.undefined.field) -- a?.undefined returns nil, so this throws a "attempt to index a nil value"
-
--- Other safe navigator operators behave similarly:
-print(a:method) -- nil if a is nil, other normal behaviour
-print(a["key"]) -- nil if a is nil, other normal behaviour
-print(a?()) -- nil if a is nil, other normal behaviour
-```
-
-Some operators can be prefixed by a `?` to turn into a safe version of the operator: if the base value if `nil`, the normal behaviour of the operator will be skipped and nil will be returned; otherwise, the operator run as usual. Is available safe dot index `?.`, safe array index `?[...]`, safe method stub `?:` and safe function call `?(...)`.
-
-##### If and while with assignement in the condition
-```lua
-if f, err = io.open("somefile") then -- condition if verified if f is a truthy value (not nil or false)
-	-- do something with f
-	f:close()
-elseif f2, err2 = io.open("anotherfile") then -- same behaviour on elseif
-	print("could not open somefile:", err) -- f and err stay in scope for the rest of the if-elseif-else block
-	-- do something with f2
-	f2:close()
-else
-	print("could not open somefile:", err)
-	print("could not open anotherfile:", err2)
-end
--- f, err, f2 and err2 are now out of scope
-
-if (value = list[index = 2]) and yes = true then -- several assignements can be performed, anywhere in the expression; index is defined before value, yes is defined after these two. The condition is verified if both value and yes are thruthy.
-	print(index, value)
-end
-
--- When used in a while, the expression is evaluated at each iteration.
-while line = io.read() do
-	print(line)
-end
-
--- The assignement have the same priority as regular assignements, i.e., the lowest.
-if a = 1 and 2 then -- will be read as a = (1 and 2)
-elseif (a = 1) and 2 then -- will be read as (a = 1) and 2
-end
-```
-
-Assignements can be used in the condition of if, elseif and while statements. Several variables can be assigned; only the first will be tested in the condition, for each assignement. The assigned variables will be in scope the duration of the block; for if statements, they will also be in scope for the following elseif(s) and else.
-
-For while statements, the assigned expression will be reevaluated at each iteration.
-
-##### Suffixable string and table litterals
-```lua
-"some text":upper() -- "SOME TEXT". Same as ("some text"):upper() in Lua.
-"string".upper -- the string.upper function. "string"["upper"] also works.
-
-{thing = 3}.thing -- 3. Also works with tables!
-[for i=0,5 do i*i end][3] -- 9. And table comprehensions!
-
--- Functions calls have priority:
-someFunction"thing":upper() -- same as (someFunction("thing")):upper() (i.e., the way it would be parsed by Lua)
-```
-
-String litterals, table litterals, and comprehensions can be suffixed with `:` method calls, `.` indexing, or `[` indexing, without needing to be enclosed in parentheses.
-
-**Please note**, that "normal" functions calls have priority over this syntax, in order to maintain Lua compatibility.
-
-##### Method stubs
-```lua
-object = {
-	value = 25,
-	method = function(self, str)
-		print(str, self.value)
-	end
-}
-
-stub = object:method
-
-object.method = error -- stub stores the method as it was when stub was defined
-object = nil -- also stores the object
-
-print(stub("hello")) -- hello	25
-```
-
-Create a closure function which bundles the variable and its method; when called it will call the method on the variable, without requiring to pass the variable as a first argument.
-
-The closure stores the value of the variable and method when created.
-
-##### Statement expressions
-```lua
-a = if false then
-	"foo" -- i.e. push "foo", i.e. return "foo"
-else
-	"bar"
-end
-print(a) -- bar
-
-a, b, c = for i=1,2 do i end
-print(a, b, c) -- 1, 2, nil
-```
-
-`if`, `do`, `while`, `repeat` and `for` statements can be used as expressions. Their content will be run as if they were run in a separate function which is immediatly run.
-
-##### One line statements
-```lua
-if condition()
-	a()
-elseif foo()
-	b()
-
-if other()
-	a()
-else -- "end" is always needed for else!
-	c()
-end
-```
-
-`if`, `elseif`, `for`, and `while` statements can be written without `do`, `then` or `end`, in which case they contain a single statement.
-
-**Please note** that an `end` is always required for `else` blocks.
+  function a:hey()
+      print(@foo) -- Hoi
+      print(@["foo"]) -- also works
+      print(@ == self) -- true
+  end
+  ```
+
+  When a variable name is prefied with `@`, the name will be accessed in `self`.
+
+  When used by itself, `@` is an alias for `self`.
+</details>
+
+<details>
+  <summary>`let` variable declaration</summary>
+
+  ```lua
+  let a = {
+      foo = function()
+          print(type(a)) -- table
+      end
+  }
+  ```
+
+  Similar to `local`, but the variable will be declared *before* the assignemnt (i.e. it will compile into `local a; a = value`), so you can access it from functions defined in the value.
+
+  This does not support Lua 5.4 attributes.
+
+  Can also be used as a shorter name for `local`.
+</details>
+
+<details>
+  <summary>`const` and `close` variable declaration</summary>
+
+  ```lua
+  const a = 5
+  close b = {}
+
+  const x, y, z = 1, 2, 3 -- every variable will be defined using <const>
+  ```
+
+  Shortcut to Lua 5.4 variable attribute. Do not behave like `let`, as attributes require the variable to be constant and therefore can't be predeclared. Only compatibel with Lua 5.4 target.
+</details>
+
+<details>
+  <summary>`continue` keyword</summary>
+
+  ```lua
+  for i=1, 10 do
+      if i % 2 == 0 then
+          continue
+      end
+      print(i) -- 1, 3, 5, 7, 9
+  end
+  ```
+
+  Will skip the current loop iteration.
+</details>
+
+<details>
+  <summary>`push` keyword</summary>
+
+  ```lua
+  function a()
+      for i=1, 5 do
+          push i, "next"
+      end
+      return "done"
+  end
+  print(a()) -- 1, next, 2, next, 3, next, 4, next, 5, next, done
+  ```
+
+  Add one or more value to the returned value list. If you use a `return` afterwards, the pushed values will be placed *before* the `return` values, otherwise the function will only return what was pushed.
+
+  In particular, this keyword is useful when used through implicit `push` with table comprehension and statement expressions.
+</details>
+
+<details>
+  <summary>Implicit `push`</summary>
+
+  ```lua
+  function a()
+      for i=1, 5 do
+          i, next
+      end
+      return "done"
+  end
+  print(a()) -- 1, next, 2, next, 3, next, 4, next, 5, next, done
+
+  -- or probably more useful...
+  local square = (x) x*x end -- function(x) return x*x end
+  ```
+
+  Any list of expressions placed *at the end of a block* will be converted into a `push` automatically.
+
+  **Please note** that this doesn't work with `v()` function calls, because these are already valid statements. Use `push v()` in this case.
+</details>
+
+<details>
+  <summary>Table comprehension</summary>
+
+  ```lua
+  a = [
+      for i=1, 10 do
+          i
+      end
+  ] -- { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+
+  a = [
+      for i=1, 10 do
+          if i%2 == 0 then
+              @[i] = true
+          end
+      end
+  ] -- { [2] = true, [4] = true, [6] = true, [8] = true, [10] = true }
+
+  a = [push unpack(t1); push unpack(t2)] -- concatenate t1 and t2
+  ```
+
+  Comprehensions provide a shorter syntax for defining and initializing tables based on a block of code.
+
+  You can write *any* code you want between `[` and `]`, this code will be run as if it was a separate function which is immediadtly run.
+
+  Values returned by the function will be inserted in the generated table in the order they were returned. This way, each time you `push` value(s), they will be added to the table.
+
+  The table generation function also have access to the `self` variable (and its alias `@`), which is the table which is being created, so you can set any of the table's field.
+</details>
+
+<details>
+  <summary>Destructuring assignement</summary>
+
+  ```lua
+  t = { x = 1, y = 2, z = 3 }
+
+  {x, y, z} = t -- x, y, z = t.x, t.y, t.z
+
+  {x = o} = t -- o = t.x
+
+  {["x"] = o} = t -- o = t["x"]
+
+  -- Also works with local, let, for ... in, if with assignement, +=, etc.
+  local {x, y} = t
+  let {x, y} = t
+  for i, {x, y} in ipairs{t} do end
+  if {x, y} = t then end
+  {x} += t -- x = x + t.x
+
+  -- Works as expected with multiple assignement.
+  a, {x, y, z}, b = 1, t, 2
+
+  ```
+
+  Destruturing assignement allows to quickly extract fields from a table into a variable.
+
+  This is done by replacing the variable name in any assignement with a table literal, where every item is the name of the field and assigned variable. It is possible to use a different field name than the variable name by naming the table item (`fieldName = var` or `[fieldExpression] = var`).
+</details>
+
+
+<details>
+  <summary>Safe navigation operators</summary>
+
+  ```lua
+  a = nil
+  print(a?.b) -- nil
+
+  a = {b=true}
+  print(a?.b) -- true
+
+  -- So instead of typing
+  if object and object.child and object.child.isGreen then
+      -- stuff
+  end
+  -- you can type
+  if object?.child?.isGreen then
+      -- stuff
+  end
+
+  -- The ?. operator does not break the whole chain; make sure to use the operator on each index.
+  print(a?.undefined.field) -- a?.undefined returns nil, so this throws a "attempt to index a nil value"
+
+  -- Other safe navigator operators behave similarly:
+  print(a:method) -- nil if a is nil, other normal behaviour
+  print(a["key"]) -- nil if a is nil, other normal behaviour
+  print(a?()) -- nil if a is nil, other normal behaviour
+  ```
+
+  Some operators can be prefixed by a `?` to turn into a safe version of the operator: if the base value if `nil`, the normal behaviour of the operator will be skipped and nil will be returned; otherwise, the operator run as usual. Is available safe dot index `?.`, safe array index `?[...]`, safe method stub `?:` and safe function call `?(...)`.
+</details>
+
+<details>
+  <summary>If and while with assignement in the condition</summary>
+
+  ```lua
+  if f, err = io.open("somefile") then -- condition if verified if f is a truthy value (not nil or false)
+      -- do something with f
+      f:close()
+  elseif f2, err2 = io.open("anotherfile") then -- same behaviour on elseif
+      print("could not open somefile:", err) -- f and err stay in scope for the rest of the if-elseif-else block
+      -- do something with f2
+      f2:close()
+  else
+      print("could not open somefile:", err)
+      print("could not open anotherfile:", err2)
+  end
+  -- f, err, f2 and err2 are now out of scope
+
+  if (value = list[index = 2]) and yes = true then -- several assignements can be performed, anywhere in the expression; index is defined before value, yes is defined after these two. The condition is verified if both value and yes are thruthy.
+      print(index, value)
+  end
+
+  -- When used in a while, the expression is evaluated at each iteration.
+  while line = io.read() do
+      print(line)
+  end
+
+  -- The assignement have the same priority as regular assignements, i.e., the lowest.
+  if a = 1 and 2 then -- will be read as a = (1 and 2)
+  elseif (a = 1) and 2 then -- will be read as (a = 1) and 2
+  end
+  ```
+
+  Assignements can be used in the condition of if, elseif and while statements. Several variables can be assigned; only the first will be tested in the condition, for each assignement. The assigned variables will be in scope the duration of the block; for if statements, they will also be in scope for the following elseif(s) and else.
+
+  For while statements, the assigned expression will be reevaluated at each iteration.
+</details>
+
+<details>
+  <summary>Suffixable string and table litterals</summary>
+
+  ```lua
+  "some text":upper() -- "SOME TEXT". Same as ("some text"):upper() in Lua.
+  "string".upper -- the string.upper function. "string"["upper"] also works.
+
+  {thing = 3}.thing -- 3. Also works with tables!
+  [for i=0,5 do i*i end][3] -- 9. And table comprehensions!
+
+  -- Functions calls have priority:
+  someFunction"thing":upper() -- same as (someFunction("thing")):upper() (i.e., the way it would be parsed by Lua)
+  ```
+
+  String litterals, table litterals, and comprehensions can be suffixed with `:` method calls, `.` indexing, or `[` indexing, without needing to be enclosed in parentheses.
+
+  **Please note**, that "normal" functions calls have priority over this syntax, in order to maintain Lua compatibility.
+</details>
+
+<details>
+  <summary>Method stubs</summary>
+
+  ```lua
+  object = {
+      value = 25,
+      method = function(self, str)
+          print(str, self.value)
+      end
+  }
+
+  stub = object:method
+
+  object.method = error -- stub stores the method as it was when stub was defined
+  object = nil -- also stores the object
+
+  print(stub("hello")) -- hello    25
+  ```
+
+  Create a closure function which bundles the variable and its method; when called it will call the method on the variable, without requiring to pass the variable as a first argument.
+
+  The closure stores the value of the variable and method when created.
+</details>
+
+<details>
+  <summary>Statement expressions</summary>
+
+  ```lua
+  a = if false then
+      "foo" -- i.e. push "foo", i.e. return "foo"
+  else
+      "bar"
+  end
+  print(a) -- bar
+
+  a, b, c = for i=1,2 do i end
+  print(a, b, c) -- 1, 2, nil
+  ```
+
+  `if`, `do`, `while`, `repeat` and `for` statements can be used as expressions. Their content will be run as if they were run in a separate function which is immediatly run.
+</details>
+
+<details>
+  <summary>One line statements</summary>
+
+  ```lua
+  if condition()
+      a()
+  elseif foo()
+      b()
+
+  if other()
+      a()
+  else -- "end" is always needed for else!
+      c()
+  end
+  ```
+
+  `if`, `elseif`, `for`, and `while` statements can be written without `do`, `then` or `end`, in which case they contain a single statement.
+
+  **Please note** that an `end` is always required for `else` blocks.
+</details>
 
 ### Preprocessor
 Before compiling, Candran's preprocessor is run. It execute every line starting with a _#_ (ignoring prefixing whitespace, long strings and comments) as Candran code.
@@ -438,9 +393,9 @@ For example,
 
 ````lua
 #if lang == "fr" then
-	print("Bonjour")
+    print("Bonjour")
 #else
-	print("Hello")
+    print("Hello")
 #end
 ````
 
@@ -450,8 +405,8 @@ The preprocessor has access to the following variables:
 * ````candran````: the Candran library table.
 * ````output````: the current preprocessor output string. Can be redefined at any time. If you want to write something in the preprocessor output, it is preferred to use `write(...)` instead of directly modifying `output`.
 * ````import(module[, [options])````: a function which import a module. This should be equivalent to using _require(module)_ in the Candran code, except the module will be embedded in the current file. Macros and preprocessor constants defined in the imported file (using `define` and `set`) will be made available in the current file. _options_ is an optional preprocessor arguments table for the imported module (current preprocessor arguments will be inherited). Options specific to this function:
-	* ```loadLocal``` (default ```true```): ```true``` to automatically load the module into a local variable (i.e. ```local thing = require("module.thing")```)
-	* ```loadPackage``` (default ```true```): ```true``` to automatically load the module into the loaded packages table (so it will be available for following ```require("module")``` calls).
+    * ```loadLocal``` (default ```true```): ```true``` to automatically load the module into a local variable (i.e. ```local thing = require("module.thing")```)
+    * ```loadPackage``` (default ```true```): ```true``` to automatically load the module into the loaded packages table (so it will be available for following ```require("module")``` calls).
 * ````include(filename)````: a function which copy the contents of the file _filename_ to the output.
 * ````write(...)````: write to the preprocessor output. For example, ````#write("hello()")```` will output ````hello()```` in the final file.
 * ```placeholder(name)```: if the variable _name_ is defined in the preprocessor environement, its content will be inserted here.
@@ -486,7 +441,7 @@ log("network", "error") -- network: error
 debug() -- not present in complied code
 
 #define("_assert(what, err)", function(what, err)
-#	return "if "..what.." then error("..err..") end"
+#    return "if "..what.." then error("..err..") end"
 #end)
 _assert(5 = 2, "failed") -- replaced with if 5 = 2 then error("failed") end
 ```
@@ -519,93 +474,93 @@ Usage
 ### Command-line usage
 The library can be used standalone through the ```canc``` (for compiling Candran files) and ```can``` (for running Candran files directly) utilities:
 
-*	````canc````
+*    ````canc````
 
-	Display the information text (version and basic command-line usage).
+    Display the information text (version and basic command-line usage).
 
-*	````canc [options] filename...````
+*    ````canc [options] filename...````
 
-	Preprocess and compile each  _filename_ Candran files, and creates the assiociated ```.lua``` files in the same directories.
+    Preprocess and compile each  _filename_ Candran files, and creates the assiociated ```.lua``` files in the same directories.
 
-	_options_ is of type ````--no-map-lines -p --include module -d VAR 5````.
+    _options_ is of type ````--no-map-lines -p --include module -d VAR 5````.
 
-	You can choose to use another directory where files should be written using the `--destination` or `-d` option: ```--destination destinationDirectory```.
+    You can choose to use another directory where files should be written using the `--destination` or `-d` option: ```--destination destinationDirectory```.
 
-	You can choose the output filename using `--output` or `-o` option: `--output filename`. By default, compiled files have the same name as their input file, but with a ```.lua``` extension.
+    You can choose the output filename using `--output` or `-o` option: `--output filename`. By default, compiled files have the same name as their input file, but with a ```.lua``` extension.
 
-	```canc``` can write to the standard output instead of creating files using the ```--print``` or `-p` argument.
+    ```canc``` can write to the standard output instead of creating files using the ```--print``` or `-p` argument.
 
-	You can choose to run only the preprocessor or compile using the ```--preprocess``` and ```--compile``` flags.
+    You can choose to run only the preprocessor or compile using the ```--preprocess``` and ```--compile``` flags.
 
-	You can choose to only parse the file and check it for syntaxic errors using the ```--parse``` flag. Errors will be printed to stderr in a similar format to ```luac -p```.
+    You can choose to only parse the file and check it for syntaxic errors using the ```--parse``` flag. Errors will be printed to stderr in a similar format to ```luac -p```.
 
-	The ```--ast``` flag is also available for debugging, and will disable preprocessing, compiling and file writing, and instead directly dump the AST generated from the input file(s) to stdout.
+    The ```--ast``` flag is also available for debugging, and will disable preprocessing, compiling and file writing, and instead directly dump the AST generated from the input file(s) to stdout.
 
-	Instead of providing filenames, you can use ```-``` to read from standard input.
+    Instead of providing filenames, you can use ```-``` to read from standard input.
 
-	You can change the compiler target using `--target` or `-t`: `--target luajit`.
+    You can change the compiler target using `--target` or `-t`: `--target luajit`.
 
-	You can change the identation and newline string using `--indentation` and `--newline`: `--identation luajit`.
+    You can change the identation and newline string using `--indentation` and `--newline`: `--identation luajit`.
 
-	You can change Candran's built-in variable prefix using `--variable-prefix`: `--variable-prefix __CAN_`.
+    You can change Candran's built-in variable prefix using `--variable-prefix`: `--variable-prefix __CAN_`.
 
-	You can disable line mapping (error rewriting will not work) using `--no-map-lines`.
+    You can disable line mapping (error rewriting will not work) using `--no-map-lines`.
 
-	You can disable built-in macros using `--no-builtin-macros`.
+    You can disable built-in macros using `--no-builtin-macros`.
 
-	You can define preprocessor constants using `--define` or `-D`: `--define VAR 5`. `VAR` will be available and set to 5 in the preprocessor. If you specify no value, it defaults to true.
+    You can define preprocessor constants using `--define` or `-D`: `--define VAR 5`. `VAR` will be available and set to 5 in the preprocessor. If you specify no value, it defaults to true.
 
-	You can statically import modules using `--import` or `-I`: `--import module`. The module will be imported in compiled files using `#import("module",{loadLocal=false})`.
+    You can statically import modules using `--import` or `-I`: `--import module`. The module will be imported in compiled files using `#import("module",{loadLocal=false})`.
 
-	You can disable error rewriting using `--no-rewrite-errors`.
+    You can disable error rewriting using `--no-rewrite-errors`.
 
-	You can change the chunkname using `--chunkname`: `--chunkname filename`. This will change the filenames are reported in errors. By default, try to use the current file name, or stdin when using `-`.
+    You can change the chunkname using `--chunkname`: `--chunkname filename`. This will change the filenames are reported in errors. By default, try to use the current file name, or stdin when using `-`.
 
-	Use the ```-h``` or ```--help``` option to display the help text.
+    Use the ```-h``` or ```--help``` option to display the help text.
 
-	Example uses:
+    Example uses:
 
-	* ````canc foo.can````
+    * ````canc foo.can````
 
-		preprocess and compile _foo.can_ and write the result in _foo.lua_.
+        preprocess and compile _foo.can_ and write the result in _foo.lua_.
 
-	* ````canc --indentation "  " foo.can````
+    * ````canc --indentation "  " foo.can````
 
-		preprocess and compile _foo.can_ with 2-space indentation (readable code!) and write the result in _foo.lua_.
+        preprocess and compile _foo.can_ with 2-space indentation (readable code!) and write the result in _foo.lua_.
 
-	* ````canc foo.can -d verbose --print | lua````
+    * ````canc foo.can -d verbose --print | lua````
 
-		preprocess _foo.can_ with _verbose_ set to _true_ in the preprocessor, compile it and execute it.
+        preprocess _foo.can_ with _verbose_ set to _true_ in the preprocessor, compile it and execute it.
 
-	* ````canc --parse foo.can````
+    * ````canc --parse foo.can````
 
-		checks foo.can for syntaxic errors.
+        checks foo.can for syntaxic errors.
 
 *   ```can```
 
-	Start a simplisitic Candran REPL. Will automatically call `candran.setup()`.
+    Start a simplisitic Candran REPL. Will automatically call `candran.setup()`.
 
-	If you want a better REPL (autocompletion, history, ability to move the cursor), install lua-linenoise: ```luarocks install linenoise``` (automatically installed if Candran was installed using LuaRocks).
+    If you want a better REPL (autocompletion, history, ability to move the cursor), install lua-linenoise: ```luarocks install linenoise``` (automatically installed if Candran was installed using LuaRocks).
 
-*	````can [options] filename````
+*    ````can [options] filename````
 
-	Preprocess, compile and run _filename_ using the options provided.
+    Preprocess, compile and run _filename_ using the options provided.
 
-	This will automatically register the Candran package searcher using `candran.setup()`, so required Candran modules will be compiled as they are needed.
+    This will automatically register the Candran package searcher using `candran.setup()`, so required Candran modules will be compiled as they are needed.
 
-	This command will use error rewriting unless explicitely enabled (by setting the `rewriteErrors=false` option).
+    This command will use error rewriting unless explicitely enabled (by setting the `rewriteErrors=false` option).
 
-	Instead of providing a filename, you can use ```-``` to read from standard input.
+    Instead of providing a filename, you can use ```-``` to read from standard input.
 
-	Use similar options as `canc`.
+    Use similar options as `canc`.
 
-	Use the ```-h``` or ```-help``` option to display the help text.
+    Use the ```-h``` or ```-help``` option to display the help text.
 
 *   ```cancheck```
 
-	Provides a linter and static analyzer with the exact same interface as [luacheck](https://github.com/luarocks/luacheck).
+    Provides a linter and static analyzer with the exact same interface as [luacheck](https://github.com/luarocks/luacheck).
 
-	This requires luacheck: ```luarocks install luacheck``` (automatically installed if Candran was installed through LuaRocks).
+    This requires luacheck: ```luarocks install luacheck``` (automatically installed if Candran was installed through LuaRocks).
 
 ### Library usage
 Candran can also be used as a Lua library:
