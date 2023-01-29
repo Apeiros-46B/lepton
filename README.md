@@ -47,7 +47,7 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
   <summary>Default function parameters</summary>
 
   ```lua
-  function foo(bar = "default", other = thing.do()) {
+  fn foo(bar = "default", other = thing.do()) {
       -- stuff
   }
   ```
@@ -80,11 +80,11 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
       foo = "Hoi"
   }
 
-  function a:hey()
+  fn a:hey() {
       print(@foo) -- Hoi
       print(@["foo"]) -- also works
       print(@ == self) -- true
-  end
+  }
   ```
 
   When a variable name is prefied with `@`, the name will be accessed in `self`.
@@ -97,9 +97,9 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
 
   ```lua
   let a = {
-      foo = function()
+      foo = () -> {
           print(type(a)) -- table
-      end
+      }
   }
   ```
 
@@ -127,12 +127,12 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
   <summary>`continue` keyword</summary>
 
   ```lua
-  for i=1, 10 do
-      if i % 2 == 0 then
+  for (i : 1, 10) {
+      if (i %% 2) {
           continue
-      end
+      }
       print(i) -- 1, 3, 5, 7, 9
-  end
+  }
   ```
 
   Will skip the current loop iteration.
@@ -142,12 +142,12 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
   <summary>`push` keyword</summary>
 
   ```lua
-  function a()
-      for i=1, 5 do
+  fn a() {
+      for (i : 1, 5) {
           push i, "next"
-      end
+      }
       return "done"
-  end
+  }
   print(a()) -- 1, next, 2, next, 3, next, 4, next, 5, next, done
   ```
 
@@ -160,16 +160,16 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
   <summary>Implicit `push`</summary>
 
   ```lua
-  function a()
-      for i=1, 5 do
+  fn a() {
+      for (i : 1, 5) do
           i, next
       end
       return "done"
-  end
+  }
   print(a()) -- 1, next, 2, next, 3, next, 4, next, 5, next, done
 
   -- or probably more useful...
-  local square = (x) x*x end -- function(x) return x*x end
+  local square = x -> x*x
   ```
 
   Any list of expressions placed *at the end of a block* will be converted into a `push` automatically.
@@ -181,18 +181,14 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
   <summary>Table comprehension</summary>
 
   ```lua
-  a = [
-      for i=1, 10 do
-          i
-      end
-  ] -- { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+  a = [ for (i : 1, 10) i ] -- { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
 
   a = [
-      for i=1, 10 do
-          if i%2 == 0 then
+      for (i : 1, 10) {
+          if (i %% 2) {
               @[i] = true
-          end
-      end
+          }
+      }
   ] -- { [2] = true, [4] = true, [6] = true, [8] = true, [10] = true }
 
   a = [push unpack(t1); push unpack(t2)] -- concatenate t1 and t2
@@ -222,8 +218,8 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
   -- Also works with local, let, for ... in, if with assignement, +=, etc.
   local {x, y} = t
   let {x, y} = t
-  for i, {x, y} in ipairs{t} do end
-  if {x, y} = t then end
+  for (i, {x, y} : ipairs(t)) {}
+  if ({x, y} = t) {}
   {x} += t -- x = x + t.x
 
   -- Works as expected with multiple assignement.
@@ -231,11 +227,10 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
 
   ```
 
-  Destruturing assignement allows to quickly extract fields from a table into a variable.
+  Destructuring assignement allows to quickly extract fields from a table into a variable.
 
   This is done by replacing the variable name in any assignement with a table literal, where every item is the name of the field and assigned variable. It is possible to use a different field name than the variable name by naming the table item (`fieldName = var` or `[fieldExpression] = var`).
 </details>
-
 
 <details>
   <summary>Safe navigation operators</summary>
@@ -248,13 +243,13 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
   print(a?.b) -- true
 
   -- So instead of typing
-  if object and object.child and object.child.isGreen then
+  if (object && object.child && object.child.isGreen) {
       -- stuff
-  end
+  }
   -- you can type
-  if object?.child?.isGreen then
+  if (object?.child?.isGreen) {
       -- stuff
-  end
+  }
 
   -- The ?. operator does not break the whole chain; make sure to use the operator on each index.
   print(a?.undefined.field) -- a?.undefined returns nil, so this throws a "attempt to index a nil value"
@@ -272,32 +267,32 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
   <summary>If and while with assignement in the condition</summary>
 
   ```lua
-  if f, err = io.open("somefile") then -- condition if verified if f is a truthy value (not nil or false)
+  if (f, err = io.open("somefile")) { -- condition if verified if f is a truthy value (not nil or false)
       -- do something with f
       f:close()
-  elseif f2, err2 = io.open("anotherfile") then -- same behaviour on elseif
+  } else if (f2, err2 = io.open("anotherfile")) { -- same behaviour on elseif
       print("could not open somefile:", err) -- f and err stay in scope for the rest of the if-elseif-else block
       -- do something with f2
       f2:close()
-  else
+  } else {
       print("could not open somefile:", err)
       print("could not open anotherfile:", err2)
-  end
+  }
   -- f, err, f2 and err2 are now out of scope
 
-  if (value = list[index = 2]) and yes = true then -- several assignements can be performed, anywhere in the expression; index is defined before value, yes is defined after these two. The condition is verified if both value and yes are thruthy.
+  if ((value = list[index = 2]) && yes = true) { -- several assignements can be performed, anywhere in the expression; index is defined before value, yes is defined after these two. The condition is verified if both value and yes are truthy.
       print(index, value)
-  end
+  }
 
   -- When used in a while, the expression is evaluated at each iteration.
-  while line = io.read() do
+  while (line = io.read()) {
       print(line)
-  end
+  }
 
   -- The assignement have the same priority as regular assignements, i.e., the lowest.
-  if a = 1 and 2 then -- will be read as a = (1 and 2)
-  elseif (a = 1) and 2 then -- will be read as (a = 1) and 2
-  end
+  if (a = 1 && 2) { -- will be read as a = (1 and 2)
+  } else if ((a = 1) && 2) { -- will be read as (a = 1) and 2
+  }
   ```
 
   Assignements can be used in the condition of if, elseif and while statements. Several variables can be assigned; only the first will be tested in the condition, for each assignement. The assigned variables will be in scope the duration of the block; for if statements, they will also be in scope for the following elseif(s) and else.
@@ -306,22 +301,20 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
 </details>
 
 <details>
-  <summary>Suffixable string and table litterals</summary>
+  <summary>Suffixable string and table literals</summary>
 
   ```lua
   "some text":upper() -- "SOME TEXT". Same as ("some text"):upper() in Lua.
   "string".upper -- the string.upper function. "string"["upper"] also works.
 
   {thing = 3}.thing -- 3. Also works with tables!
-  [for i=0,5 do i*i end][3] -- 9. And table comprehensions!
+  [for (i : 0, 5) i*i][3] -- 9. And table comprehensions!
 
   -- Functions calls have priority:
   someFunction"thing":upper() -- same as (someFunction("thing")):upper() (i.e., the way it would be parsed by Lua)
   ```
 
-  String litterals, table litterals, and comprehensions can be suffixed with `:` method calls, `.` indexing, or `[` indexing, without needing to be enclosed in parentheses.
-
-  **Please note**, that "normal" functions calls have priority over this syntax, in order to maintain Lua compatibility.
+  String literals, table literals, and comprehensions can be suffixed with `:` method calls, `.` indexing, or `[` indexing, without needing to be enclosed in parentheses.
 </details>
 
 <details>
@@ -330,9 +323,9 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
   ```lua
   object = {
       value = 25,
-      method = function(self, str)
+      method = :str -> {
           print(str, self.value)
-      end
+      }
   }
 
   stub = object:method
@@ -352,14 +345,14 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
   <summary>Statement expressions</summary>
 
   ```lua
-  a = if false then
+  a = if (false) {
       "foo" -- i.e. push "foo", i.e. return "foo"
-  else
+  } else {
       "bar"
-  end
+  }
   print(a) -- bar
 
-  a, b, c = for i=1,2 do i end
+  a, b, c = for (i : 1,2) i
   print(a, b, c) -- 1, 2, nil
   ```
 
@@ -370,48 +363,45 @@ After the [preprocessor](#preprocessor) is run the Lepton code is compiled to Lu
   <summary>One line statements</summary>
 
   ```lua
-  if condition()
+  if (condition())
       a()
-  elseif foo()
+  else if (foo())
       b()
 
-  if other()
+  if (other())
       a()
-  else -- "end" is always needed for else!
+  else
       c()
-  end
   ```
 
   `if`, `elseif`, `for`, and `while` statements can be written without `do`, `then` or `end`, in which case they contain a single statement.
-
-  **Please note** that an `end` is always required for `else` blocks.
 </details>
 
-### Preprocessor
+### [CURRENTLY BROKEN] Preprocessor
 Before compiling, Candran's preprocessor is run. It execute every line starting with a _#_ (ignoring prefixing whitespace, long strings and comments) as Candran code.
 For example,
 
-````lua
+```lua
 #if lang == "fr" then
     print("Bonjour")
 #else
     print("Hello")
 #end
-````
+```
 
-Will output ````print("Bonjour")```` or ````print("Hello")```` depending of the "lang" argument passed to the preprocessor.
+Will output `print("Bonjour")` or `print("Hello")` depending of the "lang" argument passed to the preprocessor.
 
 The preprocessor has access to the following variables:
-* ````candran````: the Candran library table.
-* ````output````: the current preprocessor output string. Can be redefined at any time. If you want to write something in the preprocessor output, it is preferred to use `write(...)` instead of directly modifying `output`.
-* ````import(module[, [options])````: a function which import a module. This should be equivalent to using _require(module)_ in the Candran code, except the module will be embedded in the current file. Macros and preprocessor constants defined in the imported file (using `define` and `set`) will be made available in the current file. _options_ is an optional preprocessor arguments table for the imported module (current preprocessor arguments will be inherited). Options specific to this function:
-    * ```loadLocal``` (default ```true```): ```true``` to automatically load the module into a local variable (i.e. ```local thing = require("module.thing")```)
-    * ```loadPackage``` (default ```true```): ```true``` to automatically load the module into the loaded packages table (so it will be available for following ```require("module")``` calls).
-* ````include(filename)````: a function which copy the contents of the file _filename_ to the output.
-* ````write(...)````: write to the preprocessor output. For example, ````#write("hello()")```` will output ````hello()```` in the final file.
-* ```placeholder(name)```: if the variable _name_ is defined in the preprocessor environement, its content will be inserted here.
-* ```define(identifier, replacement)```: define a macro. See below.
-* ```set(identifier, value)```: set a preprocessor constant.
+* `candran`: the Candran library table.
+* `output`: the current preprocessor output string. Can be redefined at any time. If you want to write something in the preprocessor output, it is preferred to use `write(...)` instead of directly modifying `output`.
+* `import(module[, [options])`: a function which import a module. This should be equivalent to using _require(module)_ in the Candran code, except the module will be embedded in the current file. Macros and preprocessor constants defined in the imported file (using `define` and `set`) will be made available in the current file. _options_ is an optional preprocessor arguments table for the imported module (current preprocessor arguments will be inherited). Options specific to this function:
+    * `loadLocal` (default `true`): `true` to automatically load the module into a local variable (i.e. `local thing = require("module.thing")`)
+    * `loadPackage` (default `true`): `true` to automatically load the module into the loaded packages table (so it will be available for following `require("module")` calls).
+* `include(filename)`: a function which copy the contents of the file _filename_ to the output.
+* `write(...)`: write to the preprocessor output. For example, `#write("hello()")` will output `hello()` in the final file.
+* `placeholder(name)`: if the variable _name_ is defined in the preprocessor environement, its content will be inserted here.
+* `define(identifier, replacement)`: define a macro. See below.
+* `set(identifier, value)`: set a preprocessor constant.
 * each arguments passed to the preprocessor is directly available in the environment.
 * and every standard Lua library.
 
@@ -447,7 +437,7 @@ _assert(5 = 2, "failed") -- replaced with if 5 = 2 then error("failed") end
 ```
 
 Candran provide some predefined macros by default:
-* `__STR__(expr)`: returns a string litteral representing the expression (e.g., `__STR__(5 + 2)` expands to `"5 + 2"`)
+* `__STR__(expr)`: returns a string literal representing the expression (e.g., `__STR__(5 + 2)` expands to `"5 + 2"`)
 * `__CONSTEXPR__(expr)`: calculate the result of the expression in the preprocessor, and returns a representation of the returned value, i.e. precalculate an expression at compile time
 You can disable these built-in macros using the `builtInMacros` compiler option.
 
