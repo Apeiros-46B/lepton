@@ -135,7 +135,6 @@ local labels = {
     { 'ErrOFunc', [[expected '{' after the parameter list]] },
     { 'ErrCFunc', [[expected '}' to close the function body]] },
     { 'ErrArrowFuncArrow', [[expected '->' after the arrow function parameter(s)]] },
-    { 'ErrOArrowFunc', [[expected '{' after '->']] },
     { 'ErrCArrowFunc', [[expected '}' to close the arrow function]] },
     { 'ErrParList', [[expected a variable name or '...' after ',']] },
 
@@ -253,7 +252,7 @@ local function parenAround(expr)
     return sym('(') * expr * sym(')')
 end
 
-local function tagC(tag, patt)
+local function tag(tag, patt)
     return Ct(Cg(Cp(), 'pos') * Cg(Cc(tag), 'tag') * patt)
 end
 
@@ -315,21 +314,40 @@ end
 
 -- lets you name variables with names that are keywords in Lua but not Lepton
 local function fixLuaKeywords(t)
-    local keywords = { 'and', 'do', 'elseif', 'end', 'function', 'in', 'not', 'or', 'then' }
+    local keywords = {
+        ['and']      = true,
+        ['do']       = true,
+        ['elseif']   = true,
+        ['end']      = true,
+        ['function'] = true,
+        ['in']       = true,
+        ['not']      = true,
+        ['or']       = true,
+        ['then']     = true,
+    }
     if t.tag == 'Pair' then
-        if isAny(t[1][1], keywords) then
+        if keywords[t[1][1]] then
             t[1][1] = '_' .. t[1][1]
         end
     else
-        if isAny(t[1], keywords) then
+        if keywords[t[1]] then
             t[1] = '_' .. t[1]
         end
     end
     return t
 end
 
+local calls = {
+    Call = true,
+    SafeCall = true,
+    Broadcast = true,
+    BroadcastKV = true,
+    Filter = true,
+    FilterKV = true,
+}
+
 local function makeSuffixedExpr(t1, t2)
-    if isAny(t2.tag, { 'Call', 'SafeCall', 'Broadcast', 'BroadcastKV', 'Filter', 'FilterKV' }) then
+    if calls[t2.tag] then
         local t = { tag = t2.tag, pos = t1.pos, [1] = t1 }
         for _, v in ipairs(t2) do
             t[#t+1] = v
@@ -395,14 +413,6 @@ local function eEnd(label)
     return e(sym('}'), label)
 end
 
-local function eBlkStartEnd(startLabel, endLabel, canFollow)
-    if canFollow then
-        return eStart(startLabel) * V'Block' * eEnd(endLabel) * canFollow^-1
-    else
-        return eStart(startLabel) * V'Block' * eEnd(endLabel)
-    end
-end
-
 local function eBlkStartEndOrSingleStat(startLabel, endLabel, canFollow) -- will try a SingleStat if start doesn't match
     local start = sym('{')
     if canFollow then
@@ -466,7 +476,7 @@ local G = { V'Lua',
     Lua      = (V'Shebang'^-1 * V'Skip' * V'Block' * e(P(-1), 'Extra')) / fixStructure;
     Shebang  = P'#!' * (P(1) - P'\n')^0;
 
-    Block       = tagC('Block', (V'Stat' + -V'BlockEnd' * throw('InvalidStat'))^0 * ((V'RetStat' + V'ImplicitPushStat') * sym(';')^-1)^-1);
+    Block       = tag('Block', (V'Stat' + -V'BlockEnd' * throw('InvalidStat'))^0 * ((V'RetStat' + V'ImplicitPushStat') * sym(';')^-1)^-1);
     Stat        = V'IfStat' + V'DoStat' + V'WhileStat' + V'RepeatStat' + V'ForStat'
                 + V'LocalStat' + V'FuncStat' + V'BreakStat' + V'LabelStat' + V'GoToStat'
                 + V'LetStat' + V'ConstStat' + V'CloseStat'
@@ -475,80 +485,80 @@ local G = { V'Lua',
                 + sym(';');
     BlockEnd    = P'return' + sym('}') + ']' + -1 + V'ImplicitPushStat' + V'Assignment';
 
-    SingleStatBlock = tagC('Block', V'Stat' + V'RetStat' + V'ImplicitPushStat');
-    BlockNoErr      = tagC('Block', V'Stat'^0 * ((V'RetStat' + V'ImplicitPushStat') * sym(';')^-1)^-1); -- used to check if something a valid block without throwing an error
+    SingleStatBlock = tag('Block', V'Stat' + V'RetStat' + V'ImplicitPushStat');
+    BlockNoErr      = tag('Block', V'Stat'^0 * ((V'RetStat' + V'ImplicitPushStat') * sym(';')^-1)^-1); -- used to check if something a valid block without throwing an error
 
-    IfStat      = tagC('If', V'IfPart');
+    IfStat      = tag('If', V'IfPart');
     IfPart      = kw('if') * set('lexpr', e(parenAround(V'Expr'), 'ExprIf')) * eBlkStartEndOrSingleStat('OIf', 'CIf', V'ElseIfPart' + V'ElsePart');
     ElseIfPart  = kw('else') * V'IfPart';
     ElsePart    = kw('else') * eBlkStartEndOrSingleStat('OElse', 'CIf');
 
     DoStat      = kw('do') * eBlkStartEndOrSingleStat('ODo', 'CDo') / tagDo;
-    WhileStat   = tagC('While', kw('while') * set('lexpr', e(parenAround(V'Expr'), 'ExprWhile')) * V'WhileBody');
+    WhileStat   = tag('While', kw('while') * set('lexpr', e(parenAround(V'Expr'), 'ExprWhile')) * V'WhileBody');
     WhileBody   = eBlkStartEndOrSingleStat('DoWhile', 'EndWhile');
-    RepeatStat  = tagC('Repeat', kw('repeat') * eBlkStartEndOrSingleStat('ORep', 'CRep') * e(kw('until'), 'UntilRep') * e(parenAround(V'Expr'), 'ExprRep'));
+    RepeatStat  = tag('Repeat', kw('repeat') * eBlkStartEndOrSingleStat('ORep', 'CRep') * e(kw('until'), 'UntilRep') * e(parenAround(V'Expr'), 'ExprRep'));
 
     ForStat   = kw('for') * e(V'ForNum' + V'ForIn', 'ForRange');
-    ForNum    = tagC('Fornum', parenAround(V'Id' * sym(':') * V'NumRange') * V'ForBody');
+    ForNum    = tag('Fornum', parenAround(V'Id' * sym(':') * V'NumRange') * V'ForBody');
     NumRange  = e(V'Expr', 'ForRangeStart') * e(sym(','), 'ForRangeComma') * e(V'Expr', 'ForRangeEnd')
               * (sym(':') * e(V'Expr', 'ForRangeStep'))^-1;
-    ForIn     = tagC('Forin', parenAround(V'DestructuringNameList' * e(sym(':'), 'InFor') * e(V'ExprList', 'EListFor')) * V'ForBody');
+    ForIn     = tag('Forin', parenAround(V'DestructuringNameList' * e(sym(':'), 'InFor') * e(V'ExprList', 'EListFor')) * V'ForBody');
     ForBody   = eBlkStartEndOrSingleStat('OFor', 'CFor');
 
     LocalStat    = kw('local') * e(V'LocalFunc' + V'LocalAssign', 'DefLocal');
-    LocalFunc    = tagC('Localrec', kw('fn') * e(V'Id', 'NameLFunc') * V'FuncBody') / fixFuncStat;
-    LocalAssign  = tagC('Local', V'AttributeNameList' * (sym('=') * e(V'ExprList', 'EListLAssign') + Ct(Cc())))
-                 + tagC('Local', V'DestructuringNameList' * sym('=') * e(V'ExprList', 'EListLAssign'));
+    LocalFunc    = tag('Localrec', kw('fn') * e(V'Id', 'NameLFunc') * V'FuncBody') / fixFuncStat;
+    LocalAssign  = tag('Local', V'AttributeNameList' * (sym('=') * e(V'ExprList', 'EListLAssign') + Ct(Cc())))
+                 + tag('Local', V'DestructuringNameList' * sym('=') * e(V'ExprList', 'EListLAssign'));
 
     LetStat      = kw('let') * e(V'LetAssign', 'DefLet');
-    LetAssign    = tagC('Let', V'NameList' * (sym('=') * e(V'ExprList', 'EListLAssign') + Ct(Cc())))
-                 + tagC('Let', V'DestructuringNameList' * sym('=') * e(V'ExprList', 'EListLAssign'));
+    LetAssign    = tag('Let', V'NameList' * (sym('=') * e(V'ExprList', 'EListLAssign') + Ct(Cc())))
+                 + tag('Let', V'DestructuringNameList' * sym('=') * e(V'ExprList', 'EListLAssign'));
 
     ConstStat       = kw('const') * e(V'AttributeAssign' / setAttribute('const'), 'DefConst');
     CloseStat       = kw('close') * e(V'AttributeAssign' / setAttribute('close'), 'DefClose');
-    AttributeAssign = tagC('Local', V'NameList' * (sym('=') * e(V'ExprList', 'EListLAssign') + Ct(Cc())))
-                    + tagC('Local', V'DestructuringNameList' * sym('=') * e(V'ExprList', 'EListLAssign'));
+    AttributeAssign = tag('Local', V'NameList' * (sym('=') * e(V'ExprList', 'EListLAssign') + Ct(Cc())))
+                    + tag('Local', V'DestructuringNameList' * sym('=') * e(V'ExprList', 'EListLAssign'));
 
-    Assignment  = tagC('Set', (V'VarList' + V'DestructuringNameList') * V'BinOp'^-1 * ((P'=' - '==') / '=')
+    Assignment  = tag('Set', (V'VarList' + V'DestructuringNameList') * V'BinOp'^-1 * ((P'=' - '==') / '=')
                 * ((V'BinOp' - P'-') + #(P'-' * V'Space') * V'BinOp')^-1 * V'Skip' * e(V'ExprList', 'EListAssign'));
 
-    AppendAssignment = tagC('AppendSet', V'VarList' * sym('#=') * e(V'ExprList', 'EListAssign'));
+    AppendAssignment = tag('AppendSet', V'VarList' * sym('#=') * e(V'ExprList', 'EListAssign'));
 
-    FuncStat    = tagC('Set', kw('fn') * e(V'FuncName', 'FuncName') * V'FuncBody') / fixFuncStat;
+    FuncStat    = tag('Set', kw('fn') * e(V'FuncName', 'FuncName') * V'FuncBody') / fixFuncStat;
     FuncName    = Cf(V'Id' * (sym('.') * e(V'StrId', 'NameFunc1'))^0, insertIndex)
                 * (sym(':') * e(V'StrId', 'NameFunc2'))^-1 / markMethod;
-    FuncBody    = tagC('Function', V'FuncParams' * eBlkStartEndOrSingleStat('OFunc', 'CFunc'));
+    FuncBody    = tag('Function', V'FuncParams' * eBlkStartEndOrSingleStat('OFunc', 'CFunc'));
     FuncParams  = e(sym('('), 'OParenPList') * V'ParList' * e(sym(')'), 'CParenPList');
-    ParList     = V'NamedParList' * (sym(',') * e(tagC('Dots', sym('...')), 'ParList'))^-1 / addDots
-                + Ct(tagC('Dots', sym('...')))
+    ParList     = V'NamedParList' * (sym(',') * e(tag('Dots', sym('...')), 'ParList'))^-1 / addDots
+                + Ct(tag('Dots', sym('...')))
                 + Ct(Cc()); -- Cc({}) generates a bug since the {} would be shared across parses
 
-    ArrowFuncDef    = tagC('Function', V'ArrowFuncParams' * sym('->') * V'ArrowFuncBody') / fixArrowFunc;
-    ArrowFuncParams = (sym(':') / ':')^-1 * (parenAround(V'ParList') + tagC('NamedPar', V'NamedPar'));
-    ArrowFuncBody   = (-sym('{') * tagC('Block', tagC('Push', V'OrExpr')) * -sym('}')) + eBlkStartEnd('OArrowFunc', 'CArrowFunc');
+    ArrowFuncDef    = tag('Function', V'ArrowFuncParams' * sym('->') * V'ArrowFuncBody') / fixArrowFunc;
+    ArrowFuncParams = (sym(':') / ':')^-1 * (parenAround(V'ParList') + tag('NamedPar', V'NamedPar'));
+    ArrowFuncBody   = (-sym('{') * tag('Block', tag('Push', V'OrExpr')) * -sym('}')) + sym('{') * V'Block' * eEnd('CArrowFunc');
 
-    NamedParList  = tagC('NamedParList', commaSep(V'NamedPar'));
-    NamedPar      = tagC('ParPair', V'ParKey' * e(sym('='), 'EqField') * e(V'Expr', 'ExprField')) + V'Id';
+    NamedParList  = tag('NamedParList', commaSep(V'NamedPar'));
+    NamedPar      = tag('ParPair', V'ParKey' * e(sym('='), 'EqField') * e(V'Expr', 'ExprField')) + V'Id';
     ParKey        = V'Id' * #('=' * -P'=');
 
-    LabelStat       = tagC('Label', sym('::') * e(V'Name', 'Label') * e(sym('::'), 'CloseLabel'));
-    GoToStat        = tagC('Goto', kw('goto') * e(V'Name', 'Goto'));
-    BreakStat       = tagC('Break', kw('break'));
-    ContinueStat    = tagC('Continue', kw('continue'));
-    RetStat         = tagC('Return', kw('return') * commaSep(V'Expr', 'RetList')^-1);
+    LabelStat       = tag('Label', sym('::') * e(V'Name', 'Label') * e(sym('::'), 'CloseLabel'));
+    GoToStat        = tag('Goto', kw('goto') * e(V'Name', 'Goto'));
+    BreakStat       = tag('Break', kw('break'));
+    ContinueStat    = tag('Continue', kw('continue'));
+    RetStat         = tag('Return', kw('return') * commaSep(V'Expr', 'RetList')^-1);
 
-    PushStat         = tagC('Push', kw('push') * commaSep(V'Expr', 'RetList')^-1);
-    ImplicitPushStat = tagC('Push', commaSep(V'Expr', 'RetList')) / markImplicit;
+    PushStat         = tag('Push', kw('push') * commaSep(V'Expr', 'RetList')^-1);
+    ImplicitPushStat = tag('Push', commaSep(V'Expr', 'RetList')) / markImplicit;
 
-    NameList              = tagC('NameList', commaSep(V'Id'));
-    DestructuringNameList = tagC('NameList', commaSep(V'DestructuringId')),
-    AttributeNameList     = tagC('AttributeNameList', commaSep(V'AttributeId'));
-    VarList               = tagC('VarList', commaSep(V'VarExpr'));
-    ExprList              = tagC('ExpList', commaSep(V'Expr', 'ExprList'));
+    NameList              = tag('NameList', commaSep(V'Id'));
+    DestructuringNameList = tag('NameList', commaSep(V'DestructuringId')),
+    AttributeNameList     = tag('AttributeNameList', commaSep(V'AttributeId'));
+    VarList               = tag('VarList', commaSep(V'VarExpr'));
+    ExprList              = tag('ExpList', commaSep(V'Expr', 'ExprList'));
 
-    DestructuringId          = tagC('DestructuringId', sym('{') * V'DestructuringIdFieldList' * e(sym('}'), 'CBraceDestructuring')) + V'Id',
+    DestructuringId          = tag('DestructuringId', sym('{') * V'DestructuringIdFieldList' * eEnd('CBraceDestructuring')) + V'Id',
     DestructuringIdFieldList = sepBy(V'DestructuringIdField', V'FieldSep') * V'FieldSep'^-1;
-    DestructuringIdField     = tagC('Pair', V'FieldKey' * e(sym('='), 'DestructuringEqField') * e(V'Id', 'DestructuringExprField')) + V'Id';
+    DestructuringIdField     = tag('Pair', V'FieldKey' * e(sym('='), 'DestructuringEqField') * e(V'Id', 'DestructuringExprField')) + V'Id';
 
     Expr        = V'PipeExpr';
     PipeExpr    = chainOp(V'OrExpr', V'PipeOp', 'PipeExpr');
@@ -566,29 +576,20 @@ local G = { V'Lua',
     UnaryExpr   = V'UnaryOp' * e(V'UnaryExpr', 'UnaryExpr') / unaryOp
                 + V'PowExpr';
     PowExpr     = V'SimpleExpr' * (V'PowOp' * e(V'UnaryExpr', 'PowExpr'))^-1 / binaryOp;
-    SimpleExpr  = tagC('Number', V'Number')
-                + tagC('Nil', kw('nil'))
-                + tagC('Boolean', kw('false') * Cc(false))
-                + tagC('Boolean', kw('true') * Cc(true))
-                + tagC('Dots', sym('...'))
+    SimpleExpr  = tag('Number', V'Number')
+                + tag('Nil', kw('nil'))
+                + tag('Boolean', kw('false') * Cc(false))
+                + tag('Boolean', kw('true') * Cc(true))
+                + tag('Dots', sym('...'))
                 + V'FuncDef'
                 + V'ArrowFuncDef'
-                + (when('lexpr') * tagC('LetExpr', mb(V'DestructuringNameList') * sym('=') * -sym('=') * e(V'ExprList', 'EListLAssign')))
+                + (when('lexpr') * tag('LetExpr', mb(V'DestructuringNameList') * sym('=') * -sym('=') * e(V'ExprList', 'EListLAssign')))
                 + V'SuffixedExpr'
                 + V'StatExpr';
 
     StatExpr = (V'IfStat' + V'DoStat' + V'WhileStat' + V'RepeatStat' + V'ForStat') / statToExpr;
 
-    FuncCall = Cmt(V'SuffixedExpr', function(s, i, exp)
-        return exp.tag == 'Call'
-            or exp.tag == 'SafeCall'
-            or exp.tag == 'Broadcast'
-            or exp.tag == 'BroadcastKV'
-            or exp.tag == 'Filter'
-            or exp.tag == 'FilterKV',
-
-            exp
-    end);
+    FuncCall = Cmt(V'SuffixedExpr', function(s, i, exp) return calls[exp.tag] or false, exp end);
     VarExpr = Cmt(V'SuffixedExpr', function(s, i, exp) return exp.tag == 'Id' or exp.tag == 'Index', exp end);
 
     SuffixedExpr      = Cf(V'PrimaryExpr' * (V'Index' + V'MethodStub' + V'Call')^0
@@ -596,42 +597,43 @@ local G = { V'Lua',
                       + V'NoCallPrimaryExpr', makeSuffixedExpr);
     PrimaryExpr       = V'SelfId' * (V'SelfCall' + V'SelfIndex')
                       + V'Id'
-                      + tagC('Paren', sym('(') * e(V'Expr', 'ExprParen') * e(sym(')'), 'CParenExpr'))
+                      + tag('Paren', sym('(') * e(V'Expr', 'ExprParen') * e(sym(')'), 'CParenExpr'))
                       + V'StringFormat';
-    NoCallPrimaryExpr = tagC('String', V'String') + V'Table' + V'TableCompr';
-    Index             = tagC('DotIndex', sym('.' * -P'.' * -V'Call' * -V'PipeOp') * e(V'StrId', 'NameIndex'))
-                      + tagC('ArrayIndex', sym('[' * -P(S'=[')) * e(V'Expr', 'ExprIndex') * e(sym(']'), 'CBracketIndex'))
-                      + tagC('SafeDotIndex', sym('?.' * -P'.') * e(V'StrId', 'NameIndex'))
-                      + tagC('SafeArrayIndex', sym('?[' * -P(S'=[')) * e(V'Expr', 'ExprIndex') * e(sym(']'), 'CBracketIndex'));
-    MethodStub        = tagC('MethodStub', sym(':' * -P':') * e(V'StrId', 'NameMeth'))
-                      + tagC('SafeMethodStub', sym('?:' * -P':') * e(V'StrId', 'NameMeth'));
-    Call              = tagC('Call', V'FuncArgs')
-                      + tagC('SafeCall', sym('?') * V'FuncArgs')
-                      + tagC('Broadcast', sym('.') * V'FuncArgs')
-                      + tagC('BroadcastKV', sym('..') * V'FuncArgs')
-                      + tagC('Filter', sym('-<') * V'FuncArgs')
-                      + tagC('FilterKV', sym('-<<') * V'FuncArgs');
-    SelfCall          = tagC('MethodStub', V'StrId') * V'Call';
-    SelfIndex         = tagC('DotIndex', V'StrId');
+    NoCallPrimaryExpr = tag('String', V'String') + V'TableUnpack' + V'Table' + V'TableCompr';
+    Index             = tag('DotIndex', sym('.' * -P'.' * -V'Call' * -V'PipeOp' * -V'Table') * e(V'StrId', 'NameIndex'))
+                      + tag('ArrayIndex', sym('[' * -P(S'=[')) * e(V'Expr', 'ExprIndex') * e(sym(']'), 'CBracketIndex'))
+                      + tag('SafeDotIndex', sym('?.' * -P'.') * e(V'StrId', 'NameIndex'))
+                      + tag('SafeArrayIndex', sym('?[' * -P(S'=[')) * e(V'Expr', 'ExprIndex') * e(sym(']'), 'CBracketIndex'));
+    MethodStub        = tag('MethodStub', sym(':' * -P':') * e(V'StrId', 'NameMeth'))
+                      + tag('SafeMethodStub', sym('?:' * -P':') * e(V'StrId', 'NameMeth'));
+    Call              = tag('Call', V'FuncArgs')
+                      + tag('SafeCall', sym('?') * V'FuncArgs')
+                      + tag('Broadcast', sym('.') * V'FuncArgs')
+                      + tag('BroadcastKV', sym('..') * V'FuncArgs')
+                      + tag('Filter', sym('-<') * V'FuncArgs')
+                      + tag('FilterKV', sym('-<<') * V'FuncArgs');
+    SelfCall          = tag('MethodStub', V'StrId') * V'Call';
+    SelfIndex         = tag('DotIndex', V'StrId');
 
     FuncDef   = (kw('fn') * V'FuncBody');
     FuncArgs  = sym('(') * commaSep(V'Expr', 'ArgList')^-1 * e(sym(')'), 'CParenArgs');
 
-    Table      = tagC('Table', sym('{') * V'FieldList'^-1 * e(sym('}'), 'CBraceTable'));
+    Table      = tag('Table', sym('{') * V'FieldList'^-1 * eEnd('CBraceTable'));
     FieldList  = sepBy(V'Field', V'FieldSep') * V'FieldSep'^-1;
-    Field      = tagC('Pair', V'FieldKey' * e(sym('='), 'EqField') * e(V'Expr', 'ExprField')) / fixLuaKeywords
+    Field      = tag('Pair', V'FieldKey' * e(sym('='), 'EqField') * e(V'Expr', 'ExprField')) / fixLuaKeywords
                + V'Expr';
     FieldKey   = sym('[' * -P(S'=[')) * e(V'Expr', 'ExprFKey') * e(sym(']'), 'CBracketFKey')
                + V'StrId' * #('=' * -P'=');
     FieldSep   = sym(',') + sym(';');
 
-    TableCompr = tagC('TableCompr', sym('[') * V'Block' * e(sym(']'), 'CBracketTableCompr'));
+    TableUnpack = tag('TableUnpack', (V'Name' + V'Table') * sym('.') * V'Table');
+    TableCompr  = tag('TableCompr', sym('[') * V'Block' * e(sym(']'), 'CBracketTableCompr'));
 
-    SelfId          = tagC('Id', sym('@') / 'self');
-    Id              = (tagC('Id', V'Name') / fixLuaKeywords) + V'SelfId';
-    AttributeSelfId = tagC('AttributeId', sym'@' / 'self' * V'Attribute'^-1);
-    AttributeId     = tagC('AttributeId', V'Name' * V'Attribute'^-1) / fixLuaKeywords + V'AttributeSelfId';
-    StrId           = tagC('String', V'Name');
+    SelfId          = tag('Id', sym('@') / 'self');
+    Id              = (tag('Id', V'Name') / fixLuaKeywords) + V'SelfId';
+    AttributeSelfId = tag('AttributeId', sym'@' / 'self' * V'Attribute'^-1);
+    AttributeId     = tag('AttributeId', V'Name' * V'Attribute'^-1) / fixLuaKeywords + V'AttributeSelfId';
+    StrId           = tag('String', V'Name');
 
     Attribute = sym('<') * e(kw'const' / 'const' + kw'close' / 'close', 'UnknownAttribute') * e(sym('>'), 'CBracketAttribute');
 
@@ -658,14 +660,14 @@ local G = { V'Lua',
     Float    = V'Decimal' * V'Expo'^-1
              + V'Int' * V'Expo';
     Decimal  = digit^1 * '.' * digit^0
-             + P'.' * -P'.' * e(digit^1, 'DigitDeci');
+             + P'.' * -P'.' * -V'Table' * e(digit^1, 'DigitDeci');
     DeciHex  = P'.' * xdigit^0;
     DeciBin  = P'.' * S'_01'^0;
     Expo     = S'eE' * S'+-'^-1 * e(digit^1, 'DigitExpo');
     ExpoHex  = S'pP' * S'+-'^-1 * e(xdigit^1, 'DigitExpo');
     Int      = digit^1;
 
-    StringFormat = tagC('StringFormat', V'String' * V'Call');
+    StringFormat = tag('StringFormat', V'String' * V'Call');
     String       = token(V'ShortStr' + V'LongStr');
     ShortStr     = P'"' * Cs((V'EscSeq' + (P(1)-S'"\n'))^0) * e(P'"', 'Quote')
                  + P"'" * Cs((V'EscSeq' + (P(1)-S"'\n"))^0) * e(P"'", 'Quote');
@@ -750,11 +752,11 @@ local G = { V'Lua',
 local macroidentifier = {
     e(V'MacroIdentifier', 'InvalidStat') * e(P(-1), 'Extra'),
 
-    MacroIdentifier   = tagC('MacroFunction', V'Id' * sym('(') * V'MacroFunctionArgs' * e(sym(')'), 'CParenPList'))
+    MacroIdentifier   = tag('MacroFunction', V'Id' * sym('(') * V'MacroFunctionArgs' * e(sym(')'), 'CParenPList'))
                       + V'Id';
 
-    MacroFunctionArgs = V'NameList' * (sym(',') * e(tagC('Dots', sym('...')), 'ParList'))^-1 / addDots
-                      + Ct(tagC('Dots', sym('...')))
+    MacroFunctionArgs = V'NameList' * (sym(',') * e(tag('Dots', sym('...')), 'ParList'))^-1 / addDots
+                      + Ct(tag('Dots', sym('...')))
                       + Ct(Cc());
 }
 

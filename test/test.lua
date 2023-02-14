@@ -1192,6 +1192,16 @@ test('destructuring assignment with if-else if with assignment with expression a
 -- }}}
 -- }}}
 
+-- {{{ table unpack
+test('table.unpack shorthand', [[
+    return table.concat({ { 1, 2, 3, 4, 5 }.{} }, ' ')
+]], '1 2 3 4 5')
+test('table.unpack shorthand 2', [[
+    t = { 1, 2, 3, 4, 5 }
+    return table.concat({ t.{} }, ' ')
+]], '1 2 3 4 5')
+-- }}}
+
 -- {{{ table concat
 test('table.concat operator', [[
     return { 'Hello', 'world!' } +++ ' '

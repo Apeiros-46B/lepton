@@ -10,7 +10,7 @@ local begin_loop, end_loop = scope.begin_loop, scope.end_loop
 local insideloop = scope.insideloop
 
 -- creates an error message for the input string
-local function syntaxerror (errorinfo, pos, msg)
+local function syntaxerror(errorinfo, pos, msg)
     local l, c = lineno(errorinfo.subject, pos)
     local error_msg = '%s:%d:%d: syntax error, %s'
     return string.format(error_msg, errorinfo.filename, l, c, msg)
@@ -57,14 +57,14 @@ local function verify_pending_gotos(env)
     return true
 end
 
-local function set_vararg (env, is_vararg)
+local function set_vararg(env, is_vararg)
     env['function'][env.fscope].is_vararg = is_vararg
 end
 
 local traverse_stm, traverse_exp, traverse_var
 local traverse_block, traverse_explist, traverse_varlist, traverse_parlist
 
-function traverse_parlist (env, parlist)
+function traverse_parlist(env, parlist)
     local len = #parlist
     local is_vararg = false
     if len > 0 and parlist[len].tag == 'Dots' then
@@ -74,7 +74,7 @@ function traverse_parlist (env, parlist)
     return true
 end
 
-local function traverse_function (env, exp)
+local function traverse_function(env, exp)
     new_function(env)
     new_scope(env)
     local status, msg = traverse_parlist(env, exp[1])
@@ -86,7 +86,7 @@ local function traverse_function (env, exp)
     return true
 end
 
-local function traverse_tablecompr (env, exp)
+local function traverse_tablecompr(env, exp)
     new_function(env)
     new_scope(env)
     local status, msg = traverse_block(env, exp[1])
@@ -96,7 +96,7 @@ local function traverse_tablecompr (env, exp)
     return true
 end
 
-local function traverse_statexpr (env, exp)
+local function traverse_statexpr(env, exp)
     new_function(env)
     new_scope(env)
     exp.tag = exp.tag:gsub('Expr$', '')
@@ -108,7 +108,7 @@ local function traverse_statexpr (env, exp)
     return true
 end
 
-local function traverse_op (env, exp)
+local function traverse_op(env, exp)
     local status, msg = traverse_exp(env, exp[2])
     if not status then return status, msg end
     if exp[3] then
@@ -118,13 +118,13 @@ local function traverse_op (env, exp)
     return true
 end
 
-local function traverse_paren (env, exp)
+local function traverse_paren(env, exp)
     local status, msg = traverse_exp(env, exp[1])
     if not status then return status, msg end
     return true
 end
 
-local function traverse_table (env, fieldlist)
+local function traverse_table(env, fieldlist)
     for k, v in ipairs(fieldlist) do
         local tag = v.tag
         if tag == 'Pair' then
@@ -140,7 +140,7 @@ local function traverse_table (env, fieldlist)
     return true
 end
 
-local function traverse_vararg (env, exp)
+local function traverse_vararg(env, exp)
     if not env['function'][env.fscope].is_vararg then
         local msg = "cannot use '...' outside a vararg function"
         return nil, syntaxerror(env.errorinfo, exp.pos, msg)
@@ -148,7 +148,7 @@ local function traverse_vararg (env, exp)
     return true
 end
 
-local function traverse_call (env, call)
+local function traverse_call(env, call)
     local status, msg = traverse_exp(env, call[1])
     if not status then return status, msg end
     for i=2, #call do
@@ -158,7 +158,7 @@ local function traverse_call (env, call)
     return true
 end
 
-local function traverse_assignment (env, stm)
+local function traverse_assignment(env, stm)
     local status, msg = traverse_varlist(env, stm[1])
     if not status then return status, msg end
     status, msg = traverse_explist(env, stm[#stm])
@@ -166,7 +166,7 @@ local function traverse_assignment (env, stm)
     return true
 end
 
-local function traverse_break (env, stm)
+local function traverse_break(env, stm)
     if not insideloop(env) then
         local msg = '<break> not inside a loop'
         return nil, syntaxerror(env.errorinfo, stm.pos, msg)
@@ -174,7 +174,7 @@ local function traverse_break (env, stm)
     return true
 end
 
-local function traverse_continue (env, stm)
+local function traverse_continue(env, stm)
     if not insideloop(env) then
         local msg = '<continue> not inside a loop'
         return nil, syntaxerror(env.errorinfo, stm.pos, msg)
@@ -182,13 +182,13 @@ local function traverse_continue (env, stm)
     return true
 end
 
-local function traverse_push (env, stm)
+local function traverse_push(env, stm)
     local status, msg = traverse_explist(env, stm)
     if not status then return status, msg end
     return true
 end
 
-local function traverse_forin (env, stm)
+local function traverse_forin(env, stm)
     begin_loop(env)
     new_scope(env)
     local status, msg = traverse_explist(env, stm[2])
@@ -200,7 +200,7 @@ local function traverse_forin (env, stm)
     return true
 end
 
-local function traverse_fornum (env, stm)
+local function traverse_fornum(env, stm)
     local status, msg
     begin_loop(env)
     new_scope(env)
@@ -222,25 +222,25 @@ local function traverse_fornum (env, stm)
     return true
 end
 
-local function traverse_goto (env, stm)
+local function traverse_goto(env, stm)
     local status, msg = set_pending_goto(env, stm)
     if not status then return status, msg end
     return true
 end
 
-local function traverse_let (env, stm)
+local function traverse_let(env, stm)
     local status, msg = traverse_explist(env, stm[2])
     if not status then return status, msg end
     return true
 end
 
-local function traverse_letrec (env, stm)
+local function traverse_letrec(env, stm)
     local status, msg = traverse_exp(env, stm[2][1])
     if not status then return status, msg end
     return true
 end
 
-local function traverse_if (env, stm)
+local function traverse_if(env, stm)
     local len = #stm
     if len % 2 == 0 then
         for i=1, len, 2 do
@@ -262,13 +262,13 @@ local function traverse_if (env, stm)
     return true
 end
 
-local function traverse_label (env, stm)
+local function traverse_label(env, stm)
     local status, msg = set_label(env, stm[1], stm.pos)
     if not status then return status, msg end
     return true
 end
 
-local function traverse_repeat (env, stm)
+local function traverse_repeat(env, stm)
     begin_loop(env)
     local status, msg = traverse_block(env, stm[1])
     if not status then return status, msg end
@@ -278,13 +278,13 @@ local function traverse_repeat (env, stm)
     return true
 end
 
-local function traverse_return (env, stm)
+local function traverse_return(env, stm)
     local status, msg = traverse_explist(env, stm)
     if not status then return status, msg end
     return true
 end
 
-local function traverse_while (env, stm)
+local function traverse_while(env, stm)
     begin_loop(env)
     local status, msg = traverse_exp(env, stm[1])
     if not status then return status, msg end
@@ -294,7 +294,7 @@ local function traverse_while (env, stm)
     return true
 end
 
-function traverse_var (env, var)
+function traverse_var(env, var)
     local tag = var.tag
     if tag == 'Id' then -- `Id{ <string> }
         return true
@@ -311,7 +311,7 @@ function traverse_var (env, var)
     end
 end
 
-function traverse_varlist (env, varlist)
+function traverse_varlist(env, varlist)
     for k, v in ipairs(varlist) do
         local status, msg = traverse_var(env, v)
         if not status then return status, msg end
@@ -319,7 +319,7 @@ function traverse_varlist (env, varlist)
     return true
 end
 
-local function traverse_methodstub (env, var)
+local function traverse_methodstub(env, var)
     local status, msg = traverse_exp(env, var[1])
     if not status then return status, msg end
     status, msg = traverse_exp(env, var[2])
@@ -327,7 +327,7 @@ local function traverse_methodstub (env, var)
     return true
 end
 
-local function traverse_safeindex (env, var)
+local function traverse_safeindex(env, var)
     local status, msg = traverse_exp(env, var[1])
     if not status then return status, msg end
     status, msg = traverse_exp(env, var[2])
@@ -335,8 +335,17 @@ local function traverse_safeindex (env, var)
     return true
 end
 
-function traverse_exp (env, exp)
+function traverse_exp(env, exp)
     local tag = exp.tag
+    local calls = {
+        Call = true,
+        SafeCall = true,
+        Broadcast = true,
+        BroadcastKV = true,
+        Filter = true,
+        FilterKV = true,
+        TableUnpack = true,
+    }
     if tag == 'Nil' or
         tag == 'Boolean' or -- `Boolean{ <boolean> }
         tag == 'Number' or -- `Number{ <number> }
@@ -353,7 +362,7 @@ function traverse_exp (env, exp)
         return traverse_op(env, exp)
     elseif tag == 'Paren' then -- `Paren{ expr }
         return traverse_paren(env, exp)
-    elseif tag == 'Call' or tag == 'SafeCall' or tag == 'Broadcast' or tag == 'BroadcastKV' or tag == 'Filter' or tag == 'FilterKV' then -- `(Safe)Call{ expr expr* }
+    elseif calls[tag] then -- `(Safe)Call{ expr expr* }
         return traverse_call(env, exp)
     elseif tag == 'Id' or -- `Id{ <string> }
         tag == 'Index' then -- `Index{ expr expr }
@@ -371,7 +380,7 @@ function traverse_exp (env, exp)
     end
 end
 
-function traverse_explist (env, explist)
+function traverse_explist(env, explist)
     for k, v in ipairs(explist) do
         local status, msg = traverse_exp(env, v)
         if not status then return status, msg end
@@ -379,7 +388,7 @@ function traverse_explist (env, explist)
     return true
 end
 
-function traverse_stm (env, stm)
+function traverse_stm(env, stm)
     local tag = stm.tag
     if tag == 'Do' then -- `Do{ stat* }
         return traverse_block(env, stm)
@@ -423,7 +432,7 @@ function traverse_stm (env, stm)
     end
 end
 
-function traverse_block (env, block)
+function traverse_block(env, block)
     local l = {}
     new_scope(env)
     for k, v in ipairs(block) do
@@ -435,7 +444,7 @@ function traverse_block (env, block)
 end
 
 
-local function traverse (ast, errorinfo)
+local function traverse(ast, errorinfo)
     assert(type(ast) == 'table')
     assert(type(errorinfo) == 'table')
     local env = { errorinfo = errorinfo, ['function'] = {} }

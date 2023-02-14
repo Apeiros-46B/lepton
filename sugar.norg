@@ -2,8 +2,8 @@
 -- (x) `value |> func_1 |> func_2`  becomes `func_2(func_1(value))`
 -- (x) `value .|> func_1 |> func_2`  becomes `func_2(func_1.(value))` (broadcast)
 -- (x) `value ..|> func_1 |> func_2`  becomes `func_2(func_1..(value))` (key+value broadcast)
--- ( ) `value -<|> func_1 |> func_2`  becomes `func_2(func_1-<(value))` (filter) [syntax needs reconsideration]
--- ( ) `value -<<|> func_1 |> func_2`  becomes `func_2(func_1-<<(value))` (key+value filter) [syntax needs reconsideration]
+-- ( ) `value ||> func_1 |> func_2`  becomes `func_2(func_1-<(value))` (filter)
+-- ( ) `value |||> func_1 |> func_2`  becomes `func_2(func_1-<<(value))` (key+value filter)
 
 - ( ) *Quick table.unpack*
 -- ( ) `t.{}` becomes `table.unpack(t)`
@@ -17,19 +17,18 @@
    %Same rules as above for methods but with some slight changes:%
 -- ( ) `<someTable:func>($, 42, $)`  becomes `(x, y) -> someTable:func(x, 42, y)`
 -- ( ) `<someTable::func>($, 42, $)` becomes `(self, x, y) -> someTable.func(self, x, 42, y)`
+   %Vararg support:%
+-- ( ) `<func>($...)` becomes `(...) -> func(...)`
 
 - ( ) *Short-circuit condition as if statement* (inspired by Shell)
 -- ( ) `condition && statement` becomes `if (condition) statement`
 -- ( ) `condition || statement` becomes `if (!condition) statement`
--- ( ) Chainable
 
 - ( ) *String interpolation*
+  %Only allowed in double-quoted strings%
 -- ( ) `"string $var"` inserts var
--- ( ) `"string ${var}"` does the same, but the curly braces can separate var name from text after and can use format placeholders
---- ( ) `"string ${var:.16f}"` to supply format placeholder (`.16f` as example)
--- ( ) `"string $(expr)"` can insert an expression
---- ( ) `"string $(expr:.16f)"` to supply format placeholder (`.16f` as example)
--- ( ) *Only allowed in double-quoted strings*
+-- ( ) `"string ${expr}"` inserts a whole expression
+--- ( ) `"string ${expr:.16f}"` to supply format placeholder (`.16f` as example)
 
 - ( ) -For loop sugars- [syntax needs reconsideration]
 -- ( ) `for (v:t)` where `t` is an identifier or table literal becomes `for _, v in pairs(t)`
